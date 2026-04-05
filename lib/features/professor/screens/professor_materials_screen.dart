@@ -37,22 +37,26 @@ class _ProfessorMaterialsScreenState extends State<ProfessorMaterialsScreen> {
           title: 'IMU-CET Navigation Basics',
           description: 'Introduction to celestial navigation for deck cadets.',
           fileUrl: 'https://example.com/nav_basics.pdf',
-          fileType: 'pdf',
+          fileType: FileType.pdf,
+          category: 'IMU-CET',
           subject: 'IMU-CET',
-          uploadedBy: prof.id,
-          uploadedByName: prof.name,
-          createdAt: DateTime.now().subtract(const Duration(days: 5)),
+          uploadedByProfessorId: prof.id,
+          uploaderName: prof.name,
+          uploadedAt: DateTime.now().subtract(const Duration(days: 5)),
+          targetCourses: ['11th Science', '12th Science'],
         ),
         StudyMaterialModel(
           id: 'mat_002',
           title: 'Maritime GK Monthly Capsule',
           description: 'Important maritime current affairs for March 2024.',
           fileUrl: 'https://example.com/gk_capsule.pdf',
-          fileType: 'pdf',
+          fileType: FileType.pdf,
+          category: 'Maritime GK',
           subject: 'Maritime GK',
-          uploadedBy: prof.id,
-          uploadedByName: prof.name,
-          createdAt: DateTime.now().subtract(const Duration(days: 2)),
+          uploadedByProfessorId: prof.id,
+          uploaderName: prof.name,
+          uploadedAt: DateTime.now().subtract(const Duration(days: 2)),
+          targetCourses: ['12th Science'],
         ),
       ];
       _isLoading = false;
@@ -96,7 +100,7 @@ class _ProfessorMaterialsScreenState extends State<ProfessorMaterialsScreen> {
             const SizedBox(height: 24),
             SizedBox(
               width: double.infinity,
-              child: NavyButton(
+              child: CustomButton(
                 label: 'Confirm Upload',
                 onPressed: () {
                   // Mock local add
@@ -106,11 +110,13 @@ class _ProfessorMaterialsScreenState extends State<ProfessorMaterialsScreen> {
                       title: 'New Uploaded Material',
                       description: 'Freshly uploaded content.',
                       fileUrl: '',
-                      fileType: 'pdf',
+                      fileType: FileType.pdf,
+                      category: prof.subjects.first,
                       subject: prof.subjects.first,
-                      uploadedBy: prof.id,
-                      uploadedByName: prof.name,
-                      createdAt: DateTime.now(),
+                      uploadedByProfessorId: prof.id,
+                      uploaderName: prof.name,
+                      uploadedAt: DateTime.now(),
+                      targetCourses: ['11th Science'],
                     ));
                   });
                   Navigator.pop(context);
@@ -127,7 +133,7 @@ class _ProfessorMaterialsScreenState extends State<ProfessorMaterialsScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: AppColors.backgroundGrey,
+      backgroundColor: AppColors.background,
       appBar: AppBar(
         title: Text('Study Materials', style: AppTextStyles.headingSmall.copyWith(color: Colors.white)),
         backgroundColor: AppColors.navyBlueBase,
@@ -147,13 +153,29 @@ class _ProfessorMaterialsScreenState extends State<ProfessorMaterialsScreen> {
                   itemCount: _materials.length,
                   itemBuilder: (context, index) {
                     final material = _materials[index];
-                      trailing: IconButton(
-                        icon: const Icon(Icons.delete_outline_rounded, color: Colors.redAccent),
-                        onPressed: () => _deleteMaterial(material.id),
+                    return Padding(
+                      padding: const EdgeInsets.only(bottom: AppSpacing.md),
+                      child: DashboardCard(
+                        title: material.title,
+                        subtitle: material.subject,
+                        leading: Icon(
+                          material.fileType == FileType.pdf ? Icons.picture_as_pdf_rounded : Icons.link_rounded,
+                          color: AppColors.navyBlueBase,
+                        ),
+                        trailing: IconButton(
+                          icon: const Icon(Icons.delete_outline_rounded, color: Colors.redAccent),
+                          onPressed: () => _deleteMaterial(material.id),
+                        ),
+                        onTap: () {
+                          // Logic to view/download material
+                        },
+                        child: Text(
+                          material.description,
+                          style: AppTextStyles.bodySmall,
+                          maxLines: 2,
+                          overflow: TextOverflow.ellipsis,
+                        ),
                       ),
-                      onTap: () {
-                        // Logic to view/download material
-                      },
                     );
                   },
                 ),

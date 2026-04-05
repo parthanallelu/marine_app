@@ -44,7 +44,7 @@ class _ProfessorProfileScreenState extends State<ProfessorProfileScreen> {
 
     if (_isLoading) {
       return const Scaffold(
-        backgroundColor: AppColors.backgroundGrey,
+        backgroundColor: AppColors.background,
         body: Center(child: CircularProgressIndicator()),
       );
     }
@@ -52,7 +52,7 @@ class _ProfessorProfileScreenState extends State<ProfessorProfileScreen> {
     final prof = authProvider.currentUser as ProfessorModel;
 
     return Scaffold(
-      backgroundColor: AppColors.backgroundGrey,
+      backgroundColor: AppColors.background,
       body: CustomScrollView(
         slivers: [
           // Profile Header
@@ -189,6 +189,7 @@ class _ProfessorProfileScreenState extends State<ProfessorProfileScreen> {
                     subtitle: batch.courseType,
                     leading: const Icon(Icons.group_rounded, color: AppColors.navyBlueBase),
                     trailing: Text('${batch.studentIds.length} Studs', style: AppTextStyles.caption),
+                    child: const SizedBox.shrink(),
                   );
                 },
                 childCount: _myBatches.length,
@@ -210,6 +211,23 @@ class _ProfessorProfileScreenState extends State<ProfessorProfileScreen> {
             ),
           ),
         ],
+      ),
+    );
+  }
+
+  Widget _buildSubjects(ProfessorModel prof) {
+    return DashboardCard(
+      title: "Teaching Subjects",
+      icon: Icons.book_rounded,
+      child: Wrap(
+        spacing: 8,
+        runSpacing: 8,
+        children: prof.subjects.map((subject) => Chip(
+          label: Text(subject, style: AppTextStyles.labelSmall),
+          backgroundColor: AppColors.navyBlueSurface,
+          side: BorderSide.none,
+          shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),
+        )).toList(),
       ),
     );
   }

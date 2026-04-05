@@ -131,7 +131,7 @@ class _AdminStudentsScreenState extends State<AdminStudentsScreen> {
           ),
           ...["All", ...AppConstants.branches].map((branch) => ListTile(
                 title: Text(branch),
-                leading: Radio.adaptive<String>(
+                leading: Radio<String>.adaptive(
                   value: branch,
                   groupValue: _selectedBranch,
                   onChanged: (val) {
@@ -163,7 +163,7 @@ class _AdminStudentsScreenState extends State<AdminStudentsScreen> {
           ),
           ...["All", ...AppConstants.courseTypes].map((course) => ListTile(
                 title: Text(course),
-                leading: Radio.adaptive<String>(
+                leading: Radio<String>.adaptive(
                   value: course,
                   groupValue: _selectedCourse,
                   onChanged: (val) {
