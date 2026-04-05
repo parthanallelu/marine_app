@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:go_router/go_router.dart';
 import '../../../core/theme/app_theme.dart';
+import '../../../core/constants/app_constants.dart';
 import '../../../core/common_widgets/common_widgets.dart';
 import '../../../providers/auth_provider.dart';
 import '../../../models/app_models.dart';
@@ -15,19 +16,36 @@ class ProfessorProfileScreen extends StatefulWidget {
 }
 
 class _ProfessorProfileScreenState extends State<ProfessorProfileScreen> {
-  bool _isLoading = false;
+  bool _isLoading = true;
   late List<BatchModel> _myBatches;
 
   @override
   void initState() {
     super.initState();
-    _loadProfileData();
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      _loadProfileData();
+    });
   }
 
   void _loadProfileData() {
+    if (!mounted) return;
+    
+    final authProvider = context.read<AuthProvider>();
+    final prof = authProvider.currentUser as ProfessorModel?;
+    
+    if (prof == null) {
+      setState(() {
+        _myBatches = [];
+        _isLoading = false;
+      });
+      return;
+    }
+
     setState(() => _isLoading = true);
-    final prof = context.read<AuthProvider>().currentUser as ProfessorModel;
+    
+    // Simulate slight delay for future-readiness
     _myBatches = DummyData.batches.where((b) => b.professorId == prof.id).toList();
+    
     setState(() => _isLoading = false);
   }
 
@@ -35,9 +53,10 @@ class _ProfessorProfileScreenState extends State<ProfessorProfileScreen> {
   Widget build(BuildContext context) {
     final authProvider = context.watch<AuthProvider>();
 
+    // Role security check
     if (!authProvider.isProfessor) {
       WidgetsBinding.instance.addPostFrameCallback((_) {
-        context.goNamed('role_selection');
+        context.go(AppRoutes.roleSelection);
       });
       return const Scaffold(body: Center(child: CircularProgressIndicator()));
     }
@@ -49,7 +68,13 @@ class _ProfessorProfileScreenState extends State<ProfessorProfileScreen> {
       );
     }
 
-    final prof = authProvider.currentUser as ProfessorModel;
+    final prof = authProvider.currentUser as ProfessorModel?;
+    if (prof == null) {
+       return const Scaffold(
+        backgroundColor: AppColors.background,
+        body: Center(child: Text("Error loading profile. Please login again.")),
+      );
+    }
 
     return Scaffold(
       backgroundColor: AppColors.background,
@@ -76,7 +101,7 @@ class _ProfessorProfileScreenState extends State<ProfessorProfileScreen> {
                         radius: 45,
                         backgroundColor: AppColors.gold.withAlpha((0.2 * 255).round()),
                         child: Text(
-                          prof.name[0],
+                          prof.name.isNotEmpty ? prof.name[0] : '?',
                           style: AppTextStyles.headingLarge.copyWith(color: AppColors.gold, fontSize: 36),
                         ),
                       ),
@@ -178,24 +203,38 @@ class _ProfessorProfileScreenState extends State<ProfessorProfileScreen> {
             ),
           ),
           const SizedBox(height: 12).toSliver,
-          SliverPadding(
-            padding: const EdgeInsets.symmetric(horizontal: 20),
-            sliver: SliverList(
-              delegate: SliverChildBuilderDelegate(
-                (context, index) {
-                  final batch = _myBatches[index];
-                  return DashboardCard(
-                    title: batch.name,
-                    subtitle: batch.courseType,
-                    leading: const Icon(Icons.group_rounded, color: AppColors.navyBlueBase),
-                    trailing: Text('${batch.studentIds.length} Studs', style: AppTextStyles.caption),
-                    child: const SizedBox.shrink(),
-                  );
-                },
-                childCount: _myBatches.length,
+          
+          if (_myBatches.isEmpty)
+            const SliverToBoxAdapter(
+              child: Padding(
+                padding: EdgeInsets.all(20),
+                child: EmptyState(
+                  icon: Icons.class_outlined,
+                  title: "No Batches",
+                  subtitle: "You don't have any assigned batches.",
+                ),
+              ),
+            )
+          else
+            SliverPadding(
+              padding: const EdgeInsets.symmetric(horizontal: 20),
+              sliver: SliverList(
+                delegate: SliverChildBuilderDelegate(
+                  (context, index) {
+                    final batch = _myBatches[index];
+                    return DashboardCard(
+                      title: batch.name,
+                      subtitle: batch.courseType,
+                      leading: const Icon(Icons.group_rounded, color: AppColors.navyBlueBase),
+                      trailing: Text('${batch.studentIds.length} Studs', style: AppTextStyles.caption),
+                      child: const SizedBox.shrink(),
+                      onTap: () {},
+                    );
+                  },
+                  childCount: _myBatches.length,
+                ),
               ),
             ),
-          ),
 
           // Logout Button
           SliverToBoxAdapter(

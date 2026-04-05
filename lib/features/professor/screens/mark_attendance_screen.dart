@@ -1,11 +1,14 @@
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 import 'package:intl/intl.dart';
+import 'package:provider/provider.dart';
 import '../../../core/theme/app_theme.dart';
 import '../../../core/constants/app_constants.dart';
 import '../../../core/common_widgets/common_widgets.dart';
+import '../../../core/common_widgets/student_tile.dart';
 import '../../../models/app_models.dart';
 import '../../../models/dummy_data.dart';
+import '../../../providers/auth_provider.dart';
 
 class MarkAttendanceScreen extends StatefulWidget {
   const MarkAttendanceScreen({super.key});
@@ -22,14 +25,17 @@ class _MarkAttendanceScreenState extends State<MarkAttendanceScreen> {
   bool _isLoading = false;
 
   void _onBatchChanged(String? batchId) {
-    if (batchId == null) return;
+    if (batchId == null || batchId == _selectedBatch) return;
+    
     setState(() {
       _selectedBatch = batchId;
       _isLoading = true;
+      _resetAttendanceMap();
     });
 
     // Mock loading students for the batch
     Future.delayed(const Duration(milliseconds: 500), () {
+      if (!mounted) return;
       final batch = DummyData.batches.firstWhere((b) => b.id == batchId);
       setState(() {
         _students = DummyData.students.where((s) => batch.studentIds.contains(s.id)).toList();
@@ -42,12 +48,18 @@ class _MarkAttendanceScreenState extends State<MarkAttendanceScreen> {
     });
   }
 
+  void _resetAttendanceMap() {
+    _attendance.clear();
+    _students = [];
+  }
+
   Future<void> _selectDate() async {
+    final now = DateTime.now();
     final picked = await showDatePicker(
       context: context,
-      initialDate: _selectedDate,
-      firstDate: DateTime.now().subtract(const Duration(days: 30)),
-      lastDate: DateTime.now(),
+      initialDate: _selectedDate.isAfter(now) ? now : _selectedDate,
+      firstDate: now.subtract(const Duration(days: 30)),
+      lastDate: now,
     );
     if (picked != null) {
       setState(() => _selectedDate = picked);
@@ -56,6 +68,16 @@ class _MarkAttendanceScreenState extends State<MarkAttendanceScreen> {
 
   @override
   Widget build(BuildContext context) {
+    final authProvider = context.watch<AuthProvider>();
+    
+    // Role security check
+    if (!authProvider.isProfessor) {
+      WidgetsBinding.instance.addPostFrameCallback((_) {
+        context.go(AppRoutes.roleSelection);
+      });
+      return const Scaffold(body: Center(child: CircularProgressIndicator()));
+    }
+
     return Scaffold(
       backgroundColor: AppColors.navyBlueBase,
       appBar: AppBar(
@@ -86,7 +108,7 @@ class _MarkAttendanceScreenState extends State<MarkAttendanceScreen> {
                       icon: const Icon(Icons.keyboard_arrow_down_rounded, color: Colors.white),
                       isExpanded: true,
                       style: const TextStyle(color: Colors.white, fontSize: 16),
-                      items: DummyData.batches.map((batch) {
+                      items: DummyData.batches.where((b) => b.professorId == (authProvider.currentUser?.id ?? '')).map((batch) {
                         return DropdownMenuItem(
                           value: batch.id,
                           child: Text(batch.name),
@@ -189,29 +211,16 @@ class _MarkAttendanceScreenState extends State<MarkAttendanceScreen> {
               final student = _students[index];
               final status = _attendance[student.id] ?? AttendanceStatus.present;
 
-              return Container(
-                margin: const EdgeInsets.only(bottom: AppSpacing.md),
-                decoration: BoxDecoration(
-                  color: Colors.white,
-                  borderRadius: AppRadius.cardRadius,
-                  boxShadow: AppShadows.subtle,
-                ),
-                child: ListTile(
-                  contentPadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 4),
-                  leading: CircleAvatar(
-                    backgroundColor: AppColors.navyBlueSurface,
-                    child: Text(student.name[0], style: const TextStyle(color: AppColors.navyBlueBase, fontWeight: FontWeight.bold)),
-                  ),
-                  title: Text(student.name, style: AppTextStyles.labelLarge),
-                  subtitle: Text('Roll: ${student.rollNumber}', style: AppTextStyles.bodySmall),
-                  trailing: Row(
-                    mainAxisSize: MainAxisSize.min,
-                    children: [
-                      _statusToggle(student.id, AttendanceStatus.present, Icons.check_circle_rounded, AppColors.success, status == AttendanceStatus.present),
-                      const SizedBox(width: 12),
-                      _statusToggle(student.id, AttendanceStatus.absent, Icons.cancel_rounded, AppColors.absent, status == AttendanceStatus.absent),
-                    ],
-                  ),
+              return StudentTile(
+                name: student.name,
+                rollNumber: student.rollNumber,
+                trailing: Row(
+                  mainAxisSize: MainAxisSize.min,
+                  children: [
+                    _statusToggle(student.id, AttendanceStatus.present, Icons.check_circle_rounded, AppColors.success, status == AttendanceStatus.present),
+                    const SizedBox(width: 12),
+                    _statusToggle(student.id, AttendanceStatus.absent, Icons.cancel_rounded, AppColors.absent, status == AttendanceStatus.absent),
+                  ],
                 ),
               );
             },
@@ -230,7 +239,6 @@ class _MarkAttendanceScreenState extends State<MarkAttendanceScreen> {
             ],
           ),
           child: SafeArea(
-            top: false,
             child: CustomButton(
               label: 'Submit Attendance',
               onPressed: _saveAttendance,
@@ -277,8 +285,22 @@ class _MarkAttendanceScreenState extends State<MarkAttendanceScreen> {
   }
 
   void _saveAttendance() {
+    // Final date validation check
+    if (_selectedDate.isAfter(DateTime.now())) {
+       ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(
+          content: Text('Cannot mark attendance for future dates.'),
+          backgroundColor: AppColors.error,
+        ),
+      );
+      return;
+    }
+
     ScaffoldMessenger.of(context).showSnackBar(
-      const SnackBar(content: Text('Attendance submitted successfully!')),
+      const SnackBar(
+        content: Text('Attendance submitted successfully!'),
+        backgroundColor: AppColors.success,
+      ),
     );
     context.pop();
   }

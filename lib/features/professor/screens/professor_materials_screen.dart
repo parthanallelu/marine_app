@@ -1,7 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:intl/intl.dart';
+import 'package:go_router/go_router.dart';
 import '../../../core/theme/app_theme.dart';
+import '../../../core/constants/app_constants.dart';
 import '../../../core/common_widgets/common_widgets.dart';
 import '../../../models/app_models.dart';
 import '../../../models/dummy_data.dart';
@@ -17,6 +19,11 @@ class ProfessorMaterialsScreen extends StatefulWidget {
 class _ProfessorMaterialsScreenState extends State<ProfessorMaterialsScreen> {
   List<StudyMaterialModel> _materials = [];
   bool _isLoading = true;
+  
+  // Controllers for upload form
+  final _titleController = TextEditingController();
+  final _descriptionController = TextEditingController();
+  String? _selectedSubject;
 
   @override
   void initState() {
@@ -24,12 +31,21 @@ class _ProfessorMaterialsScreenState extends State<ProfessorMaterialsScreen> {
     _loadMaterials();
   }
 
+  @override
+  void dispose() {
+    _titleController.dispose();
+    _descriptionController.dispose();
+    super.dispose();
+  }
+
   void _loadMaterials() {
+    // TODO: Replace with Firestore query in next phase:
+    // materialRepository.getProfessorMaterials(professorId);
+    
     final prof = Provider.of<AuthProvider>(context, listen: false).currentUser as ProfessorModel?;
     if (prof == null) return;
 
     // Simulate fetching materials uploaded by this professor
-    // Since DummyData doesn't have a static list, we mock it here
     setState(() {
       _materials = [
         StudyMaterialModel(
@@ -76,62 +92,119 @@ class _ProfessorMaterialsScreenState extends State<ProfessorMaterialsScreen> {
     final prof = Provider.of<AuthProvider>(context, listen: false).currentUser as ProfessorModel?;
     if (prof == null) return;
 
+    // Reset controllers
+    _titleController.clear();
+    _descriptionController.clear();
+    _selectedSubject = prof.subjects.isNotEmpty ? prof.subjects.first : null;
+
     showModalBottomSheet(
       context: context,
       isScrollControlled: true,
       shape: const RoundedRectangleBorder(borderRadius: BorderRadius.vertical(top: Radius.circular(24))),
-      builder: (context) => Padding(
-        padding: EdgeInsets.only(bottom: MediaQuery.of(context).viewInsets.bottom, left: 20, right: 20, top: 20),
-        child: Column(
-          mainAxisSize: MainAxisSize.min,
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            Text('Upload Study Material', style: AppTextStyles.headingSmall),
-            const SizedBox(height: 20),
-            TextField(decoration: InputDecoration(labelText: 'Title', border: OutlineInputBorder(borderRadius: BorderRadius.circular(12)))),
-            const SizedBox(height: 12),
-            TextField(decoration: InputDecoration(labelText: 'Description', border: OutlineInputBorder(borderRadius: BorderRadius.circular(12)))),
-            const SizedBox(height: 12),
-            DropdownButtonFormField<String>(
-              decoration: InputDecoration(labelText: 'Subject', border: OutlineInputBorder(borderRadius: BorderRadius.circular(12))),
-              items: prof.subjects.map((s) => DropdownMenuItem(value: s, child: Text(s))).toList(),
-              onChanged: (v) {},
-            ),
-            const SizedBox(height: 24),
-            SizedBox(
-              width: double.infinity,
-              child: CustomButton(
-                label: 'Confirm Upload',
-                onPressed: () {
-                  // Mock local add
-                  setState(() {
-                    _materials.insert(0, StudyMaterialModel(
-                      id: 'mat_${DateTime.now().millisecondsSinceEpoch}',
-                      title: 'New Uploaded Material',
-                      description: 'Freshly uploaded content.',
-                      fileUrl: '',
-                      fileType: FileType.pdf,
-                      category: prof.subjects.first,
-                      subject: prof.subjects.first,
-                      uploadedByProfessorId: prof.id,
-                      uploaderName: prof.name,
-                      uploadedAt: DateTime.now(),
-                      targetCourses: ['11th Science'],
-                    ));
-                  });
-                  Navigator.pop(context);
-                },
+      builder: (context) => StatefulBuilder(
+        builder: (context, setModalState) => Padding(
+          padding: EdgeInsets.only(bottom: MediaQuery.of(context).viewInsets.bottom, left: 20, right: 20, top: 20),
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Text('Upload Study Material', style: AppTextStyles.headingSmall),
+              const SizedBox(height: 20),
+              CustomTextField(
+                label: 'Title',
+                hintText: 'e.g. Navigation Lesson 1',
+                controller: _titleController,
               ),
-            ),
-            const SizedBox(height: 32),
-          ],
+              const SizedBox(height: 12),
+              CustomTextField(
+                label: 'Description',
+                hintText: 'Briefly describe the content',
+                controller: _descriptionController,
+                maxLines: 3,
+              ),
+              const SizedBox(height: 12),
+              const Text('Subject', style: AppTextStyles.labelLarge),
+              const SizedBox(height: 8),
+              DropdownButtonFormField<String>(
+                value: _selectedSubject,
+                decoration: InputDecoration(
+                  border: OutlineInputBorder(borderRadius: BorderRadius.circular(12)),
+                  contentPadding: const EdgeInsets.symmetric(horizontal: 16),
+                ),
+                items: prof.subjects.map((s) => DropdownMenuItem(value: s, child: Text(s))).toList(),
+                onChanged: (v) => setModalState(() => _selectedSubject = v),
+              ),
+              const SizedBox(height: 24),
+              SizedBox(
+                width: double.infinity,
+                child: CustomButton(
+                  label: 'Confirm Upload',
+                  onPressed: () => _handleUpload(prof),
+                ),
+              ),
+              const SizedBox(height: 32),
+            ],
+          ),
         ),
       ),
     );
   }
 
+  void _handleUpload(ProfessorModel prof) {
+    // Validation rules
+    if (_titleController.text.trim().isEmpty) {
+      _showError('Title is required');
+      return;
+    }
+    if (_selectedSubject == null) {
+      _showError('Subject is required');
+      return;
+    }
+
+    // Mock local add
+    setState(() {
+      _materials.insert(0, StudyMaterialModel(
+        id: 'mat_${DateTime.now().millisecondsSinceEpoch}',
+        title: _titleController.text.trim(),
+        description: _descriptionController.text.trim(),
+        fileUrl: 'mock_url',
+        fileType: FileType.pdf,
+        category: _selectedSubject!,
+        subject: _selectedSubject!,
+        uploadedByProfessorId: prof.id,
+        uploaderName: prof.name,
+        uploadedAt: DateTime.now(),
+        targetCourses: ['11th Science'],
+      ));
+    });
+    
+    Navigator.pop(context);
+    ScaffoldMessenger.of(context).showSnackBar(
+      const SnackBar(
+        content: Text('Material uploaded successfully!'),
+        backgroundColor: AppColors.success,
+      ),
+    );
+  }
+
+  void _showError(String message) {
+    ScaffoldMessenger.of(context).showSnackBar(
+      SnackBar(content: Text(message), backgroundColor: AppColors.error),
+    );
+  }
+
   @override
   Widget build(BuildContext context) {
+    final authProvider = context.watch<AuthProvider>();
+    
+    // Role security check
+    if (!authProvider.isProfessor) {
+      WidgetsBinding.instance.addPostFrameCallback((_) {
+        context.go(AppRoutes.roleSelection);
+      });
+      return const Scaffold(body: Center(child: CircularProgressIndicator()));
+    }
+
     return Scaffold(
       backgroundColor: AppColors.background,
       appBar: AppBar(

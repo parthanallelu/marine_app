@@ -5,6 +5,7 @@ import 'package:intl/intl.dart';
 import '../../../core/theme/app_theme.dart';
 import '../../../core/constants/app_constants.dart';
 import '../../../core/common_widgets/common_widgets.dart';
+import '../../../core/common_widgets/batch_card.dart';
 import '../../../models/app_models.dart';
 import '../../../models/dummy_data.dart';
 import '../../../providers/auth_provider.dart';
@@ -20,22 +21,35 @@ class _ProfessorHomeScreenState extends State<ProfessorHomeScreen> {
   late List<BatchModel> _assignedBatches;
   late List<BatchModel> _todaysClasses;
   late int _totalStudents;
-  bool _isLoading = false;
+  bool _isLoading = true;
 
   @override
   void initState() {
     super.initState();
-    _computeDashboardData();
+    // Use post-frame callback to ensure context is available for Provider
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      _loadDashboardData();
+    });
   }
 
-  void _computeDashboardData() {
+  Future<void> _loadDashboardData() async {
+    setState(() => _isLoading = true);
+    
+    // Simulate async network delay for future-readiness
+    await Future.delayed(const Duration(milliseconds: 600));
+
+    if (!mounted) return;
+
     final authProvider = Provider.of<AuthProvider>(context, listen: false);
     final professor = authProvider.currentUser as ProfessorModel?;
 
     if (professor == null) {
-      _assignedBatches = [];
-      _todaysClasses = [];
-      _totalStudents = 0;
+      setState(() {
+        _assignedBatches = [];
+        _todaysClasses = [];
+        _totalStudents = 0;
+        _isLoading = false;
+      });
       return;
     }
 
@@ -52,13 +66,29 @@ class _ProfessorHomeScreenState extends State<ProfessorHomeScreen> {
     _todaysClasses = _assignedBatches
         .where((b) => b.days.contains(today))
         .toList();
+
+    setState(() => _isLoading = false);
   }
 
   @override
   Widget build(BuildContext context) {
-    final professor = context.watch<AuthProvider>().currentUser as ProfessorModel?;
+    final authProvider = context.watch<AuthProvider>();
+    final professor = authProvider.currentUser as ProfessorModel?;
 
-    if (professor == null) return const Scaffold(body: Center(child: CircularProgressIndicator()));
+    // Role security check
+    if (!authProvider.isProfessor) {
+      WidgetsBinding.instance.addPostFrameCallback((_) {
+        context.go(AppRoutes.roleSelection);
+      });
+      return const Scaffold(body: Center(child: CircularProgressIndicator()));
+    }
+
+    if (professor == null || _isLoading) {
+      return const Scaffold(
+        backgroundColor: AppColors.background,
+        body: Center(child: CircularProgressIndicator()),
+      );
+    }
 
     return Scaffold(
       backgroundColor: AppColors.background,
@@ -78,9 +108,9 @@ class _ProfessorHomeScreenState extends State<ProfessorHomeScreen> {
                   const SizedBox(height: AppSpacing.xxl),
                   _buildQuickActions(context),
                   const SizedBox(height: AppSpacing.xxl),
-                  _buildTodaySchedule(context, professor),
+                  _buildTodaySchedule(context),
                   const SizedBox(height: AppSpacing.xxl),
-                  _buildMyBatches(professor),
+                  _buildMyBatches(),
                   const SizedBox(height: AppSpacing.xxxl),
                 ],
               ),
@@ -144,7 +174,7 @@ class _ProfessorHomeScreenState extends State<ProfessorHomeScreen> {
               label: 'Upload',
               icon: Icons.upload_file_rounded,
               color: AppColors.oceanBlue,
-              onTap: () => context.goNamed(AppRoutes.professorMaterials),
+              onTap: () => context.push(AppRoutes.professorMaterials),
             ),
             QuickActionTile(
               label: 'Students',
@@ -158,7 +188,7 @@ class _ProfessorHomeScreenState extends State<ProfessorHomeScreen> {
     );
   }
 
-  Widget _buildTodaySchedule(BuildContext context, ProfessorModel professor) {
+  Widget _buildTodaySchedule(BuildContext context) {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
@@ -182,36 +212,21 @@ class _ProfessorHomeScreenState extends State<ProfessorHomeScreen> {
         else
           ..._todaysClasses.map((batch) => Padding(
                 padding: const EdgeInsets.only(bottom: AppSpacing.md),
-                child: DashboardCard(
-                  title: batch.name,
-                  subtitle: batch.timing,
-                  leading: Container(
-                    padding: const EdgeInsets.all(10),
-                    decoration: BoxDecoration(
-                      color: AppColors.navyBlueSurface,
-                      borderRadius: BorderRadius.circular(12),
-                    ),
-                    child: const Icon(Icons.class_rounded, color: AppColors.navyBlueBase),
-                  ),
-                  child: Row(
-                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                    children: [
-                      CourseBadge(courseType: batch.courseType),
-                      Text(
-                        '${batch.studentIds.length} Students',
-                        style: AppTextStyles.bodySmall.copyWith(color: AppColors.textSecondary),
-                      ),
-                    ],
-                  ),
-                  onAction: () => context.push(AppRoutes.markAttendance),
+                child: BatchCard(
+                  name: batch.name,
+                  courseType: batch.courseType,
+                  timing: batch.timing,
+                  branch: batch.branch,
+                  studentCount: batch.studentIds.length,
                   actionLabel: 'Mark Attendance',
+                  onAction: () => context.push(AppRoutes.markAttendance),
                 ),
               )),
       ],
     );
   }
 
-  Widget _buildMyBatches(ProfessorModel professor) {
+  Widget _buildMyBatches() {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
@@ -219,9 +234,9 @@ class _ProfessorHomeScreenState extends State<ProfessorHomeScreen> {
         const SizedBox(height: AppSpacing.md),
         if (_assignedBatches.isEmpty)
           const EmptyState(
-            icon: Icons.group_off_outlined,
-            title: 'No Batches',
-            subtitle: 'You are not assigned to any batches yet.',
+            icon: Icons.class_outlined,
+            title: 'No Batches Assigned',
+            subtitle: 'Contact admin if you believe this is an error.',
           )
         else
           ListView.builder(
@@ -230,32 +245,16 @@ class _ProfessorHomeScreenState extends State<ProfessorHomeScreen> {
             itemCount: _assignedBatches.length,
             itemBuilder: (context, index) {
               final batch = _assignedBatches[index];
-              return Container(
-                margin: const EdgeInsets.only(bottom: AppSpacing.md),
-                decoration: BoxDecoration(
-                  color: Colors.white,
-                  borderRadius: AppRadius.cardRadius,
-                  boxShadow: AppShadows.subtle,
-                ),
-                child: ListTile(
-                  contentPadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
-                  leading: Container(
-                    width: 48,
-                    height: 48,
-                    decoration: BoxDecoration(
-                      color: AppColors.navyBlueSurface,
-                      borderRadius: BorderRadius.circular(12),
-                    ),
-                    child: const Icon(Icons.school_rounded, color: AppColors.navyBlueBase),
-                  ),
-                  title: Text(batch.name, style: AppTextStyles.labelLarge),
-                  subtitle: Text(
-                    '${batch.courseType} • ${batch.branch}',
-                    style: AppTextStyles.bodySmall.copyWith(color: AppColors.textSecondary),
-                  ),
-                  trailing: const Icon(Icons.chevron_right_rounded, size: 20),
+              return Padding(
+                padding: const EdgeInsets.only(bottom: AppSpacing.md),
+                child: BatchCard(
+                  name: batch.name,
+                  courseType: batch.courseType,
+                  timing: batch.timing,
+                  branch: batch.branch,
+                  studentCount: batch.studentIds.length,
                   onTap: () {
-                    // Future: Batch details
+                    // Future: Batch details screen
                   },
                 ),
               );
@@ -287,26 +286,33 @@ class _ProfessorHomeScreenState extends State<ProfessorHomeScreen> {
               padding: const EdgeInsets.symmetric(horizontal: 20),
               child: Text('Assigned Students', style: AppTextStyles.headingSmall),
             ),
-            const SizedBox(height: 16),
-            Expanded(
-              child: ListView.builder(
-                controller: scrollController,
-                itemCount: students.length,
-                itemBuilder: (context, index) {
-                  final student = students[index];
-                  return ListTile(
-                    leading: CircleAvatar(
-                      backgroundColor: AppColors.navyBlueSurface,
-                      child: Text(student.name[0], style: const TextStyle(color: AppColors.navyBlueBase)),
-                    ),
-                    title: Text(student.name, style: AppTextStyles.bodyLarge),
-                    subtitle: Text('${student.batchName} | ${student.rollNumber}', style: AppTextStyles.bodySmall),
-                    trailing: const Icon(Icons.phone_outlined, size: 20, color: AppColors.oceanBlue),
-                    onTap: () {},
-                  );
-                },
+            const SizedBox(height: 20),
+            if (students.isEmpty)
+              const Expanded(
+                child: EmptyState(
+                  icon: Icons.person_off_rounded,
+                  title: 'No Students Found',
+                  subtitle: 'You are not connected to any students yet.',
+                ),
+              )
+            else
+              Expanded(
+                child: ListView.builder(
+                  controller: scrollController,
+                  padding: const EdgeInsets.symmetric(horizontal: 20),
+                  itemCount: students.length,
+                  itemBuilder: (context, index) {
+                    final student = students[index];
+                    return StudentTile(
+                      name: student.name,
+                      rollNumber: student.rollNumber,
+                      batchName: student.batchName,
+                      trailing: const Icon(Icons.phone_outlined, size: 20, color: AppColors.oceanBlue),
+                      onTap: () {},
+                    );
+                  },
+                ),
               ),
-            ),
           ],
         ),
       ),
