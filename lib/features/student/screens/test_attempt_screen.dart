@@ -3,7 +3,6 @@ import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 import 'package:provider/provider.dart';
 import '../../../core/theme/app_theme.dart';
-import '../../../core/constants/app_constants.dart';
 import '../../../core/common_widgets/common_widgets.dart';
 import '../../../providers/auth_provider.dart';
 import '../../../models/app_models.dart';
@@ -30,6 +29,8 @@ class _TestAttemptScreenState extends State<TestAttemptScreen> {
   @override
   void initState() {
     super.initState();
+    // TODO: Replace DummyData with Firestore query:
+    // _test = await testRepository.getTestById(widget.testId);
     _test = DummyData.tests.firstWhere((t) => t.id == widget.testId);
     _secondsLeft = _test.durationMinutes * 60;
     _startTimer();
@@ -37,11 +38,16 @@ class _TestAttemptScreenState extends State<TestAttemptScreen> {
 
   void _startTimer() {
     _timer = Timer.periodic(const Duration(seconds: 1), (timer) {
+      if (!mounted) {
+        timer.cancel();
+        return;
+      }
+      
       if (_secondsLeft <= 0) {
         timer.cancel();
         _submitTest();
       } else {
-        if (mounted) setState(() => _secondsLeft--);
+        setState(() => _secondsLeft--);
       }
     });
   }
@@ -68,7 +74,7 @@ class _TestAttemptScreenState extends State<TestAttemptScreen> {
   void _submitTest() {
     _timer?.cancel();
     
-    // Calculate score
+    // TODO: Replace with backend calculation for anti-cheat
     int correctCount = 0;
     for (var q in _test.questions) {
       if (_answers[q.id] == q.correctOptionIndex) {
@@ -89,11 +95,16 @@ class _TestAttemptScreenState extends State<TestAttemptScreen> {
       score: totalScore,
       totalMarks: _test.totalMarks.toDouble(),
       timeTakenSeconds: (_test.durationMinutes * 60 - _secondsLeft),
-      submittedAt: DateTime.now(),
+      submittedAt: DateTime.now().toUtc(),
       isPassed: (totalScore >= _test.passingMarks),
     );
 
-    context.pushReplacement('${AppRoutes.studentTests}/result/${result.id}', extra: result);
+    // TODO: Save result to Firestore:
+    // await studentRepository.saveTestResult(result);
+
+    if (mounted) {
+      context.pushReplacementNamed('test_result', pathParameters: {'resultId': result.id}, extra: result);
+    }
   }
 
   Future<void> _showSubmitDialog() async {
@@ -170,7 +181,7 @@ class _TestAttemptScreenState extends State<TestAttemptScreen> {
                   return GestureDetector(
                     onTap: () {
                       _pageController.animateToPage(index, duration: const Duration(milliseconds: 300), curve: Curves.easeInOut);
-                      Navigator.pop(context);
+                      if (mounted) Navigator.pop(context);
                     },
                     child: Container(
                       decoration: BoxDecoration(
@@ -212,6 +223,15 @@ class _TestAttemptScreenState extends State<TestAttemptScreen> {
 
   @override
   Widget build(BuildContext context) {
+    // Access Control Safety
+    final auth = context.watch<AuthProvider>();
+    if (!auth.isStudent) {
+      WidgetsBinding.instance.addPostFrameCallback((_) {
+        context.goNamed('role_selection');
+      });
+      return const Scaffold(body: Center(child: CircularProgressIndicator()));
+    }
+
     final timerColor = _getTimerColor();
     final answeredCount = _answers.length;
     final totalCount = _test.questions.length;
@@ -296,7 +316,9 @@ class _TestAttemptScreenState extends State<TestAttemptScreen> {
                 ? PageView.builder(
                     controller: _pageController,
                     physics: const NeverScrollableScrollPhysics(),
-                    onPageChanged: (idx) => setState(() => _currentIndex = idx),
+                    onPageChanged: (idx) {
+                      if (mounted) setState(() => _currentIndex = idx);
+                    },
                     itemCount: totalCount,
                     itemBuilder: (context, index) {
                       final question = _test.questions[index];
@@ -304,7 +326,7 @@ class _TestAttemptScreenState extends State<TestAttemptScreen> {
                         question: question,
                         selectedOption: _answers[question.id],
                         onOptionSelected: (optIdx) {
-                          setState(() => _answers[question.id] = optIdx);
+                          if (mounted) setState(() => _answers[question.id] = optIdx);
                         },
                       );
                     },
@@ -413,7 +435,7 @@ class _QuestionPage extends StatelessWidget {
             final optionLabel = String.fromCharCode(65 + index); // A, B, C, D
 
             return GestureDetector(
-              onTap: () => onOptionSelected(index),
+                onTap: () => onOptionSelected(index),
               child: AnimatedContainer(
                 duration: const Duration(milliseconds: 180),
                 margin: const EdgeInsets.only(bottom: 12),

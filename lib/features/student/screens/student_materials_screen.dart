@@ -1,7 +1,10 @@
 import 'package:flutter/material.dart';
+import 'package:provider/provider.dart';
+import 'package:go_router/go_router.dart';
 import '../../../core/theme/app_theme.dart';
 import '../../../core/constants/app_constants.dart';
 import '../../../core/common_widgets/common_widgets.dart';
+import '../../../providers/auth_provider.dart';
 import '../../../models/app_models.dart';
 import '../../../models/dummy_data.dart';
 
@@ -13,35 +16,36 @@ class StudentMaterialsScreen extends StatefulWidget {
 }
 
 class _StudentMaterialsScreenState extends State<StudentMaterialsScreen> {
+  bool _isLoading = false;
   String _selectedCategory = 'All';
   String _searchQuery = '';
   final TextEditingController _searchController = TextEditingController();
+  late List<StudyMaterialModel> _allMaterials;
+
+  @override
+  void initState() {
+    super.initState();
+    _loadMaterials();
+  }
+
+  void _loadMaterials() {
+    setState(() => _isLoading = true);
+    
+    // TODO: Replace DummyData with Firestore query:
+    // _allMaterials = await materialRepository.getAllMaterials();
+    _allMaterials = DummyData.materials;
+
+    setState(() => _isLoading = false);
+  }
 
   List<StudyMaterialModel> _getFilteredMaterials() {
-    return DummyData.materials.where((m) {
+    return _allMaterials.where((m) {
       final categoryMatch = _selectedCategory == 'All' || m.category == _selectedCategory;
       final queryMatch = _searchQuery.isEmpty || 
           m.title.toLowerCase().contains(_searchQuery.toLowerCase()) ||
           m.category.toLowerCase().contains(_searchQuery.toLowerCase());
       return categoryMatch && queryMatch;
     }).toList();
-  }
-
-  Color _getCategoryColor(String category) {
-    switch (category) {
-      case 'IMU-CET':
-        return AppColors.navyBlueBase;
-      case 'Psychometric':
-        return AppColors.course12th;
-      case 'English Communication':
-        return AppColors.oceanBlue;
-      case 'Maritime GK':
-        return AppColors.courseCrash;
-      case 'Interview Prep':
-        return AppColors.gold;
-      default:
-        return AppColors.navyBlueBase;
-    }
   }
 
   @override
@@ -52,6 +56,23 @@ class _StudentMaterialsScreenState extends State<StudentMaterialsScreen> {
 
   @override
   Widget build(BuildContext context) {
+    final authProvider = context.watch<AuthProvider>();
+    
+    // Access Control Safety
+    if (!authProvider.isStudent) {
+      WidgetsBinding.instance.addPostFrameCallback((_) {
+        context.goNamed('role_selection');
+      });
+      return const Scaffold(body: Center(child: CircularProgressIndicator()));
+    }
+
+    if (_isLoading) {
+      return const Scaffold(
+        backgroundColor: AppColors.background,
+        body: Center(child: CircularProgressIndicator()),
+      );
+    }
+
     final filteredMaterials = _getFilteredMaterials();
     final categories = ['All'] + AppConstants.materialCategories;
 
@@ -61,7 +82,7 @@ class _StudentMaterialsScreenState extends State<StudentMaterialsScreen> {
         children: [
           NavyHeader(
             title: "Study Materials",
-            subtitle: "${DummyData.materials.length} resources available",
+            subtitle: "${_allMaterials.length} resources available",
           ),
           
           // Search Field
@@ -129,7 +150,7 @@ class _StudentMaterialsScreenState extends State<StudentMaterialsScreen> {
 
           const SizedBox(height: 12),
 
-          // List
+          // LIST PERFORMANCE: Using ListView.builder for dynamic lists
           Expanded(
             child: filteredMaterials.isEmpty
                 ? const EmptyState(
@@ -142,86 +163,14 @@ class _StudentMaterialsScreenState extends State<StudentMaterialsScreen> {
                     itemCount: filteredMaterials.length,
                     itemBuilder: (context, index) {
                       final material = filteredMaterials[index];
-                      final categoryColor = _getCategoryColor(material.category);
-                      
-                      return Container(
-                        margin: const EdgeInsets.only(bottom: 12),
-                        padding: const EdgeInsets.all(12),
-                        decoration: BoxDecoration(
-                          color: Colors.white,
-                          borderRadius: BorderRadius.circular(16),
-                          boxShadow: AppShadows.subtle,
-                        ),
-                        child: Row(
-                          children: [
-                            Container(
-                              width: 52,
-                              height: 52,
-                              decoration: BoxDecoration(
-                                color: categoryColor.withAlpha((0.1 * 255).round()),
-                                borderRadius: BorderRadius.circular(12),
-                              ),
-                              alignment: Alignment.center,
-                              child: Icon(
-                                material.fileType == FileType.pdf ? Icons.description_rounded : Icons.play_circle_rounded,
-                                color: categoryColor,
-                                size: 28,
-                              ),
-                            ),
-                            const SizedBox(width: 16),
-                            Expanded(
-                              child: Column(
-                                crossAxisAlignment: CrossAxisAlignment.start,
-                                children: [
-                                  Text(
-                                    material.title,
-                                    style: AppTextStyles.labelLarge,
-                                    maxLines: 2,
-                                    overflow: TextOverflow.ellipsis,
-                                  ),
-                                  const SizedBox(height: 4),
-                                  Row(
-                                    children: [
-                                      Container(
-                                        padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 2),
-                                        decoration: BoxDecoration(
-                                          color: AppColors.background,
-                                          borderRadius: BorderRadius.circular(4),
-                                        ),
-                                        child: Text(
-                                          material.category,
-                                          style: AppTextStyles.caption.copyWith(color: AppColors.textSecondary),
-                                        ),
-                                      ),
-                                      if (material.companyTarget != null) ...[
-                                        const SizedBox(width: 6),
-                                        Text("•", style: AppTextStyles.caption),
-                                        const SizedBox(width: 6),
-                                        Text(
-                                          material.companyTarget!,
-                                          style: AppTextStyles.caption.copyWith(color: AppColors.gold, fontWeight: FontWeight.bold),
-                                        ),
-                                      ],
-                                    ],
-                                  ),
-                                  const SizedBox(height: 2),
-                                  Text(
-                                    "${material.uploaderName} • ${material.fileSizeLabel}",
-                                    style: AppTextStyles.caption.copyWith(color: AppColors.textHint),
-                                  ),
-                                ],
-                              ),
-                            ),
-                            IconButton(
-                              onPressed: () {
-                                ScaffoldMessenger.of(context).showSnackBar(
-                                  SnackBar(content: Text("Downloading: ${material.title}")),
-                                );
-                              },
-                              icon: const Icon(Icons.file_download_outlined, color: AppColors.navyBlueBase),
-                            ),
-                          ],
-                        ),
+                      // REUSABLE COMPONENT: Using MaterialCard
+                      return MaterialCard(
+                        material: material,
+                        onDownload: () {
+                          ScaffoldMessenger.of(context).showSnackBar(
+                            SnackBar(content: Text("Downloading: ${material.title}")),
+                          );
+                        },
                       );
                     },
                   ),

@@ -535,6 +535,10 @@ class NavyHeader extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final Widget? leadingWidget = leading;
+    final List<Widget>? actionsList = actions;
+    final String? subtitleText = subtitle;
+
     return Container(
       width: double.infinity,
       constraints: BoxConstraints(minHeight: minHeight),
@@ -555,17 +559,17 @@ class NavyHeader extends StatelessWidget {
             children: [
               Row(
                 children: [
-                  if (leading != null) leading!,
+                  if (leadingWidget != null) leadingWidget,
                   const Spacer(),
-                  if (actions != null) ...actions!,
+                  ...?actionsList,
                 ],
               ),
               const SizedBox(height: 16),
               Text(title, style: AppTextStyles.headingLarge.copyWith(color: Colors.white)),
-              if (subtitle != null) ...[
+              if (subtitleText != null) ...[
                 const SizedBox(height: 4),
                 Text(
-                  subtitle!,
+                  subtitleText,
                   style: AppTextStyles.bodyMedium.copyWith(color: Colors.white.withAlpha((0.7 * 255).round())),
                 ),
               ],
@@ -667,6 +671,254 @@ class CustomTextField extends StatelessWidget {
           ),
         ),
       ],
+    );
+  }
+}
+
+// ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+// UpcomingTestTile
+// ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+class UpcomingTestTile extends StatelessWidget {
+  final dynamic test; // Using dynamic for now to support both TestModel and future types
+  final VoidCallback? onTap;
+
+  const UpcomingTestTile({super.key, required this.test, this.onTap});
+
+  @override
+  Widget build(BuildContext context) {
+    final now = DateTime.now();
+    final scheduledDate = test.scheduledDate as DateTime;
+    final difference = scheduledDate.difference(DateTime(now.year, now.month, now.day)).inDays;
+    
+    String daysLabel;
+    bool isUrgent = difference <= 2;
+    if (difference == 0) {
+      daysLabel = "Today";
+    } else if (difference == 1) {
+      daysLabel = "Tomorrow";
+    } else {
+      daysLabel = "In $difference days";
+    }
+
+    return GestureDetector(
+      onTap: onTap,
+      child: Container(
+        margin: const EdgeInsets.only(bottom: 10),
+        padding: const EdgeInsets.all(12),
+        decoration: BoxDecoration(
+          color: AppColors.oceanBlueSurface,
+          borderRadius: BorderRadius.circular(12),
+        ),
+        child: Row(
+          children: [
+            Container(
+              padding: const EdgeInsets.all(8),
+              decoration: BoxDecoration(
+                color: AppColors.oceanBlue.withAlpha((0.15 * 255).round()),
+                borderRadius: BorderRadius.circular(10),
+              ),
+              child: const Icon(Icons.quiz_rounded, color: AppColors.oceanBlue, size: 24),
+            ),
+            const SizedBox(width: 12),
+            Expanded(
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Text(test.title, style: AppTextStyles.labelLarge),
+                  Text(
+                    "${test.durationMinutes}m • ${test.questions.length} Questions",
+                    style: AppTextStyles.bodySmall.copyWith(color: AppColors.textSecondary),
+                  ),
+                ],
+              ),
+            ),
+            Container(
+              padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+              decoration: BoxDecoration(
+                color: isUrgent ? AppColors.errorSurface : AppColors.navyBlueSurface,
+                borderRadius: BorderRadius.circular(6),
+              ),
+              child: Text(
+                daysLabel,
+                style: AppTextStyles.labelSmall.copyWith(
+                  color: isUrgent ? AppColors.error : AppColors.navyBlueBase,
+                  fontWeight: FontWeight.bold,
+                ),
+              ),
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+}
+
+// ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+// AnnouncementTile
+// ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+class AnnouncementTile extends StatelessWidget {
+  final dynamic announcement;
+  final VoidCallback? onTap;
+
+  const AnnouncementTile({super.key, required this.announcement, this.onTap});
+
+  @override
+  Widget build(BuildContext context) {
+    final isHigh = announcement.priority.toLowerCase() == 'high';
+    final bgColor = isHigh ? AppColors.errorSurface : AppColors.warningSurface;
+    final color = isHigh ? AppColors.error : AppColors.warning;
+
+    return GestureDetector(
+      onTap: onTap,
+      child: Container(
+        margin: const EdgeInsets.only(bottom: 10),
+        padding: const EdgeInsets.all(12),
+        decoration: BoxDecoration(
+          color: bgColor,
+          borderRadius: BorderRadius.circular(12),
+        ),
+        child: Row(
+          children: [
+            Icon(isHigh ? Icons.push_pin_rounded : Icons.announcement_rounded, color: color, size: 20),
+            const SizedBox(width: 12),
+            Expanded(
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Text(
+                    announcement.title,
+                    style: AppTextStyles.labelLarge,
+                    maxLines: 1,
+                    overflow: TextOverflow.ellipsis,
+                  ),
+                  Text(
+                    announcement.description,
+                    style: AppTextStyles.bodySmall.copyWith(color: AppColors.textSecondary),
+                    maxLines: 1,
+                    overflow: TextOverflow.ellipsis,
+                  ),
+                ],
+              ),
+            ),
+            const SizedBox(width: 8),
+            PriorityTag(priority: announcement.priority),
+          ],
+        ),
+      ),
+    );
+  }
+}
+
+// ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+// MaterialCard
+// ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+class MaterialCard extends StatelessWidget {
+  final dynamic material;
+  final VoidCallback? onDownload;
+
+  const MaterialCard({super.key, required this.material, this.onDownload});
+
+  @override
+  Widget build(BuildContext context) {
+    // Helper to determine category color (reproduced here for common widget)
+    Color categoryColor;
+    switch (material.category) {
+      case 'IMU-CET':
+        categoryColor = AppColors.navyBlueBase;
+        break;
+      case 'Psychometric':
+        categoryColor = AppColors.course12th;
+        break;
+      case 'English Communication':
+        categoryColor = AppColors.oceanBlue;
+        break;
+      case 'Maritime GK':
+        categoryColor = AppColors.courseCrash;
+        break;
+      case 'Interview Prep':
+        categoryColor = AppColors.gold;
+        break;
+      default:
+        categoryColor = AppColors.navyBlueBase;
+    }
+
+    return Container(
+      margin: const EdgeInsets.only(bottom: 12),
+      padding: const EdgeInsets.all(12),
+      decoration: BoxDecoration(
+        color: Colors.white,
+        borderRadius: BorderRadius.circular(16),
+        boxShadow: AppShadows.subtle,
+      ),
+      child: Row(
+        children: [
+          Container(
+            width: 52,
+            height: 52,
+            decoration: BoxDecoration(
+              color: categoryColor.withAlpha((0.1 * 255).round()),
+              borderRadius: BorderRadius.circular(12),
+            ),
+            alignment: Alignment.center,
+            child: Icon(
+              material.fileType.name == 'pdf' ? Icons.description_rounded : Icons.play_circle_rounded,
+              color: categoryColor,
+              size: 28,
+            ),
+          ),
+          const SizedBox(width: 16),
+          Expanded(
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Text(
+                  material.title,
+                  style: AppTextStyles.labelLarge,
+                  maxLines: 2,
+                  overflow: TextOverflow.ellipsis,
+                ),
+                const SizedBox(height: 4),
+                Row(
+                  children: [
+                    Container(
+                      padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 2),
+                      decoration: BoxDecoration(
+                        color: AppColors.background,
+                        borderRadius: BorderRadius.circular(4),
+                      ),
+                      child: Text(
+                        material.category,
+                        style: AppTextStyles.caption.copyWith(color: AppColors.textSecondary),
+                      ),
+                    ),
+                    if (material.companyTarget != null) ...[
+                      const SizedBox(width: 6),
+                      Text("•", style: AppTextStyles.caption),
+                      const SizedBox(width: 6),
+                      Text(
+                        material.companyTarget!,
+                        style: AppTextStyles.caption.copyWith(color: AppColors.gold, fontWeight: FontWeight.bold),
+                      ),
+                    ],
+                  ],
+                ),
+                const SizedBox(height: 2),
+                Text(
+                  "${material.uploaderName} • ${material.fileSizeLabel}",
+                  style: AppTextStyles.caption.copyWith(color: AppColors.textHint),
+                ),
+              ],
+            ),
+          ),
+          IconButton(
+            onPressed: onDownload,
+            icon: const Icon(Icons.file_download_outlined, color: AppColors.navyBlueBase),
+          ),
+        ],
+      ),
     );
   }
 }

@@ -2,7 +2,6 @@ import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:go_router/go_router.dart';
 import '../../../core/theme/app_theme.dart';
-import '../../../core/constants/app_constants.dart';
 import '../../../core/common_widgets/common_widgets.dart';
 import '../../../providers/auth_provider.dart';
 import '../../../models/app_models.dart';
@@ -17,11 +16,32 @@ class StudentTestsScreen extends StatefulWidget {
 
 class _StudentTestsScreenState extends State<StudentTestsScreen> with SingleTickerProviderStateMixin {
   late TabController _tabController;
+  bool _isLoading = false;
+  late List<TestModel> _upcomingTests;
+  late List<TestModel> _pastTests;
+  late List<TestResult> _results;
 
   @override
   void initState() {
     super.initState();
     _tabController = TabController(length: 3, vsync: this);
+    _loadTestData();
+  }
+
+  void _loadTestData() {
+    setState(() => _isLoading = true);
+    
+    // TODO: Replace DummyData with Firestore query:
+    // final testData = await studentRepository.getStudentTests(studentId);
+    
+    final student = context.read<AuthProvider>().currentUser as StudentModel;
+    final now = DateTime.now().toUtc();
+
+    _upcomingTests = DummyData.tests.where((t) => t.scheduledDate.isAfter(now)).toList();
+    _pastTests = DummyData.tests.where((t) => t.scheduledDate.isBefore(now)).toList();
+    _results = DummyData.testResults.where((r) => r.studentId == student.id).toList();
+
+    setState(() => _isLoading = false);
   }
 
   @override
@@ -32,12 +52,22 @@ class _StudentTestsScreenState extends State<StudentTestsScreen> with SingleTick
 
   @override
   Widget build(BuildContext context) {
-    final student = context.watch<AuthProvider>().currentUser as StudentModel;
-    final now = DateTime.now();
+    final authProvider = context.watch<AuthProvider>();
+    
+    // Access Control Safety
+    if (!authProvider.isStudent) {
+      WidgetsBinding.instance.addPostFrameCallback((_) {
+        context.goNamed('role_selection');
+      });
+      return const Scaffold(body: Center(child: CircularProgressIndicator()));
+    }
 
-    final upcomingTests = DummyData.tests.where((t) => t.scheduledDate.isAfter(now)).toList();
-    final pastTests = DummyData.tests.where((t) => t.scheduledDate.isBefore(now)).toList();
-    final results = DummyData.testResults.where((r) => r.studentId == student.id).toList();
+    if (_isLoading) {
+      return const Scaffold(
+        backgroundColor: AppColors.background,
+        body: Center(child: CircularProgressIndicator()),
+      );
+    }
 
     return Scaffold(
       backgroundColor: AppColors.background,
@@ -57,18 +87,13 @@ class _StudentTestsScreenState extends State<StudentTestsScreen> with SingleTick
               bottom: false,
               child: Column(
                 children: [
-                  const Padding(
-                    padding: EdgeInsets.fromLTRB(20, 12, 20, 8),
+                  Padding(
+                    padding: const EdgeInsets.fromLTRB(20, 12, 20, 8),
                     child: Row(
                       children: [
                         Text(
                           "Mock Tests",
-                          style: TextStyle(
-                            fontSize: 24,
-                            fontWeight: FontWeight.bold,
-                            color: Colors.white,
-                            fontFamily: 'Poppins',
-                          ),
+                          style: AppTextStyles.headingLarge.copyWith(color: Colors.white),
                         ),
                       ],
                     ),
@@ -79,9 +104,9 @@ class _StudentTestsScreenState extends State<StudentTestsScreen> with SingleTick
                     labelColor: Colors.white,
                     unselectedLabelColor: Colors.white54,
                     tabs: [
-                      Tab(text: "Upcoming (${upcomingTests.length})"),
-                      Tab(text: "Past (${pastTests.length})"),
-                      Tab(text: "Results (${results.length})"),
+                      Tab(text: "Upcoming (${_upcomingTests.length})"),
+                      Tab(text: "Past (${_pastTests.length})"),
+                      Tab(text: "Results (${_results.length})"),
                     ],
                   ),
                 ],
@@ -94,9 +119,9 @@ class _StudentTestsScreenState extends State<StudentTestsScreen> with SingleTick
             child: TabBarView(
               controller: _tabController,
               children: [
-                _TestList(tests: upcomingTests, isUpcoming: true),
-                _TestList(tests: pastTests, isUpcoming: false),
-                _ResultList(results: results),
+                _TestList(tests: _upcomingTests, isUpcoming: true),
+                _TestList(tests: _pastTests, isUpcoming: false),
+                _ResultList(results: _results),
               ],
             ),
           ),
@@ -114,13 +139,14 @@ class _TestList extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     if (tests.isEmpty) {
-      return const EmptyState(
+      return EmptyState(
         icon: Icons.quiz_rounded,
         title: "No Tests Found",
-        subtitle: "There are no tests available at the moment.",
+        subtitle: isUpcoming ? "There are no upcoming tests scheduled." : "You have no past tests.",
       );
     }
 
+    // LIST PERFORMANCE: Using ListView.builder for dynamic lists
     return ListView.builder(
       padding: const EdgeInsets.all(20),
       itemCount: tests.length,
@@ -230,7 +256,7 @@ class _TestCard extends StatelessWidget {
                 const SizedBox(height: 16),
                 Row(
                   children: [
-                    Icon(Icons.event_note, size: 16, color: AppColors.textHint),
+                    const Icon(Icons.event_note, size: 16, color: AppColors.textHint),
                     const SizedBox(width: 4),
                     Text(
                       test.scheduledDate.toString().split(' ')[0],
@@ -242,11 +268,12 @@ class _TestCard extends StatelessWidget {
                         label: "Start Test",
                         height: 40,
                         color: typeColor,
-                        onPressed: () => context.push('${AppRoutes.studentTests}/attempt/${test.id}'),
+                        // NAVIGATION SAFETY: Using goNamed
+                        onPressed: () => context.pushNamed('test_attempt', pathParameters: {'testId': test.id}),
                       ),
                   ],
                 ),
-              ],
+               ],
             ),
           ),
         ],
@@ -314,59 +341,62 @@ class _ResultCard extends StatelessWidget {
     final color = hasPassed ? AppColors.success : AppColors.error;
     final bgColor = hasPassed ? AppColors.successSurface : AppColors.errorSurface;
 
-    return Container(
-      margin: const EdgeInsets.only(bottom: 16),
-      padding: const EdgeInsets.all(16),
-      decoration: BoxDecoration(
-        color: Colors.white,
-        borderRadius: AppRadius.cardRadius,
-        boxShadow: AppShadows.card,
-      ),
-      child: Row(
-        children: [
-          Container(
-            width: 56,
-            height: 56,
-            decoration: BoxDecoration(
-              color: bgColor,
-              borderRadius: BorderRadius.circular(14),
+    return GestureDetector(
+      onTap: () => context.pushNamed('test_result', pathParameters: {'resultId': result.id}),
+      child: Container(
+        margin: const EdgeInsets.only(bottom: 16),
+        padding: const EdgeInsets.all(16),
+        decoration: BoxDecoration(
+          color: Colors.white,
+          borderRadius: AppRadius.cardRadius,
+          boxShadow: AppShadows.card,
+        ),
+        child: Row(
+          children: [
+            Container(
+              width: 56,
+              height: 56,
+              decoration: BoxDecoration(
+                color: bgColor,
+                borderRadius: BorderRadius.circular(14),
+              ),
+              alignment: Alignment.center,
+              child: Text(
+                result.grade,
+                style: AppTextStyles.headingMedium.copyWith(color: color, fontWeight: FontWeight.bold),
+              ),
             ),
-            alignment: Alignment.center,
-            child: Text(
-              result.grade,
-              style: AppTextStyles.headingMedium.copyWith(color: color, fontWeight: FontWeight.bold),
+            const SizedBox(width: 16),
+            Expanded(
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Text(result.testTitle, style: AppTextStyles.labelLarge),
+                  const SizedBox(height: 4),
+                  Text(
+                    "Score: ${result.score.toInt()}/${result.totalMarks.toInt()} (${result.percentage.toStringAsFixed(1)}%)",
+                    style: AppTextStyles.bodySmall.copyWith(color: AppColors.textSecondary),
+                  ),
+                  Text(
+                    result.submittedAt.toString().split(' ')[0],
+                    style: AppTextStyles.caption.copyWith(color: AppColors.textHint),
+                  ),
+                ],
+              ),
             ),
-          ),
-          const SizedBox(width: 16),
-          Expanded(
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                Text(result.testTitle, style: AppTextStyles.labelLarge),
-                const SizedBox(height: 4),
-                Text(
-                  "Score: ${result.score.toInt()}/${result.totalMarks.toInt()} (${result.percentage.toStringAsFixed(1)}%)",
-                  style: AppTextStyles.bodySmall.copyWith(color: AppColors.textSecondary),
-                ),
-                Text(
-                  result.submittedAt.toString().split(' ')[0],
-                  style: AppTextStyles.caption.copyWith(color: AppColors.textHint),
-                ),
-              ],
+            Container(
+              padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+              decoration: BoxDecoration(
+                color: bgColor,
+                borderRadius: BorderRadius.circular(20),
+              ),
+              child: Text(
+                hasPassed ? "PASSED" : "FAILED",
+                style: AppTextStyles.labelSmall.copyWith(color: color, fontWeight: FontWeight.bold, fontSize: 10),
+              ),
             ),
-          ),
-          Container(
-            padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
-            decoration: BoxDecoration(
-              color: bgColor,
-              borderRadius: BorderRadius.circular(20),
-            ),
-            child: Text(
-              hasPassed ? "PASSED" : "FAILED",
-              style: AppTextStyles.labelSmall.copyWith(color: color, fontWeight: FontWeight.bold, fontSize: 10),
-            ),
-          ),
-        ],
+          ],
+        ),
       ),
     );
   }

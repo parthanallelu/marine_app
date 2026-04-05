@@ -2,32 +2,74 @@ import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:go_router/go_router.dart';
 import '../../../core/theme/app_theme.dart';
-import '../../../core/constants/app_constants.dart';
 import '../../../core/common_widgets/common_widgets.dart';
 import '../../../providers/auth_provider.dart';
 import '../../../models/app_models.dart';
 import '../../../models/dummy_data.dart';
 
-class StudentProfileScreen extends StatelessWidget {
+class StudentProfileScreen extends StatefulWidget {
   const StudentProfileScreen({super.key});
 
   @override
-  Widget build(BuildContext context) {
-    final student = context.watch<AuthProvider>().currentUser as StudentModel;
+  State<StudentProfileScreen> createState() => _StudentProfileScreenState();
+}
 
-    // Compute stats
+class _StudentProfileScreenState extends State<StudentProfileScreen> {
+  bool _isLoading = false;
+  late AttendanceSummary _attendance;
+  late double _avgScore;
+  late FeeRecord _feeRecord;
+
+  @override
+  void initState() {
+    super.initState();
+    _loadProfileStats();
+  }
+
+  void _loadProfileStats() {
+    setState(() => _isLoading = true);
+    
+    // TODO: Replace DummyData with Firestore query:
+    // final profileData = await studentRepository.getStudentProfileStats(studentId);
+    
+    final student = context.read<AuthProvider>().currentUser as StudentModel;
+
     final records = DummyData.generateAttendanceForStudent(student.id, student.name, student.batchId);
-    final attendance = DummyData.attendanceSummaryFor(student.id, records);
+    _attendance = DummyData.attendanceSummaryFor(student.id, records);
     
     final results = DummyData.testResults.where((r) => r.studentId == student.id).toList();
-    final avgScore = results.isEmpty
+    _avgScore = results.isEmpty
         ? 0.0
         : results.map((r) => r.percentage).reduce((a, b) => a + b) / results.length;
     
-    final feeRecord = DummyData.feeRecords.firstWhere(
+    _feeRecord = DummyData.feeRecords.firstWhere(
       (f) => f.studentId == student.id,
       orElse: () => DummyData.feeRecords.first,
     );
+
+    setState(() => _isLoading = false);
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    final authProvider = context.watch<AuthProvider>();
+    
+    // Access Control Safety
+    if (!authProvider.isStudent) {
+      WidgetsBinding.instance.addPostFrameCallback((_) {
+        context.goNamed('role_selection');
+      });
+      return const Scaffold(body: Center(child: CircularProgressIndicator()));
+    }
+
+    if (_isLoading) {
+      return const Scaffold(
+        backgroundColor: AppColors.background,
+        body: Center(child: CircularProgressIndicator()),
+      );
+    }
+
+    final student = authProvider.currentUser as StudentModel;
 
     return Scaffold(
       backgroundColor: AppColors.background,
@@ -102,23 +144,23 @@ class StudentProfileScreen extends StatelessWidget {
                       children: [
                         _ProfileStat(
                           label: "Attendance",
-                          value: attendance.percentageLabel,
+                          value: _attendance.percentageLabel,
                           icon: Icons.calendar_today,
                           color: AppColors.success,
                         ),
                         const VerticalDivider(width: 32),
                         _ProfileStat(
                           label: "Test Avg",
-                          value: "${avgScore.toStringAsFixed(0)}%",
+                          value: "${_avgScore.toStringAsFixed(0)}%",
                           icon: Icons.quiz_rounded,
                           color: AppColors.oceanBlue,
                         ),
                         const VerticalDivider(width: 32),
                         _ProfileStat(
                           label: "Fees Paid",
-                          value: "${feeRecord.percentagePaid.toStringAsFixed(0)}%",
+                          value: "${_feeRecord.percentagePaid.toStringAsFixed(0)}%",
                           icon: Icons.receipt_rounded,
-                          color: feeRecord.pendingAmount > 0 ? AppColors.warning : AppColors.success,
+                          color: _feeRecord.pendingAmount > 0 ? AppColors.warning : AppColors.success,
                         ),
                       ],
                     ),
@@ -177,7 +219,8 @@ class StudentProfileScreen extends StatelessWidget {
                       ),
                       title: Text("Fee Details", style: AppTextStyles.labelLarge),
                       trailing: const Icon(Icons.chevron_right_rounded),
-                      onTap: () => context.push('${AppRoutes.studentProfile}/fees'),
+                      // NAVIGATION SAFETY: Using goNamed
+                      onTap: () => context.pushNamed('student_fees'),
                     ),
                     const Divider(height: 1, indent: 52),
                     ListTile(
@@ -188,7 +231,8 @@ class StudentProfileScreen extends StatelessWidget {
                       ),
                       title: Text("Announcements", style: AppTextStyles.labelLarge),
                       trailing: const Icon(Icons.chevron_right_rounded),
-                      onTap: () => context.push('${AppRoutes.studentProfile}/announcements'),
+                      // NAVIGATION SAFETY: Using goNamed
+                      onTap: () => context.pushNamed('student_announcements'),
                     ),
                   ],
                 ),
@@ -273,16 +317,56 @@ class _ProfileStat extends StatelessWidget {
 // StudentFeesScreen
 // ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 
-class StudentFeesScreen extends StatelessWidget {
+class StudentFeesScreen extends StatefulWidget {
   const StudentFeesScreen({super.key});
 
   @override
-  Widget build(BuildContext context) {
-    final student = context.watch<AuthProvider>().currentUser as StudentModel;
-    final feeRecord = DummyData.feeRecords.firstWhere(
+  State<StudentFeesScreen> createState() => _StudentFeesScreenState();
+}
+
+class _StudentFeesScreenState extends State<StudentFeesScreen> {
+  bool _isLoading = false;
+  late FeeRecord _feeRecord;
+
+  @override
+  void initState() {
+    super.initState();
+    _loadFeeData();
+  }
+
+  void _loadFeeData() {
+    setState(() => _isLoading = true);
+    
+    // TODO: Replace DummyData with Firestore query:
+    // _feeRecord = await studentRepository.getStudentFees(studentId);
+    
+    final student = context.read<AuthProvider>().currentUser as StudentModel;
+    _feeRecord = DummyData.feeRecords.firstWhere(
       (f) => f.studentId == student.id,
       orElse: () => DummyData.feeRecords.first,
     );
+
+    setState(() => _isLoading = false);
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    final authProvider = context.watch<AuthProvider>();
+    
+    // Access Control Safety
+    if (!authProvider.isStudent) {
+      WidgetsBinding.instance.addPostFrameCallback((_) {
+        context.goNamed('role_selection');
+      });
+      return const Scaffold(body: Center(child: CircularProgressIndicator()));
+    }
+
+    if (_isLoading) {
+      return const Scaffold(
+        backgroundColor: AppColors.background,
+        body: Center(child: CircularProgressIndicator()),
+      );
+    }
 
     return Scaffold(
       backgroundColor: AppColors.background,
@@ -324,12 +408,12 @@ class StudentFeesScreen extends StatelessWidget {
                   Row(
                     mainAxisAlignment: MainAxisAlignment.spaceEvenly,
                     children: [
-                      _FeeSummaryItem(label: "Total Fees", value: "₹${feeRecord.totalFees.toInt()}"),
-                      _FeeSummaryItem(label: "Paid Amount", value: "₹${feeRecord.paidAmount.toInt()}"),
+                      _FeeSummaryItem(label: "Total Fees", value: "₹${_feeRecord.totalFees.toInt()}"),
+                      _FeeSummaryItem(label: "Paid Amount", value: "₹${_feeRecord.paidAmount.toInt()}"),
                       _FeeSummaryItem(
                         label: "Pending", 
-                        value: "₹${feeRecord.pendingAmount.toInt()}",
-                        valueColor: feeRecord.pendingAmount > 0 ? Colors.orange : AppColors.gold,
+                        value: "₹${_feeRecord.pendingAmount.toInt()}",
+                        valueColor: _feeRecord.pendingAmount > 0 ? Colors.orange : AppColors.gold,
                       ),
                     ],
                   ),
@@ -337,7 +421,7 @@ class StudentFeesScreen extends StatelessWidget {
                   ClipRRect(
                     borderRadius: BorderRadius.circular(8),
                     child: LinearProgressIndicator(
-                      value: feeRecord.paidAmount / feeRecord.totalFees,
+                      value: _feeRecord.paidAmount / _feeRecord.totalFees,
                       minHeight: 8,
                       backgroundColor: Colors.white.withAlpha((0.2 * 255).round()),
                       valueColor: const AlwaysStoppedAnimation<Color>(AppColors.gold),
@@ -347,7 +431,7 @@ class StudentFeesScreen extends StatelessWidget {
                   Align(
                     alignment: Alignment.centerRight,
                     child: Text(
-                      "${feeRecord.percentagePaid.toStringAsFixed(1)}% paid",
+                      "${_feeRecord.percentagePaid.toStringAsFixed(1)}% paid",
                       style: AppTextStyles.caption.copyWith(color: Colors.white70),
                     ),
                   ),
@@ -364,13 +448,13 @@ class StudentFeesScreen extends StatelessWidget {
             ),
           ),
 
-          // SLIVER 3 — SliverList of installment cards
+          // SLIVER 3 — LIST PERFORMANCE: Using SliverList.builder
           SliverPadding(
             padding: const EdgeInsets.all(20),
             sliver: SliverList(
               delegate: SliverChildBuilderDelegate(
                 (context, index) {
-                  final installment = feeRecord.installments[index];
+                  final installment = _feeRecord.installments[index];
                   final isPaid = installment.status == FeeStatus.paid;
                   final color = isPaid ? AppColors.success : AppColors.warning;
 
@@ -441,7 +525,7 @@ class StudentFeesScreen extends StatelessWidget {
                     ),
                   );
                 },
-                childCount: feeRecord.installments.length,
+                childCount: _feeRecord.installments.length,
               ),
             ),
           ),

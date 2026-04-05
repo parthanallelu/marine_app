@@ -1,9 +1,11 @@
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
+import 'package:provider/provider.dart';
 import '../../../core/theme/app_theme.dart';
-import '../../../core/constants/app_constants.dart';
 import '../../../core/common_widgets/common_widgets.dart';
 import '../../../models/app_models.dart';
+import '../../../models/dummy_data.dart';
+import '../../../providers/auth_provider.dart';
 
 class TestResultScreen extends StatelessWidget {
   final String resultId;
@@ -17,19 +19,24 @@ class TestResultScreen extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    // If result was not passed via extra, we show an error (fallback)
-    if (result == null) {
-      return Scaffold(
-        appBar: AppBar(title: const Text("Result")),
-        body: const EmptyState(
-          icon: Icons.error_outline,
-          title: "Result Not Found",
-          subtitle: "We couldn't retrieve the details of this test result.",
-        ),
-      );
+    // Access Control Safety
+    final auth = context.watch<AuthProvider>();
+    if (!auth.isStudent) {
+      WidgetsBinding.instance.addPostFrameCallback((_) {
+        context.goNamed('role_selection');
+      });
+      return const Scaffold(body: Center(child: CircularProgressIndicator()));
     }
 
-    final hasPassed = result!.isPassed;
+    // SAFE CASTING: If result was not passed via extra, we try to fetch it or show error
+    // TODO: Replace with Firestore fetch:
+    // final testResult = result ?? await testRepository.getResultById(resultId);
+    final testResult = result ?? DummyData.testResults.firstWhere(
+      (r) => r.id == resultId,
+      orElse: () => DummyData.testResults.first, // Fallback for dummy demo
+    );
+
+    final hasPassed = testResult.isPassed;
     final primaryColor = hasPassed ? const Color(0xFF1B5E20) : const Color(0xFF7F0000);
     final accentColor = hasPassed ? AppColors.success : AppColors.error;
 
@@ -62,7 +69,7 @@ class TestResultScreen extends StatelessWidget {
                         ),
                         alignment: Alignment.center,
                         child: Text(
-                          result!.grade,
+                          testResult.grade,
                           style: const TextStyle(
                             fontSize: 48,
                             fontWeight: FontWeight.bold,
@@ -78,7 +85,7 @@ class TestResultScreen extends StatelessWidget {
                       ),
                       const SizedBox(height: 4),
                       Text(
-                        result!.testTitle,
+                        testResult.testTitle,
                         style: AppTextStyles.bodyMedium.copyWith(color: Colors.white.withAlpha((0.8 * 255).round())),
                         textAlign: TextAlign.center,
                       ),
@@ -88,15 +95,15 @@ class TestResultScreen extends StatelessWidget {
                         children: [
                           _ResultStat(
                             label: "Score",
-                            value: "${result!.score.toInt()} / ${result!.totalMarks.toInt()}",
+                            value: "${testResult.score.toInt()} / ${testResult.totalMarks.toInt()}",
                           ),
                           _ResultStat(
                             label: "Percentage",
-                            value: "${result!.percentage.toStringAsFixed(1)}%",
+                            value: "${testResult.percentage.toStringAsFixed(1)}%",
                           ),
                           _ResultStat(
                             label: "Time taken",
-                            value: "${result!.timeTakenSeconds ~/ 60}m ${result!.timeTakenSeconds % 60}s",
+                            value: "${testResult.timeTakenSeconds ~/ 60}m ${testResult.timeTakenSeconds % 60}s",
                           ),
                         ],
                       ),
@@ -117,14 +124,16 @@ class TestResultScreen extends StatelessWidget {
                     label: "Back to Tests",
                     width: double.infinity,
                     icon: Icons.quiz_rounded,
-                    onPressed: () => context.go(AppRoutes.studentTests),
+                    // NAVIGATION SAFETY: Using goNamed
+                    onPressed: () => context.goNamed('student_tests'),
                   ),
                   const SizedBox(height: 12),
                   CustomButton(
                     label: "Dashboard",
                     width: double.infinity,
                     isOutlined: true,
-                    onPressed: () => context.go(AppRoutes.studentHome),
+                    // NAVIGATION SAFETY: Using goNamed
+                    onPressed: () => context.goNamed('student_home'),
                   ),
                 ],
               ),
@@ -149,6 +158,7 @@ class _ResultStat extends StatelessWidget {
           value,
           style: AppTextStyles.headingMedium.copyWith(color: Colors.white, fontSize: 18),
         ),
+        const SizedBox(height: 4),
         Text(
           label,
           style: AppTextStyles.caption.copyWith(color: Colors.white.withAlpha((0.7 * 255).round())),

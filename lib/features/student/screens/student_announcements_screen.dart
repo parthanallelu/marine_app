@@ -1,23 +1,65 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
+import 'package:go_router/go_router.dart';
 import '../../../core/theme/app_theme.dart';
 import '../../../core/common_widgets/common_widgets.dart';
 import '../../../providers/auth_provider.dart';
 import '../../../models/app_models.dart';
 import '../../../models/dummy_data.dart';
 
-class AnnouncementsScreen extends StatelessWidget {
+class AnnouncementsScreen extends StatefulWidget {
   const AnnouncementsScreen({super.key});
 
   @override
-  Widget build(BuildContext context) {
-    final student = context.watch<AuthProvider>().currentUser as StudentModel;
+  State<AnnouncementsScreen> createState() => _AnnouncementsScreenState();
+}
+
+class _AnnouncementsScreenState extends State<AnnouncementsScreen> {
+  bool _isLoading = false;
+  late List<AnnouncementModel> _announcements;
+
+  @override
+  void initState() {
+    super.initState();
+    _loadAnnouncements();
+  }
+
+  void _loadAnnouncements() {
+    setState(() => _isLoading = true);
     
-    final announcements = DummyData.announcements.where((a) {
+    // TODO: Replace DummyData with Firestore query:
+    // final announcementData = await adminRepository.getAnnouncementsForStudent(studentId);
+    
+    final auth = context.read<AuthProvider>();
+    final student = auth.currentUser as StudentModel;
+    
+    _announcements = DummyData.announcements.where((a) {
       final courseMatch = a.targetCourses.contains(student.courseType);
       final branchMatch = a.targetBranches.contains(student.branch) || a.targetBranches.length >= 4;
       return courseMatch && branchMatch;
     }).toList()..sort((a, b) => b.createdAt.compareTo(a.createdAt));
+
+    setState(() => _isLoading = false);
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    final authProvider = context.watch<AuthProvider>();
+    
+    // Access Control Safety
+    if (!authProvider.isStudent) {
+      WidgetsBinding.instance.addPostFrameCallback((_) {
+        context.goNamed('role_selection');
+      });
+      return const Scaffold(body: Center(child: CircularProgressIndicator()));
+    }
+
+    if (_isLoading) {
+      return const Scaffold(
+        backgroundColor: AppColors.background,
+        body: Center(child: CircularProgressIndicator()),
+      );
+    }
 
     return Scaffold(
       backgroundColor: AppColors.background,
@@ -27,7 +69,7 @@ class AnnouncementsScreen extends StatelessWidget {
         elevation: 0,
         foregroundColor: AppColors.navyBlueBase,
       ),
-      body: announcements.isEmpty
+      body: _announcements.isEmpty
           ? const EmptyState(
               icon: Icons.campaign_rounded,
               title: "No Announcements",
@@ -35,9 +77,9 @@ class AnnouncementsScreen extends StatelessWidget {
             )
           : ListView.builder(
               padding: const EdgeInsets.all(20),
-              itemCount: announcements.length,
+              itemCount: _announcements.length,
               itemBuilder: (context, index) {
-                final announcement = announcements[index];
+                final announcement = _announcements[index];
                 final isHigh = announcement.priority.toLowerCase() == 'high';
                 final color = isHigh ? AppColors.error : AppColors.warning;
                 final bgColor = isHigh ? AppColors.errorSurface : AppColors.warningSurface;
