@@ -39,13 +39,13 @@ class AuthProvider extends ChangeNotifier {
       if (_selectedRole == AppConstants.roleStudent) {
         final student = DummyData.students.firstWhere(
           (s) => s.email == email,
-          orElse: () => throw Exception('Student not found'),
+          orElse: () => DummyData.students.first, // Fallback to first student for demo
         );
         _currentUser = student;
       } else if (_selectedRole == AppConstants.roleProfessor) {
         final professor = DummyData.professors.firstWhere(
           (p) => p.email == email,
-          orElse: () => throw Exception('Professor not found'),
+          orElse: () => DummyData.professors.first, // Fallback to first professor for demo
         );
         _currentUser = professor;
       } else if (_selectedRole == AppConstants.roleAdmin) {
