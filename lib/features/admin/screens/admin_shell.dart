@@ -43,7 +43,7 @@ class AdminShell extends StatelessWidget {
               ),
               NavigationDestination(
                 icon: Icon(Icons.class_outlined),
-                selectedIcon: Icon(Icons.class_rounded, color: AppConstants.roleAdmin == 'admin' ? AppColors.navyBlueBase : AppColors.navyBlueBase),
+                selectedIcon: Icon(Icons.class_rounded, color: AppColors.navyBlueBase),
                 label: 'Batches',
               ),
               NavigationDestination(

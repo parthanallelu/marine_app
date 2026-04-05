@@ -213,11 +213,11 @@ class _AdminAnnouncementsScreenState extends State<AdminAnnouncementsScreen> {
                                 description: descController.text,
                                 createdAt: DateTime.now(),
                                 authorName: "Principal Admin",
-                                authorRole: AppConstants.roleAdmin,
+                                targetBranches: selectedBranches,
+                                targetCourses: const ["All"],
+                                createdByAdminId: "admin",
                                 priority: selectedPriority,
                                 isPinned: isPinned,
-                                targetBranches: selectedBranches,
-                                targetRoles: ["student", "professor"],
                               );
                               setState(() {
                                 _allAnnouncements.insert(0, newNotice);

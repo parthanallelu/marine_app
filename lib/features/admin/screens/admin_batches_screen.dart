@@ -171,7 +171,7 @@ class _AdminBatchesScreenState extends State<AdminBatchesScreen> {
                       const SizedBox(height: 24),
                       ListTile(
                         contentPadding: EdgeInsets.zero,
-                        title: const Text("Start Date", style: AppTextStyles.labelLarge),
+                        title: Text("Start Date", style: AppTextStyles.labelLarge),
                         subtitle: Text("${selectedDate.day}/${selectedDate.month}/${selectedDate.year}"),
                         trailing: IconButton(
                           icon: const Icon(Icons.calendar_today_rounded, color: AppColors.navyBlueBase),

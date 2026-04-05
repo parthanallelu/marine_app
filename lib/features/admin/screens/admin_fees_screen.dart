@@ -170,13 +170,14 @@ class _AdminFeesScreenState extends State<AdminFeesScreen> {
     );
   }
 
-  void _showFeeDetailSheet(FeeRecord record) {
+  void _showFeeDetailSheet(FeeRecord initialRecord) {
     showModalBottomSheet(
       context: context,
       isScrollControlled: true,
       backgroundColor: Colors.transparent,
       builder: (context) => StatefulBuilder(
         builder: (context, setModalState) {
+          final record = _allFeeRecords.firstWhere((r) => r.id == initialRecord.id, orElse: () => initialRecord);
           final pending = record.totalFees - record.paidAmount;
           return Container(
             height: MediaQuery.of(context).size.height * 0.8,
@@ -260,7 +261,7 @@ class _AdminFeesScreenState extends State<AdminFeesScreen> {
                             const Spacer(),
                             Text("₹${inst.amount.toInt()}", style: AppTextStyles.labelLarge),
                             const SizedBox(width: 16),
-                            if (inst.isPaid)
+                            if (inst.status == FeeStatus.paid)
                               const Icon(Icons.check_circle_rounded, color: AppColors.success)
                             else
                               TextButton(
@@ -270,8 +271,22 @@ class _AdminFeesScreenState extends State<AdminFeesScreen> {
                                 ),
                                 onPressed: () {
                                   setState(() {
-                                    inst.isPaid = true;
-                                    record.paidAmount += inst.amount;
+                                    final listIndex = record.installments.indexWhere((i) => i.id == inst.id);
+                                    if (listIndex != -1) {
+                                      final newInst = inst.copyWith(status: FeeStatus.paid, paidDate: DateTime.now());
+                                      final newInstallments = List<FeeInstallment>.from(record.installments);
+                                      newInstallments[listIndex] = newInst;
+                                      
+                                      final newRecord = record.copyWith(
+                                        paidAmount: record.paidAmount + inst.amount,
+                                        installments: newInstallments,
+                                      );
+                                      
+                                      final recordIndex = _allFeeRecords.indexWhere((r) => r.id == record.id);
+                                      if (recordIndex != -1) {
+                                        _allFeeRecords[recordIndex] = newRecord;
+                                      }
+                                    }
                                   });
                                   setModalState(() {});
                                 },

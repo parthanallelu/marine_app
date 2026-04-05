@@ -246,18 +246,21 @@ class _AdminStudentsScreenState extends State<AdminStudentsScreen> {
                         width: double.infinity,
                         onPressed: () {
                           if (formKey.currentState!.validate()) {
-                            final newStudent = StudentModel(
-                              id: const Uuid().v4(),
-                              name: nameController.text,
-                              email: emailController.text,
-                              phone: phoneController.text,
-                              role: AppConstants.roleStudent,
-                              branch: selectedBranch!,
-                              courseType: selectedCourse!,
-                              rollNumber: rollController.text,
-                              createdAt: DateTime.now(),
-                              joiningDate: DateTime.now(),
-                            );
+                              final newStudent = StudentModel(
+                                id: const Uuid().v4(),
+                                name: nameController.text,
+                                email: emailController.text,
+                                phone: phoneController.text,
+                                parentPhone: phoneController.text, // Using student phone as a fallback
+                                role: AppConstants.roleStudent,
+                                branch: selectedBranch!,
+                                courseType: selectedCourse!,
+                                rollNumber: rollController.text,
+                                batchId: "unassigned",
+                                batchName: "Unassigned",
+                                createdAt: DateTime.now(),
+                                joiningDate: DateTime.now(),
+                              );
                             setState(() {
                               _allStudents.insert(0, newStudent);
                             });

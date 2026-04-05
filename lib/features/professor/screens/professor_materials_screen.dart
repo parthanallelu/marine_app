@@ -123,7 +123,7 @@ class _ProfessorMaterialsScreenState extends State<ProfessorMaterialsScreen> {
                 maxLines: 3,
               ),
               const SizedBox(height: 12),
-              const Text('Subject', style: AppTextStyles.labelLarge),
+              Text('Subject', style: AppTextStyles.labelLarge),
               const SizedBox(height: 8),
               DropdownButtonFormField<String>(
                 value: _selectedSubject,

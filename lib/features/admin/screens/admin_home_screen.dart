@@ -1,11 +1,9 @@
 import 'package:flutter/material.dart';
-import 'package:provider/provider.dart';
 import 'package:fl_chart/fl_chart.dart';
 import 'package:go_router/go_router.dart';
 import '../../../core/theme/app_theme.dart';
 import '../../../core/constants/app_constants.dart';
 import '../../../core/common_widgets/common_widgets.dart';
-import '../../../providers/auth_provider.dart';
 import '../../../models/app_models.dart';
 import '../../../models/dummy_data.dart';
 
@@ -130,7 +128,7 @@ class _AdminHomeScreenState extends State<AdminHomeScreen> {
                       maxY: (branchCounts.values.isEmpty ? 10 : branchCounts.values.reduce((a, b) => a > b ? a : b) + 2).toDouble(),
                       barTouchData: BarTouchData(
                         touchTooltipData: BarTouchTooltipData(
-                          getTooltipColor: (_) => AppColors.navyBlueBase,
+                          tooltipBgColor: AppColors.navyBlueBase,
                         ),
                       ),
                       titlesData: FlTitlesData(
