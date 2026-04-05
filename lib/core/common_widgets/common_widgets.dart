@@ -91,6 +91,11 @@ class DashboardCard extends StatelessWidget {
   final IconData? icon;
   final Color? iconColor;
   final EdgeInsetsGeometry? padding;
+  final List<Widget>? actions;
+  final VoidCallback? onTap;
+  final Widget? leading;
+  final Widget? trailing;
+  final String? subtitle;
 
   const DashboardCard({
     super.key,
@@ -101,46 +106,70 @@ class DashboardCard extends StatelessWidget {
     this.icon,
     this.iconColor,
     this.padding,
+    this.actions,
+    this.onTap,
+    this.leading,
+    this.trailing,
+    this.subtitle,
   });
 
   @override
   Widget build(BuildContext context) {
-    return Container(
-      decoration: BoxDecoration(
-        color: Colors.white,
-        borderRadius: AppRadius.cardRadius,
-        boxShadow: AppShadows.card,
-      ),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          Padding(
-            padding: const EdgeInsets.fromLTRB(16, 16, 8, 4),
-            child: Row(
-              children: [
-                if (icon != null) ...[
-                  Icon(icon, size: 20, color: iconColor ?? AppColors.navyBlueBase),
-                  const SizedBox(width: 8),
-                ],
-                Expanded(
-                  child: Text(title, style: AppTextStyles.headingSmall),
-                ),
-                if (actionLabel != null)
-                  TextButton(
-                    onPressed: onAction,
-                    child: Text(
-                      actionLabel!,
-                      style: AppTextStyles.labelMedium.copyWith(color: AppColors.oceanBlue),
+    return GestureDetector(
+      onTap: onTap,
+      child: Container(
+        decoration: BoxDecoration(
+          color: Colors.white,
+          borderRadius: AppRadius.cardRadius,
+          boxShadow: AppShadows.card,
+        ),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Padding(
+              padding: const EdgeInsets.fromLTRB(16, 16, 8, 4),
+              child: Row(
+                children: [
+                  if (leading != null) ...[
+                    leading!,
+                    const SizedBox(width: 12),
+                  ] else if (icon != null) ...[
+                    Icon(icon, size: 20, color: iconColor ?? AppColors.navyBlueBase),
+                    const SizedBox(width: 8),
+                  ],
+                  Expanded(
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        Text(title, style: AppTextStyles.headingSmall),
+                        if (subtitle != null)
+                          Text(
+                            subtitle!,
+                            style: AppTextStyles.bodySmall.copyWith(color: AppColors.textSecondary),
+                          ),
+                      ],
                     ),
                   ),
-              ],
+                  if (trailing != null) 
+                    trailing!
+                  else if (actionLabel != null)
+                    TextButton(
+                      onPressed: onAction,
+                      child: Text(
+                        actionLabel!,
+                        style: AppTextStyles.labelMedium.copyWith(color: AppColors.oceanBlue),
+                      ),
+                    ),
+                  if (actions != null) ...actions!,
+                ],
+              ),
             ),
-          ),
-          Padding(
-            padding: padding ?? const EdgeInsets.fromLTRB(16, 0, 16, 16),
-            child: child,
-          ),
-        ],
+            Padding(
+              padding: padding ?? const EdgeInsets.fromLTRB(16, 0, 16, 16),
+              child: child,
+            ),
+          ],
+        ),
       ),
     );
   }

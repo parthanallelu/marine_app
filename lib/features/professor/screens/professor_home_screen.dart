@@ -1,341 +1,314 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:go_router/go_router.dart';
+import 'package:intl/intl.dart';
 import '../../../core/theme/app_theme.dart';
 import '../../../core/constants/app_constants.dart';
 import '../../../core/common_widgets/common_widgets.dart';
-import '../../../providers/auth_provider.dart';
 import '../../../models/app_models.dart';
 import '../../../models/dummy_data.dart';
+import '../../../providers/auth_provider.dart';
 
-class ProfessorHomeScreen extends StatelessWidget {
+class ProfessorHomeScreen extends StatefulWidget {
   const ProfessorHomeScreen({super.key});
 
   @override
+  State<ProfessorHomeScreen> createState() => _ProfessorHomeScreenState();
+}
+
+class _ProfessorHomeScreenState extends State<ProfessorHomeScreen> {
+  late List<BatchModel> _assignedBatches;
+  late List<BatchModel> _todaysClasses;
+  late int _totalStudents;
+  bool _isLoading = false;
+
+  @override
+  void initState() {
+    super.initState();
+    _computeDashboardData();
+  }
+
+  void _computeDashboardData() {
+    final authProvider = Provider.of<AuthProvider>(context, listen: false);
+    final professor = authProvider.currentUser as ProfessorModel?;
+
+    if (professor == null) {
+      _assignedBatches = [];
+      _todaysClasses = [];
+      _totalStudents = 0;
+      return;
+    }
+
+    // Filter batches assigned to this professor
+    _assignedBatches = DummyData.batches
+        .where((b) => b.professorId == professor.id && b.isActive)
+        .toList();
+
+    // Calculate total students across all assigned batches
+    _totalStudents = _assignedBatches.fold(0, (sum, b) => sum + b.studentIds.length);
+
+    // Filter today's classes
+    final today = DateFormat('EEEE').format(DateTime.now()); // e.g., "Monday"
+    _todaysClasses = _assignedBatches
+        .where((b) => b.days.contains(today))
+        .toList();
+  }
+
+  @override
   Widget build(BuildContext context) {
-    final professor = context.watch<AuthProvider>().currentUser as ProfessorModel;
-    
-    // Get batches assigned to this professor
-    final professorBatches = DummyData.batches.where((b) => b.professorId == professor.id).toList();
-    
-    // Calculate total students
-    final totalStudents = professorBatches.fold<int>(0, (sum, b) => sum + b.studentIds.length);
-    
-    // Get upcoming tests created by this professor
-    final upcomingTests = DummyData.tests
-        .where((t) => t.createdByProfessorId == professor.id && t.scheduledDate.isAfter(DateTime.now()))
-        .toList()
-      ..sort((a, b) => a.scheduledDate.compareTo(b.scheduledDate));
+    final professor = context.watch<AuthProvider>().currentUser as ProfessorModel?;
+
+    if (professor == null) return const Scaffold(body: Center(child: CircularProgressIndicator()));
 
     return Scaffold(
       backgroundColor: AppColors.background,
       body: CustomScrollView(
         slivers: [
-          // SLIVER 1 — Professor Header
+          NavyHeader(
+            title: 'Welcome Back,',
+            subtitle: professor.name,
+          ),
           SliverToBoxAdapter(
-            child: _ProfessorHeader(professor: professor),
-          ),
-
-          // SLIVER 2 — Stats Row
-          SliverPadding(
-            padding: const EdgeInsets.fromLTRB(20, 20, 20, 0),
-            sliver: SliverToBoxAdapter(
-              child: Row(
-                children: [
-                  Expanded(
-                    child: StatCard(
-                      label: "Total Students",
-                      value: totalStudents.toString(),
-                      icon: Icons.people_alt_rounded,
-                      color: AppColors.oceanBlue,
-                    ),
-                  ),
-                  const SizedBox(width: 12),
-                  Expanded(
-                    child: StatCard(
-                      label: "Active Batches",
-                      value: professorBatches.length.toString(),
-                      icon: Icons.groups_rounded,
-                      color: AppColors.gold,
-                    ),
-                  ),
-                  const SizedBox(width: 12),
-                  Expanded(
-                    child: StatCard(
-                      label: "Today's Classes",
-                      value: "2", // Placeholder for schedule logic
-                      icon: Icons.calendar_today_rounded,
-                      color: AppColors.success,
-                    ),
-                  ),
-                ],
-              ),
-            ),
-          ),
-
-          // SLIVER 3 — Quick Actions
-          SliverPadding(
-            padding: const EdgeInsets.fromLTRB(20, 24, 20, 0),
-            sliver: SliverToBoxAdapter(
+            child: Padding(
+              padding: const EdgeInsets.all(AppSpacing.lg),
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  const SectionHeader(title: "Quick Actions"),
-                  const SizedBox(height: 12),
-                  Row(
-                    children: [
-                      _QuickActionCircle(
-                        label: "Mark Attendance",
-                        icon: Icons.how_to_reg_rounded,
-                        color: AppColors.navyBlueBase,
-                        onTap: () => context.go(AppRoutes.professorAttendance),
-                      ),
-                      const SizedBox(width: 16),
-                      _QuickActionCircle(
-                        label: "Upload Material",
-                        icon: Icons.upload_file_rounded,
-                        color: AppColors.oceanBlue,
-                        onTap: () => context.go(AppRoutes.professorMaterials),
-                      ),
-                      const SizedBox(width: 16),
-                      _QuickActionCircle(
-                        label: "Add Test",
-                        icon: Icons.add_task_rounded,
-                        color: AppColors.success,
-                        onTap: () {},
-                      ),
-                      const SizedBox(width: 16),
-                      _QuickActionCircle(
-                        label: "Announce",
-                        icon: Icons.campaign_rounded,
-                        color: AppColors.warning,
-                        onTap: () {},
-                      ),
-                    ],
-                  ),
+                  _buildStatsGrid(professor),
+                  const SizedBox(height: AppSpacing.xxl),
+                  _buildQuickActions(context),
+                  const SizedBox(height: AppSpacing.xxl),
+                  _buildTodaySchedule(context, professor),
+                  const SizedBox(height: AppSpacing.xxl),
+                  _buildMyBatches(professor),
+                  const SizedBox(height: AppSpacing.xxxl),
                 ],
               ),
             ),
           ),
-
-          // SLIVER 4 — My Batches
-          SliverToBoxAdapter(
-            child: Padding(
-              padding: const EdgeInsets.fromLTRB(20, 24, 20, 0),
-              child: DashboardCard(
-                title: "My Assigned Batches",
-                icon: Icons.groups_rounded,
-                iconColor: AppColors.gold,
-                child: Column(
-                  children: professorBatches.map((batch) => _BatchTile(batch: batch)).toList(),
-                ),
-              ),
-            ),
-          ),
-
-          // SLIVER 5 — Upcoming Tests
-          if (upcomingTests.isNotEmpty)
-            SliverToBoxAdapter(
-              child: Padding(
-                padding: const EdgeInsets.fromLTRB(20, 24, 20, 32),
-                child: DashboardCard(
-                  title: "Upcoming Tests (Created by you)",
-                  icon: Icons.quiz_rounded,
-                  iconColor: AppColors.oceanBlue,
-                  child: Column(
-                    children: upcomingTests.map((test) => _TestOverviewTile(test: test)).toList(),
-                  ),
-                ),
-              ),
-            )
-          else
-            const SliverToBoxAdapter(child: SizedBox(height: 32)),
         ],
       ),
     );
   }
-}
 
-class _ProfessorHeader extends StatelessWidget {
-  final ProfessorModel professor;
-  const _ProfessorHeader({required this.professor});
-
-  @override
-  Widget build(BuildContext context) {
-    return Container(
-      width: double.infinity,
-      decoration: const BoxDecoration(
-        gradient: LinearGradient(
-          colors: [AppColors.navyBlueDark, AppColors.navyBlueBase],
-          begin: Alignment.topLeft,
-          end: Alignment.bottomRight,
+  Widget _buildStatsGrid(ProfessorModel professor) {
+    return GridView.count(
+      crossAxisCount: 3,
+      shrinkWrap: true,
+      physics: const NeverScrollableScrollPhysics(),
+      crossAxisSpacing: AppSpacing.md,
+      mainAxisSpacing: AppSpacing.md,
+      children: [
+        StatCard(
+          label: 'Batches',
+          value: _assignedBatches.length.toString(),
+          icon: Icons.groups_rounded,
+          color: AppColors.navyBlueBase,
         ),
-      ),
-      child: SafeArea(
-        bottom: false,
-        child: Padding(
-          padding: const EdgeInsets.fromLTRB(20, 16, 20, 28),
-          child: Row(
-            children: [
-              CircleAvatar(
-                radius: 30,
-                backgroundColor: AppColors.gold.withAlpha((0.2 * 255).round()),
-                child: Text(
-                  professor.name[0],
-                  style: AppTextStyles.headingLarge.copyWith(color: AppColors.gold),
-                ),
-              ),
-              const SizedBox(width: 16),
-              Expanded(
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    Text(
-                      "Welcome back,",
-                      style: AppTextStyles.bodyMedium.copyWith(color: Colors.white70),
-                    ),
-                    Text(
-                      professor.name,
-                      style: AppTextStyles.headingLarge.copyWith(color: Colors.white),
-                    ),
-                    const SizedBox(height: 4),
-                    Text(
-                      professor.specialization,
-                      style: AppTextStyles.caption.copyWith(color: AppColors.gold),
-                    ),
-                  ],
-                ),
-              ),
-              IconButton(
-                onPressed: () {},
-                icon: const Icon(Icons.notifications_none_rounded, color: Colors.white),
-              ),
-            ],
-          ),
+        StatCard(
+          label: 'Students',
+          value: _totalStudents.toString(),
+          icon: Icons.person_rounded,
+          color: AppColors.oceanBlue,
         ),
-      ),
+        StatCard(
+          label: 'Subjects',
+          value: professor.subjects.length.toString(),
+          icon: Icons.book_rounded,
+          color: AppColors.gold,
+        ),
+      ],
     );
   }
-}
 
-class _QuickActionCircle extends StatelessWidget {
-  final String label;
-  final IconData icon;
-  final Color color;
-  final VoidCallback onTap;
-
-  const _QuickActionCircle({
-    required this.label,
-    required this.icon,
-    required this.color,
-    required this.onTap,
-  });
-
-  @override
-  Widget build(BuildContext context) {
-    return Expanded(
-      child: InkWell(
-        onTap: onTap,
-        borderRadius: BorderRadius.circular(12),
-        child: Column(
+  Widget _buildQuickActions(BuildContext context) {
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        const SectionHeader(title: 'Quick Actions'),
+        const SizedBox(height: AppSpacing.md),
+        GridView.count(
+          crossAxisCount: 3,
+          shrinkWrap: true,
+          physics: const NeverScrollableScrollPhysics(),
+          crossAxisSpacing: AppSpacing.md,
+          mainAxisSpacing: AppSpacing.md,
           children: [
-            Container(
-              padding: const EdgeInsets.all(12),
-              decoration: BoxDecoration(
-                color: color.withAlpha((0.1 * 255).round()),
-                borderRadius: BorderRadius.circular(16),
-              ),
-              child: Icon(icon, color: color, size: 28),
+            QuickActionTile(
+              label: 'Attendance',
+              icon: Icons.how_to_reg_rounded,
+              color: AppColors.navyBlueBase,
+              onTap: () => context.push(AppRoutes.markAttendance),
             ),
-            const SizedBox(height: 8),
-            Text(
-              label,
-              style: AppTextStyles.labelSmall.copyWith(fontSize: 10),
-              textAlign: Alignment.center.x == 0 ? TextAlign.center : null,
-              maxLines: 2,
+            QuickActionTile(
+              label: 'Upload',
+              icon: Icons.upload_file_rounded,
+              color: AppColors.oceanBlue,
+              onTap: () => context.goNamed(AppRoutes.professorMaterials),
+            ),
+            QuickActionTile(
+              label: 'Students',
+              icon: Icons.person_search_rounded,
+              color: AppColors.gold,
+              onTap: () => _showStudentsBottomSheet(),
             ),
           ],
         ),
-      ),
+      ],
     );
   }
-}
 
-class _BatchTile extends StatelessWidget {
-  final BatchModel batch;
-  const _BatchTile({required this.batch});
-
-  @override
-  Widget build(BuildContext context) {
-    return Container(
-      margin: const EdgeInsets.only(bottom: 12),
-      padding: const EdgeInsets.all(12),
-      decoration: BoxDecoration(
-        color: AppColors.background,
-        borderRadius: BorderRadius.circular(12),
-        border: Border.all(color: AppColors.navyBlueSurface),
-      ),
-      child: Row(
-        children: [
-          Container(
-            padding: const EdgeInsets.all(10),
-            decoration: BoxDecoration(
-              color: Colors.white,
-              borderRadius: BorderRadius.circular(10),
+  Widget _buildTodaySchedule(BuildContext context, ProfessorModel professor) {
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        Row(
+          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+          children: [
+            const SectionHeader(title: "Today's Classes"),
+            Text(
+              DateFormat('EEEE, MMM d').format(DateTime.now()),
+              style: AppTextStyles.bodySmall.copyWith(color: AppColors.textSecondary),
             ),
-            child: const Icon(Icons.groups_rounded, color: AppColors.navyBlueBase, size: 24),
-          ),
-          const SizedBox(width: 12),
-          Expanded(
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                Text(batch.name, style: AppTextStyles.labelLarge),
-                Text(
-                  "${batch.timing} • ${batch.studentIds.length} Students",
-                  style: AppTextStyles.bodySmall.copyWith(color: AppColors.textSecondary),
+          ],
+        ),
+        const SizedBox(height: AppSpacing.md),
+        if (_todaysClasses.isEmpty)
+          const EmptyState(
+            icon: Icons.calendar_today_outlined,
+            title: 'No Classes Today',
+            subtitle: "You don't have any classes scheduled for today.",
+          )
+        else
+          ..._todaysClasses.map((batch) => Padding(
+                padding: const EdgeInsets.only(bottom: AppSpacing.md),
+                child: DashboardCard(
+                  title: batch.name,
+                  subtitle: batch.timing,
+                  leading: Container(
+                    padding: const EdgeInsets.all(10),
+                    decoration: BoxDecoration(
+                      color: AppColors.navyBlueSurface,
+                      borderRadius: BorderRadius.circular(12),
+                    ),
+                    child: const Icon(Icons.class_rounded, color: AppColors.navyBlueBase),
+                  ),
+                  child: Row(
+                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                    children: [
+                      CourseBadge(courseType: batch.courseType),
+                      Text(
+                        '${batch.studentIds.length} Students',
+                        style: AppTextStyles.bodySmall.copyWith(color: AppColors.textSecondary),
+                      ),
+                    ],
+                  ),
+                  onAction: () => context.push(AppRoutes.markAttendance),
+                  actionLabel: 'Mark Attendance',
                 ),
-              ],
-            ),
-          ),
-          const Icon(Icons.chevron_right_rounded, color: AppColors.textHint),
-        ],
-      ),
+              )),
+      ],
     );
   }
-}
 
-class _TestOverviewTile extends StatelessWidget {
-  final TestModel test;
-  const _TestOverviewTile({required this.test});
-
-  @override
-  Widget build(BuildContext context) {
-    return Container(
-      margin: const EdgeInsets.only(bottom: 10),
-      padding: const EdgeInsets.all(12),
-      decoration: BoxDecoration(
-        color: AppColors.oceanBlueSurface.withAlpha((0.5 * 255).round()),
-        borderRadius: BorderRadius.circular(12),
-      ),
-      child: Row(
-        children: [
-          const Icon(Icons.quiz_rounded, color: AppColors.oceanBlue, size: 20),
-          const SizedBox(width: 12),
-          Expanded(
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                Text(test.title, style: AppTextStyles.labelLarge),
-                Text(
-                  "Scheduled for ${test.scheduledDate.toString().split(' ')[0]}",
-                  style: AppTextStyles.bodySmall.copyWith(color: AppColors.textSecondary),
+  Widget _buildMyBatches(ProfessorModel professor) {
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        const SectionHeader(title: 'My Batches'),
+        const SizedBox(height: AppSpacing.md),
+        if (_assignedBatches.isEmpty)
+          const EmptyState(
+            icon: Icons.group_off_outlined,
+            title: 'No Batches',
+            subtitle: 'You are not assigned to any batches yet.',
+          )
+        else
+          ListView.builder(
+            shrinkWrap: true,
+            physics: const NeverScrollableScrollPhysics(),
+            itemCount: _assignedBatches.length,
+            itemBuilder: (context, index) {
+              final batch = _assignedBatches[index];
+              return Container(
+                margin: const EdgeInsets.only(bottom: AppSpacing.md),
+                decoration: BoxDecoration(
+                  color: Colors.white,
+                  borderRadius: AppRadius.cardRadius,
+                  boxShadow: AppShadows.subtle,
                 ),
-              ],
-            ),
+                child: ListTile(
+                  contentPadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+                  leading: Container(
+                    width: 48,
+                    height: 48,
+                    decoration: BoxDecoration(
+                      color: AppColors.navyBlueSurface,
+                      borderRadius: BorderRadius.circular(12),
+                    ),
+                    child: const Icon(Icons.school_rounded, color: AppColors.navyBlueBase),
+                  ),
+                  title: Text(batch.name, style: AppTextStyles.labelLarge),
+                  subtitle: Text(
+                    '${batch.courseType} • ${batch.branch}',
+                    style: AppTextStyles.bodySmall.copyWith(color: AppColors.textSecondary),
+                  ),
+                  trailing: const Icon(Icons.chevron_right_rounded, size: 20),
+                  onTap: () {
+                    // Future: Batch details
+                  },
+                ),
+              );
+            },
           ),
-          PriorityTag(priority: "High"), // Placeholder logic
-        ],
+      ],
+    );
+  }
+
+  void _showStudentsBottomSheet() {
+    final prof = Provider.of<AuthProvider>(context, listen: false).currentUser as ProfessorModel;
+    final students = DummyData.students.where((s) => prof.batchIds.contains(s.batchId)).toList();
+
+    showModalBottomSheet(
+      context: context,
+      isScrollControlled: true,
+      shape: const RoundedRectangleBorder(borderRadius: BorderRadius.vertical(top: Radius.circular(24))),
+      builder: (context) => DraggableScrollableSheet(
+        initialChildSize: 0.7,
+        maxChildSize: 0.9,
+        minChildSize: 0.5,
+        expand: false,
+        builder: (context, scrollController) => Column(
+          children: [
+            const SizedBox(height: 12),
+            Container(width: 40, height: 4, decoration: BoxDecoration(color: Colors.grey[300], borderRadius: BorderRadius.circular(2))),
+            const SizedBox(height: 16),
+            Padding(
+              padding: const EdgeInsets.symmetric(horizontal: 20),
+              child: Text('Assigned Students', style: AppTextStyles.headingSmall),
+            ),
+            const SizedBox(height: 16),
+            Expanded(
+              child: ListView.builder(
+                controller: scrollController,
+                itemCount: students.length,
+                itemBuilder: (context, index) {
+                  final student = students[index];
+                  return ListTile(
+                    leading: CircleAvatar(
+                      backgroundColor: AppColors.navyBlueSurface,
+                      child: Text(student.name[0], style: const TextStyle(color: AppColors.navyBlueBase)),
+                    ),
+                    title: Text(student.name, style: AppTextStyles.bodyLarge),
+                    subtitle: Text('${student.batchName} | ${student.rollNumber}', style: AppTextStyles.bodySmall),
+                    trailing: const Icon(Icons.phone_outlined, size: 20, color: AppColors.oceanBlue),
+                    onTap: () {},
+                  );
+                },
+              ),
+            ),
+          ],
+        ),
       ),
     );
   }

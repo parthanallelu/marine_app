@@ -1,11 +1,11 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
+import 'package:intl/intl.dart';
 import '../../../core/theme/app_theme.dart';
-import '../../../core/constants/app_constants.dart';
 import '../../../core/common_widgets/common_widgets.dart';
-import '../../../providers/auth_provider.dart';
 import '../../../models/app_models.dart';
 import '../../../models/dummy_data.dart';
+import '../../../providers/auth_provider.dart';
 
 class ProfessorMaterialsScreen extends StatefulWidget {
   const ProfessorMaterialsScreen({super.key});
@@ -15,253 +15,152 @@ class ProfessorMaterialsScreen extends StatefulWidget {
 }
 
 class _ProfessorMaterialsScreenState extends State<ProfessorMaterialsScreen> {
-  String _searchQuery = "";
-  String _selectedCategory = "All";
+  List<StudyMaterialModel> _materials = [];
+  bool _isLoading = true;
 
   @override
-  Widget build(BuildContext context) {
-    final professor = context.watch<AuthProvider>().currentUser as ProfessorModel;
-    
-    // Filter materials created by this professor
-    final materials = DummyData.materials.where((m) {
-      final matchesProfessor = m.uploadedByProfessorId == professor.id;
-      final matchesCategory = _selectedCategory == "All" || m.category == _selectedCategory;
-      final matchesSearch = m.title.toLowerCase().contains(_searchQuery.toLowerCase());
-      return matchesProfessor && matchesCategory && matchesSearch;
-    }).toList();
+  void initState() {
+    super.initState();
+    _loadMaterials();
+  }
 
-    return Scaffold(
-      backgroundColor: AppColors.background,
-      appBar: AppBar(
-        title: Text("Study Materials", style: AppTextStyles.headingMedium),
-        backgroundColor: Colors.white,
-        elevation: 0,
-        foregroundColor: AppColors.navyBlueBase,
-        actions: [
-          IconButton(
-            onPressed: () => _showUploadDialog(),
-            icon: const Icon(Icons.add_circle_outline_rounded, color: AppColors.navyBlueBase),
-          ),
-          const SizedBox(width: 8),
-        ],
-      ),
-      body: Column(
-        children: [
-          // SEARCH & FILTER BAR
-          Container(
-            padding: const EdgeInsets.fromLTRB(16, 8, 16, 16),
-            color: Colors.white,
-            child: Column(
-              children: [
-                CustomTextField(
-                  hintText: "Search your uploads...",
-                  prefixIcon: Icons.search_rounded,
-                  onChanged: (val) => setState(() => _searchQuery = val),
-                ),
-                const SizedBox(height: 12),
-                SizedBox(
-                  height: 36,
-                  child: ListView(
-                    scrollDirection: Axis.horizontal,
-                    children: [
-                      _CategoryChip(
-                        label: "All",
-                        isSelected: _selectedCategory == "All",
-                        onTap: () => setState(() => _selectedCategory = "All"),
-                      ),
-                      ...AppConstants.materialCategories.map((cat) => _CategoryChip(
-                            label: cat,
-                            isSelected: _selectedCategory == cat,
-                            onTap: () => setState(() => _selectedCategory = cat),
-                          )),
-                    ],
-                  ),
-                ),
-              ],
-            ),
-          ),
+  void _loadMaterials() {
+    final prof = Provider.of<AuthProvider>(context, listen: false).currentUser as ProfessorModel?;
+    if (prof == null) return;
 
-          // MATERIALS LIST
-          Expanded(
-            child: materials.isEmpty
-                ? const EmptyState(
-                    icon: Icons.cloud_off_rounded,
-                    title: "No Materials Found",
-                    subtitle: "You haven't uploaded any materials in this category yet.",
-                  )
-                : ListView.builder(
-                    padding: const EdgeInsets.all(16),
-                    itemCount: materials.length,
-                    itemBuilder: (context, index) {
-                      final material = materials[index];
-                      return _MaterialUploadTile(material: material);
-                    },
-                  ),
-          ),
-        ],
-      ),
-      floatingActionButton: FloatingActionButton.extended(
-        onPressed: () => _showUploadDialog(),
-        label: const Text("Upload New"),
-        icon: const Icon(Icons.upload_file_rounded),
-        backgroundColor: AppColors.navyBlueBase,
-        foregroundColor: Colors.white,
-      ),
+    // Simulate fetching materials uploaded by this professor
+    // Since DummyData doesn't have a static list, we mock it here
+    setState(() {
+      _materials = [
+        StudyMaterialModel(
+          id: 'mat_001',
+          title: 'IMU-CET Navigation Basics',
+          description: 'Introduction to celestial navigation for deck cadets.',
+          fileUrl: 'https://example.com/nav_basics.pdf',
+          fileType: 'pdf',
+          subject: 'IMU-CET',
+          uploadedBy: prof.id,
+          uploadedByName: prof.name,
+          createdAt: DateTime.now().subtract(const Duration(days: 5)),
+        ),
+        StudyMaterialModel(
+          id: 'mat_002',
+          title: 'Maritime GK Monthly Capsule',
+          description: 'Important maritime current affairs for March 2024.',
+          fileUrl: 'https://example.com/gk_capsule.pdf',
+          fileType: 'pdf',
+          subject: 'Maritime GK',
+          uploadedBy: prof.id,
+          uploadedByName: prof.name,
+          createdAt: DateTime.now().subtract(const Duration(days: 2)),
+        ),
+      ];
+      _isLoading = false;
+    });
+  }
+
+  void _deleteMaterial(String id) {
+    setState(() {
+      _materials.removeWhere((m) => m.id == id);
+    });
+    ScaffoldMessenger.of(context).showSnackBar(
+      const SnackBar(content: Text('Material deleted successfully')),
     );
   }
 
-  void _showUploadDialog() {
+  void _showUploadBottomSheet() {
+    final prof = Provider.of<AuthProvider>(context, listen: false).currentUser as ProfessorModel?;
+    if (prof == null) return;
+
     showModalBottomSheet(
       context: context,
       isScrollControlled: true,
       shape: const RoundedRectangleBorder(borderRadius: BorderRadius.vertical(top: Radius.circular(24))),
       builder: (context) => Padding(
-        padding: EdgeInsets.only(bottom: MediaQuery.of(context).viewInsets.bottom),
-        child: Container(
-          padding: const EdgeInsets.all(24),
-          child: Column(
-            mainAxisSize: MainAxisSize.min,
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              Text("Upload Study Material", style: AppTextStyles.headingMedium),
-              const SizedBox(height: 20),
-              const CustomTextField(label: "Title", hintText: "e.g. Navigation Basics PDF"),
-              const SizedBox(height: 16),
-              const CustomTextField(label: "Description", hintText: "Enter a short description", maxLines: 3),
-              const SizedBox(height: 16),
-              Text("Category", style: AppTextStyles.labelLarge),
-              const SizedBox(height: 8),
-              // Dummy Dropdown Placeholder
-              Container(
-                padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 14),
-                decoration: BoxDecoration(
-                  border: Border.all(color: AppColors.divider),
-                  borderRadius: AppRadius.inputRadius,
-                ),
-                child: const Row(
-                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                  children: [
-                    Text("Select Category"),
-                    Icon(Icons.arrow_drop_down),
-                  ],
-                ),
+        padding: EdgeInsets.only(bottom: MediaQuery.of(context).viewInsets.bottom, left: 20, right: 20, top: 20),
+        child: Column(
+          mainAxisSize: MainAxisSize.min,
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Text('Upload Study Material', style: AppTextStyles.headingSmall),
+            const SizedBox(height: 20),
+            TextField(decoration: InputDecoration(labelText: 'Title', border: OutlineInputBorder(borderRadius: BorderRadius.circular(12)))),
+            const SizedBox(height: 12),
+            TextField(decoration: InputDecoration(labelText: 'Description', border: OutlineInputBorder(borderRadius: BorderRadius.circular(12)))),
+            const SizedBox(height: 12),
+            DropdownButtonFormField<String>(
+              decoration: InputDecoration(labelText: 'Subject', border: OutlineInputBorder(borderRadius: BorderRadius.circular(12))),
+              items: prof.subjects.map((s) => DropdownMenuItem(value: s, child: Text(s))).toList(),
+              onChanged: (v) {},
+            ),
+            const SizedBox(height: 24),
+            SizedBox(
+              width: double.infinity,
+              child: NavyButton(
+                label: 'Confirm Upload',
+                onPressed: () {
+                  // Mock local add
+                  setState(() {
+                    _materials.insert(0, StudyMaterialModel(
+                      id: 'mat_${DateTime.now().millisecondsSinceEpoch}',
+                      title: 'New Uploaded Material',
+                      description: 'Freshly uploaded content.',
+                      fileUrl: '',
+                      fileType: 'pdf',
+                      subject: prof.subjects.first,
+                      uploadedBy: prof.id,
+                      uploadedByName: prof.name,
+                      createdAt: DateTime.now(),
+                    ));
+                  });
+                  Navigator.pop(context);
+                },
               ),
-              const SizedBox(height: 24),
-              Row(
-                children: [
-                  Expanded(
-                    child: CustomButton(
-                      label: "CANCEL",
-                      isOutlined: true,
-                      onPressed: () => Navigator.pop(context),
-                    ),
-                  ),
-                  const SizedBox(width: 16),
-                  Expanded(
-                    child: CustomButton(
-                      label: "UPLOAD",
-                      onPressed: () {
-                        Navigator.pop(context);
-                        ScaffoldMessenger.of(context).showSnackBar(
-                          const SnackBar(content: Text("Material uploaded successfully!")),
-                        );
+            ),
+            const SizedBox(height: 32),
+          ],
+        ),
+      ),
+    );
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return Scaffold(
+      backgroundColor: AppColors.backgroundGrey,
+      appBar: AppBar(
+        title: Text('Study Materials', style: AppTextStyles.headingSmall.copyWith(color: Colors.white)),
+        backgroundColor: AppColors.navyBlueBase,
+        elevation: 0,
+        iconTheme: const IconThemeData(color: Colors.white),
+      ),
+      body: _isLoading
+          ? const Center(child: CircularProgressIndicator())
+          : _materials.isEmpty
+              ? const EmptyState(
+                  icon: Icons.menu_book_rounded,
+                  title: 'No Materials',
+                  subtitle: 'Upload your first study material to get started.',
+                )
+              : ListView.builder(
+                  padding: const EdgeInsets.all(16),
+                  itemCount: _materials.length,
+                  itemBuilder: (context, index) {
+                    final material = _materials[index];
+                      trailing: IconButton(
+                        icon: const Icon(Icons.delete_outline_rounded, color: Colors.redAccent),
+                        onPressed: () => _deleteMaterial(material.id),
+                      ),
+                      onTap: () {
+                        // Logic to view/download material
                       },
-                    ),
-                  ),
-                ],
-              ),
-            ],
-          ),
-        ),
-      ),
-    );
-  }
-}
-
-class _CategoryChip extends StatelessWidget {
-  final String label;
-  final bool isSelected;
-  final VoidCallback onTap;
-
-  const _CategoryChip({
-    required this.label,
-    required this.isSelected,
-    required this.onTap,
-  });
-
-  @override
-  Widget build(BuildContext context) {
-    return Padding(
-      padding: const EdgeInsets.only(right: 8),
-      child: GestureDetector(
-        onTap: onTap,
-        child: Container(
-          padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
-          decoration: BoxDecoration(
-            color: isSelected ? AppColors.navyBlueBase : AppColors.background,
-            borderRadius: BorderRadius.circular(20),
-            border: Border.all(color: isSelected ? AppColors.navyBlueBase : AppColors.divider),
-          ),
-          child: Text(
-            label,
-            style: TextStyle(
-              color: isSelected ? Colors.white : AppColors.textPrimary,
-              fontSize: 12,
-              fontWeight: isSelected ? FontWeight.bold : FontWeight.normal,
-            ),
-          ),
-        ),
-      ),
-    );
-  }
-}
-
-class _MaterialUploadTile extends StatelessWidget {
-  final StudyMaterialModel material;
-  const _MaterialUploadTile({required this.material});
-
-  @override
-  Widget build(BuildContext context) {
-    final isPdf = material.fileType == FileType.pdf;
-    final iconColor = isPdf ? const Color(0xFFC62828) : AppColors.oceanBlue;
-    final icon = isPdf ? Icons.picture_as_pdf_rounded : Icons.play_circle_fill_rounded;
-
-    return Container(
-      margin: const EdgeInsets.only(bottom: 12),
-      padding: const EdgeInsets.all(12),
-      decoration: BoxDecoration(
-        color: Colors.white,
-        borderRadius: BorderRadius.circular(16),
-        boxShadow: AppShadows.subtle,
-      ),
-      child: Row(
-        children: [
-          Container(
-            padding: const EdgeInsets.all(10),
-            decoration: BoxDecoration(
-              color: iconColor.withAlpha((0.1 * 255).round()),
-              borderRadius: BorderRadius.circular(12),
-            ),
-            child: Icon(icon, color: iconColor, size: 24),
-          ),
-          const SizedBox(width: 12),
-          Expanded(
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                Text(material.title, style: AppTextStyles.labelLarge),
-                Text(
-                  "${material.category} • ${material.uploadedAt.toString().split(' ')[0]}",
-                  style: AppTextStyles.caption.copyWith(color: AppColors.textSecondary),
+                    );
+                  },
                 ),
-              ],
-            ),
-          ),
-          IconButton(
-            onPressed: () {},
-            icon: const Icon(Icons.more_vert_rounded, color: AppColors.textHint),
-          ),
-        ],
+      floatingActionButton: FloatingActionButton(
+        onPressed: _showUploadBottomSheet,
+        backgroundColor: AppColors.navyBlueBase,
+        child: const Icon(Icons.add, color: Colors.white),
       ),
     );
   }

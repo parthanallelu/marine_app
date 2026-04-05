@@ -1,0 +1,9 @@
+﻿Analyzing manaals_tutoring_app...                               
+
+  error - The element type 'Widget?' can't be assigned to the list type 'Widget' - lib\core\common_widgets\common_widgets.dart:558:40 - list_element_type_not_assignable
+  error - A nullable expression can't be used in a spread - lib\core\common_widgets\common_widgets.dart:560:43 - unchecked_use_of_nullable_value
+   info - 'groupValue' is deprecated and shouldn't be used. Use a RadioGroup ancestor to manage group value instead. This feature was deprecated after v3.32.0-0.0.pre - lib\features\admin\screens\admin_students_screen.dart:136:19 - deprecated_member_use
+   info - 'onChanged' is deprecated and shouldn't be used. Use RadioGroup to handle value change instead. This feature was deprecated after v3.32.0-0.0.pre - lib\features\admin\screens\admin_students_screen.dart:137:19 - deprecated_member_use
+   info - 'groupValue' is deprecated and shouldn't be used. Use a RadioGroup ancestor to manage group value instead. This feature was deprecated after v3.32.0-0.0.pre - lib\features\admin\screens\admin_students_screen.dart:168:19 - deprecated_member_use
+   info - 'onChanged' is deprecated and shouldn't be used. Use RadioGroup to handle value change instead. This feature was deprecated after v3.32.0-0.0.pre - lib\features\admin\screens\admin_students_screen.dart:169:19 - deprecated_member_use
+

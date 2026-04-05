@@ -33,23 +33,23 @@ class ProfessorShell extends StatelessWidget {
             onDestinationSelected: (index) => navigationShell.goBranch(index),
             destinations: const [
               NavigationDestination(
-                icon: Icon(Icons.dashboard_outlined),
-                selectedIcon: Icon(Icons.dashboard_rounded, color: AppColors.navyBlueBase),
+                icon: Icon(Icons.home_outlined),
+                selectedIcon: Icon(Icons.home_rounded),
                 label: 'Home',
               ),
               NavigationDestination(
                 icon: Icon(Icons.how_to_reg_outlined),
-                selectedIcon: Icon(Icons.how_to_reg_rounded, color: AppColors.navyBlueBase),
+                selectedIcon: Icon(Icons.how_to_reg_rounded),
                 label: 'Attendance',
               ),
               NavigationDestination(
-                icon: Icon(Icons.library_books_outlined),
-                selectedIcon: Icon(Icons.library_books_rounded, color: AppColors.navyBlueBase),
+                icon: Icon(Icons.menu_book_outlined),
+                selectedIcon: Icon(Icons.menu_book_rounded),
                 label: 'Materials',
               ),
               NavigationDestination(
-                icon: Icon(Icons.person_outline),
-                selectedIcon: Icon(Icons.person, color: AppColors.navyBlueBase),
+                icon: Icon(Icons.person_outline_rounded),
+                selectedIcon: Icon(Icons.person_rounded),
                 label: 'Profile',
               ),
             ],
