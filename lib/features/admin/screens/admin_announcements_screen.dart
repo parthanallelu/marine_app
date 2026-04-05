@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:uuid/uuid.dart';
 import '../../../core/theme/app_theme.dart';
 import '../../../core/constants/app_constants.dart';
 import '../../../core/common_widgets/common_widgets.dart';
@@ -13,11 +14,18 @@ class AdminAnnouncementsScreen extends StatefulWidget {
 }
 
 class _AdminAnnouncementsScreenState extends State<AdminAnnouncementsScreen> {
+  late List<AnnouncementModel> _allAnnouncements;
   String _selectedBranch = "All";
 
   @override
+  void initState() {
+    super.initState();
+    _allAnnouncements = List.from(DummyData.announcements);
+  }
+
+  @override
   Widget build(BuildContext context) {
-    final announcements = DummyData.announcements.where((a) {
+    final announcements = _allAnnouncements.where((a) {
       if (_selectedBranch == "All") return true;
       return a.targetBranches.contains(_selectedBranch);
     }).toList();
@@ -25,7 +33,7 @@ class _AdminAnnouncementsScreenState extends State<AdminAnnouncementsScreen> {
     return Scaffold(
       backgroundColor: AppColors.background,
       appBar: AppBar(
-        title: Text("Announcements", style: AppTextStyles.headingMedium),
+        title: Text("Notice Board", style: AppTextStyles.headingMedium),
         backgroundColor: Colors.white,
         elevation: 0,
         foregroundColor: AppColors.navyBlueBase,
@@ -42,7 +50,7 @@ class _AdminAnnouncementsScreenState extends State<AdminAnnouncementsScreen> {
                 scrollDirection: Axis.horizontal,
                 children: [
                   _BranchChip(
-                    label: "Global",
+                    label: "Academy Wide",
                     isSelected: _selectedBranch == "All",
                     onTap: () => setState(() => _selectedBranch = "All"),
                   ),
@@ -61,11 +69,11 @@ class _AdminAnnouncementsScreenState extends State<AdminAnnouncementsScreen> {
             child: announcements.isEmpty
                 ? const EmptyState(
                     icon: Icons.campaign_rounded,
-                    title: "No Announcements",
-                    subtitle: "There are no notices for the selected filter.",
+                    title: "No Active Notices",
+                    subtitle: "No announcements have been broadcasted for this filter.",
                   )
                 : ListView.builder(
-                    padding: const EdgeInsets.all(16),
+                    padding: const EdgeInsets.fromLTRB(16, 12, 16, 80),
                     itemCount: announcements.length,
                     itemBuilder: (context, index) {
                       final announcement = announcements[index];
@@ -76,80 +84,156 @@ class _AdminAnnouncementsScreenState extends State<AdminAnnouncementsScreen> {
         ],
       ),
       floatingActionButton: FloatingActionButton.extended(
-        onPressed: () => _showCreateAnnouncementDialog(),
+        onPressed: () => _showCreateAnnouncementSheet(),
         backgroundColor: AppColors.navyBlueBase,
-        icon: const Icon(Icons.add_rounded, color: Colors.white),
-        label: const Text("New Update", style: TextStyle(color: Colors.white)),
+        icon: const Icon(Icons.campaign_rounded, color: Colors.white),
+        label: const Text("Post Notice", style: TextStyle(color: Colors.white, fontWeight: FontWeight.bold)),
       ),
     );
   }
 
-  void _showCreateAnnouncementDialog() {
+  void _showCreateAnnouncementSheet() {
+    final formKey = GlobalKey<FormState>();
+    final titleController = TextEditingController();
+    final descController = TextEditingController();
+    String selectedPriority = "Medium";
+    bool isPinned = false;
+    List<String> selectedBranches = ["All"];
+
     showModalBottomSheet(
       context: context,
       isScrollControlled: true,
-      shape: const RoundedRectangleBorder(borderRadius: BorderRadius.vertical(top: Radius.circular(24))),
-      builder: (context) => Padding(
-        padding: EdgeInsets.only(bottom: MediaQuery.of(context).viewInsets.bottom),
-        child: Container(
-          padding: const EdgeInsets.all(24),
+      backgroundColor: Colors.transparent,
+      builder: (context) => StatefulBuilder(
+        builder: (context, setModalState) => Container(
+          height: MediaQuery.of(context).size.height * 0.8,
+          decoration: const BoxDecoration(
+            color: Colors.white,
+            borderRadius: BorderRadius.vertical(top: Radius.circular(24)),
+          ),
+          padding: EdgeInsets.only(bottom: MediaQuery.of(context).viewInsets.bottom),
           child: Column(
-            mainAxisSize: MainAxisSize.min,
-            crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              Text("Broadcast Update", style: AppTextStyles.headingMedium),
-              const SizedBox(height: 20),
-              const CustomTextField(label: "Title", hintText: "e.g. Special Guest Lecture"),
-              const SizedBox(height: 16),
-              const CustomTextField(
-                label: "Message",
-                hintText: "Enter the announcement details...",
-                maxLines: 4,
-              ),
-              const SizedBox(height: 16),
-              Text("Target Branch", style: AppTextStyles.labelLarge),
-              const SizedBox(height: 8),
-              // Dummy Multi-select representation
               Container(
-                padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 12),
-                decoration: BoxDecoration(
-                  border: Border.all(color: AppColors.divider),
-                  borderRadius: AppRadius.inputRadius,
-                ),
-                child: Row(
-                  children: [
-                    const Icon(Icons.location_on_rounded, size: 16, color: AppColors.textHint),
-                    const SizedBox(width: 8),
-                    Text("Academy Wide", style: AppTextStyles.bodyMedium),
-                  ],
-                ),
+                width: 40,
+                height: 4,
+                margin: const EdgeInsets.symmetric(vertical: 12),
+                decoration: BoxDecoration(color: AppColors.divider, borderRadius: BorderRadius.circular(2)),
               ),
-              const SizedBox(height: 24),
-              Row(
-                children: [
-                  Expanded(
-                    child: CustomButton(
-                      label: "CANCEL",
-                      isOutlined: true,
-                      onPressed: () => Navigator.pop(context),
+              Expanded(
+                child: SingleChildScrollView(
+                  padding: const EdgeInsets.all(24),
+                  child: Form(
+                    key: formKey,
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        Text("Broadcast New Notice", style: AppTextStyles.headingMedium),
+                        const SizedBox(height: 8),
+                        Text(
+                          "This message will be visible to selected students and staff.",
+                          style: AppTextStyles.bodyMedium.copyWith(color: AppColors.textSecondary),
+                        ),
+                        const SizedBox(height: 24),
+                        CustomTextField(
+                          label: "Title",
+                          hintText: "Enter a concise heading",
+                          controller: titleController,
+                          prefixIcon: Icons.title_rounded,
+                          validator: (v) => v == null || v.isEmpty ? "Required" : null,
+                        ),
+                        const SizedBox(height: 16),
+                        CustomTextField(
+                          label: "Description",
+                          hintText: "Detail your announcement here...",
+                          controller: descController,
+                          maxLines: 4,
+                          validator: (v) => v == null || v.isEmpty ? "Required" : null,
+                        ),
+                        const SizedBox(height: 16),
+                        Row(
+                          children: [
+                            Expanded(
+                              child: DropdownButtonFormField<String>(
+                                value: selectedPriority,
+                                decoration: const InputDecoration(labelText: "Priority", prefixIcon: Icon(Icons.priority_high_rounded, size: 20)),
+                                items: ["Low", "Medium", "High"].map((p) => DropdownMenuItem(value: p, child: Text(p))).toList(),
+                                onChanged: (val) => setModalState(() => selectedPriority = val!),
+                              ),
+                            ),
+                            const SizedBox(width: 16),
+                            Expanded(
+                              child: SwitchListTile(
+                                title: const Text("Pinned", style: TextStyle(fontSize: 14)),
+                                value: isPinned,
+                                onChanged: (val) => setModalState(() => isPinned = val),
+                                contentPadding: EdgeInsets.zero,
+                              ),
+                            ),
+                          ],
+                        ),
+                        const SizedBox(height: 16),
+                        Text("Target Branches", style: AppTextStyles.labelLarge),
+                        const SizedBox(height: 8),
+                        Wrap(
+                          spacing: 8,
+                          children: ["All", ...AppConstants.branches].map((branch) {
+                            final isSel = selectedBranches.contains(branch);
+                            return FilterChip(
+                              label: Text(branch, style: TextStyle(fontSize: 12, color: isSel ? Colors.white : AppColors.textPrimary)),
+                              selected: isSel,
+                              selectedColor: AppColors.navyBlueBase,
+                              onSelected: (sel) {
+                                setModalState(() {
+                                  if (branch == "All") {
+                                    selectedBranches = ["All"];
+                                  } else {
+                                    selectedBranches.remove("All");
+                                    if (sel) {
+                                      selectedBranches.add(branch);
+                                    } else {
+                                      selectedBranches.remove(branch);
+                                      if (selectedBranches.isEmpty) selectedBranches = ["All"];
+                                    }
+                                  }
+                                });
+                              },
+                            );
+                          }).toList(),
+                        ),
+                        const SizedBox(height: 32),
+                        CustomButton(
+                          label: "PUBLISH BROADCAST",
+                          width: double.infinity,
+                          onPressed: () {
+                            if (formKey.currentState!.validate()) {
+                              final newNotice = AnnouncementModel(
+                                id: const Uuid().v4(),
+                                title: titleController.text,
+                                description: descController.text,
+                                createdAt: DateTime.now(),
+                                authorName: "Principal Admin",
+                                authorRole: AppConstants.roleAdmin,
+                                priority: selectedPriority,
+                                isPinned: isPinned,
+                                targetBranches: selectedBranches,
+                                targetRoles: ["student", "professor"],
+                              );
+                              setState(() {
+                                _allAnnouncements.insert(0, newNotice);
+                              });
+                              Navigator.pop(context);
+                              ScaffoldMessenger.of(context).showSnackBar(
+                                const SnackBar(content: Text("Notice published successfully!")),
+                              );
+                            }
+                          },
+                        ),
+                        const SizedBox(height: 16),
+                      ],
                     ),
                   ),
-                  const SizedBox(width: 16),
-                  Expanded(
-                    child: CustomButton(
-                      label: "BROADCAST",
-                      onPressed: () {
-                        Navigator.pop(context);
-                        ScaffoldMessenger.of(context).showSnackBar(
-                          const SnackBar(
-                            content: Text("Announcement broadcasted successfully!"),
-                            backgroundColor: AppColors.success,
-                          ),
-                        );
-                      },
-                    ),
-                  ),
-                ],
+                ),
               ),
             ],
           ),
@@ -173,7 +257,7 @@ class _BranchChip extends StatelessWidget {
       child: GestureDetector(
         onTap: onTap,
         child: Container(
-          padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+          padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 6),
           decoration: BoxDecoration(
             color: isSelected ? AppColors.navyBlueBase : AppColors.background,
             borderRadius: BorderRadius.circular(20),
@@ -183,7 +267,7 @@ class _BranchChip extends StatelessWidget {
             label,
             style: TextStyle(
               color: isSelected ? Colors.white : AppColors.textPrimary,
-              fontSize: 12,
+              fontSize: 11,
               fontWeight: isSelected ? FontWeight.bold : FontWeight.normal,
             ),
           ),
@@ -228,13 +312,19 @@ class _AdminAnnouncementCard extends StatelessWidget {
           const Divider(height: 24),
           Row(
             children: [
+              CircleAvatar(
+                radius: 12,
+                backgroundColor: AppColors.navyBlueSurface,
+                child: Text(announcement.authorName[0], style: const TextStyle(fontSize: 10, color: AppColors.navyBlueBase)),
+              ),
+              const SizedBox(width: 8),
               Text(
                 "By ${announcement.authorName}",
-                style: AppTextStyles.caption.copyWith(color: AppColors.navyBlueBase),
+                style: AppTextStyles.caption.copyWith(color: AppColors.textSecondary),
               ),
               const Spacer(),
               Text(
-                announcement.createdAt.toString().split(' ')[0],
+                "${announcement.createdAt.day}/${announcement.createdAt.month}/${announcement.createdAt.year}",
                 style: AppTextStyles.caption.copyWith(color: AppColors.textHint),
               ),
             ],

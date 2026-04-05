@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:uuid/uuid.dart';
 import '../../../core/theme/app_theme.dart';
 import '../../../core/constants/app_constants.dart';
 import '../../../core/common_widgets/common_widgets.dart';
@@ -13,19 +14,32 @@ class AdminStudentsScreen extends StatefulWidget {
 }
 
 class _AdminStudentsScreenState extends State<AdminStudentsScreen> {
+  late List<StudentModel> _allStudents;
   String _searchQuery = "";
   String _selectedBranch = "All";
   String _selectedCourse = "All";
 
   @override
-  Widget build(BuildContext context) {
-    final students = DummyData.students.where((s) {
+  void initState() {
+    super.initState();
+    // Initialize with dummy data for local session state
+    _allStudents = List.from(DummyData.students);
+  }
+
+  List<StudentModel> get _filteredStudents {
+    return _allStudents.where((s) {
       final matchesSearch = s.name.toLowerCase().contains(_searchQuery.toLowerCase()) || 
-                          s.rollNumber.toLowerCase().contains(_searchQuery.toLowerCase());
+                          s.rollNumber.toLowerCase().contains(_searchQuery.toLowerCase()) ||
+                          s.email.toLowerCase().contains(_searchQuery.toLowerCase());
       final matchesBranch = _selectedBranch == "All" || s.branch == _selectedBranch;
       final matchesCourse = _selectedCourse == "All" || s.courseType == _selectedCourse;
       return matchesSearch && matchesBranch && matchesCourse;
     }).toList();
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    final students = _filteredStudents;
 
     return Scaffold(
       backgroundColor: AppColors.background,
@@ -44,7 +58,7 @@ class _AdminStudentsScreenState extends State<AdminStudentsScreen> {
             child: Column(
               children: [
                 CustomTextField(
-                  hintText: "Search by name or roll number...",
+                  hintText: "Search by name, roll no, or email...",
                   prefixIcon: Icons.search_rounded,
                   onChanged: (val) => setState(() => _searchQuery = val),
                 ),
@@ -74,7 +88,7 @@ class _AdminStudentsScreenState extends State<AdminStudentsScreen> {
 
           // STUDENT COUNT
           Padding(
-            padding: const EdgeInsets.all(16),
+            padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
             child: Row(
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
               children: [
@@ -104,7 +118,7 @@ class _AdminStudentsScreenState extends State<AdminStudentsScreen> {
                     subtitle: "Try adjusting your filters or search terms.",
                   )
                 : ListView.builder(
-                    padding: const EdgeInsets.symmetric(horizontal: 16),
+                    padding: const EdgeInsets.fromLTRB(16, 0, 16, 80), // Extra bottom padding for FAB
                     itemCount: students.length,
                     itemBuilder: (context, index) {
                       final student = students[index];
@@ -113,6 +127,155 @@ class _AdminStudentsScreenState extends State<AdminStudentsScreen> {
                   ),
           ),
         ],
+      ),
+      floatingActionButton: FloatingActionButton.extended(
+        onPressed: () => _showAddStudentSheet(),
+        backgroundColor: AppColors.navyBlueBase,
+        icon: const Icon(Icons.person_add_alt_1_rounded, color: Colors.white),
+        label: const Text("Add Student", style: TextStyle(color: Colors.white, fontWeight: FontWeight.bold)),
+      ),
+    );
+  }
+
+  void _showAddStudentSheet() {
+    final formKey = GlobalKey<FormState>();
+    final nameController = TextEditingController();
+    final emailController = TextEditingController();
+    final phoneController = TextEditingController();
+    final rollController = TextEditingController();
+    String? selectedBranch;
+    String? selectedCourse;
+
+    showModalBottomSheet(
+      context: context,
+      isScrollControlled: true,
+      backgroundColor: Colors.transparent,
+      builder: (context) => Container(
+        height: MediaQuery.of(context).size.height * 0.85,
+        decoration: const BoxDecoration(
+          color: Colors.white,
+          borderRadius: BorderRadius.vertical(top: Radius.circular(24)),
+        ),
+        padding: EdgeInsets.only(
+          bottom: MediaQuery.of(context).viewInsets.bottom,
+        ),
+        child: Column(
+          children: [
+            Container(
+              width: 40,
+              height: 4,
+              margin: const EdgeInsets.symmetric(vertical: 12),
+              decoration: BoxDecoration(
+                color: AppColors.divider,
+                borderRadius: BorderRadius.circular(2),
+              ),
+            ),
+            Expanded(
+              child: SingleChildScrollView(
+                padding: const EdgeInsets.all(24),
+                child: Form(
+                  key: formKey,
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Text("Enroll New Student", style: AppTextStyles.headingMedium),
+                      const SizedBox(height: 8),
+                      Text(
+                        "Fill in the details below to add a student to the academy database.",
+                        style: AppTextStyles.bodyMedium.copyWith(color: AppColors.textSecondary),
+                      ),
+                      const SizedBox(height: 24),
+                      CustomTextField(
+                        label: "Full Name",
+                        hintText: "Enter student's full name",
+                        controller: nameController,
+                        prefixIcon: Icons.person_outline_rounded,
+                        validator: (v) => v == null || v.isEmpty ? "Required" : null,
+                      ),
+                      const SizedBox(height: 16),
+                      CustomTextField(
+                        label: "Email Address",
+                        hintText: "example@academy.com",
+                        controller: emailController,
+                        keyboardType: TextInputType.emailAddress,
+                        prefixIcon: Icons.email_outlined,
+                        validator: (v) => v == null || !v.contains('@') ? "Invalid email" : null,
+                      ),
+                      const SizedBox(height: 16),
+                      Row(
+                        children: [
+                          Expanded(
+                            child: CustomTextField(
+                              label: "Phone",
+                              hintText: "10-digit number",
+                              controller: phoneController,
+                              keyboardType: TextInputType.phone,
+                              prefixIcon: Icons.phone_outlined,
+                              validator: (v) => v == null || v.length < 10 ? "Invalid phone" : null,
+                            ),
+                          ),
+                          const SizedBox(width: 16),
+                          Expanded(
+                            child: CustomTextField(
+                              label: "Roll Number",
+                              hintText: "MA-2024-XXX",
+                              controller: rollController,
+                              prefixIcon: Icons.badge_outlined,
+                              validator: (v) => v == null || v.isEmpty ? "Required" : null,
+                            ),
+                          ),
+                        ],
+                      ),
+                      const SizedBox(height: 16),
+                      DropdownButtonFormField<String>(
+                        decoration: const InputDecoration(labelText: "Branch", prefixIcon: Icon(Icons.location_on_outlined, size: 20)),
+                        items: AppConstants.branches.map((b) => DropdownMenuItem(value: b, child: Text(b))).toList(),
+                        onChanged: (val) => selectedBranch = val,
+                        validator: (v) => v == null ? "Required" : null,
+                      ),
+                      const SizedBox(height: 16),
+                      DropdownButtonFormField<String>(
+                        decoration: const InputDecoration(labelText: "Course Type", prefixIcon: Icon(Icons.school_outlined, size: 20)),
+                        items: AppConstants.courseTypes.map((c) => DropdownMenuItem(value: c, child: Text(c))).toList(),
+                        onChanged: (val) => selectedCourse = val,
+                        validator: (v) => v == null ? "Required" : null,
+                      ),
+                      const SizedBox(height: 32),
+                      CustomButton(
+                        label: "Add Student to Records",
+                        width: double.infinity,
+                        onPressed: () {
+                          if (formKey.currentState!.validate()) {
+                            final newStudent = StudentModel(
+                              id: const Uuid().v4(),
+                              name: nameController.text,
+                              email: emailController.text,
+                              phone: phoneController.text,
+                              role: AppConstants.roleStudent,
+                              branch: selectedBranch!,
+                              courseType: selectedCourse!,
+                              rollNumber: rollController.text,
+                              createdAt: DateTime.now(),
+                              joiningDate: DateTime.now(),
+                            );
+                            setState(() {
+                              _allStudents.insert(0, newStudent);
+                            });
+                            Navigator.pop(context);
+                            ScaffoldMessenger.of(context).showSnackBar(
+                              const SnackBar(content: Text("Student added successfully!")),
+                            );
+                          }
+                        },
+                      ),
+                      const SizedBox(height: 16),
+                    ],
+                  ),
+                ),
+              ),
+            ),
+          ],
+        ),
       ),
     );
   }
@@ -241,7 +404,7 @@ class _AdminStudentTile extends StatelessWidget {
                 radius: 24,
                 backgroundColor: AppColors.navyBlueSurface,
                 child: Text(
-                  student.name[0],
+                  student.name.isNotEmpty ? student.name[0] : 'S',
                   style: const TextStyle(fontWeight: FontWeight.bold, color: AppColors.navyBlueBase),
                 ),
               ),
@@ -257,7 +420,7 @@ class _AdminStudentTile extends StatelessWidget {
               ),
               IconButton(
                 onPressed: () {},
-                icon: const Icon(Icons.info_outline_rounded, color: AppColors.oceanBlue),
+                icon: const Icon(Icons.arrow_forward_ios_rounded, color: AppColors.textHint, size: 14),
               ),
             ],
           ),

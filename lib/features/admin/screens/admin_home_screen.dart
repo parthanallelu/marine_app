@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
-import 'package:percent_indicator/percent_indicator.dart';
+import 'package:fl_chart/fl_chart.dart';
+import 'package:go_router/go_router.dart';
 import '../../../core/theme/app_theme.dart';
 import '../../../core/constants/app_constants.dart';
 import '../../../core/common_widgets/common_widgets.dart';
@@ -8,106 +9,194 @@ import '../../../providers/auth_provider.dart';
 import '../../../models/app_models.dart';
 import '../../../models/dummy_data.dart';
 
-class AdminHomeScreen extends StatelessWidget {
+class AdminHomeScreen extends StatefulWidget {
   const AdminHomeScreen({super.key});
 
   @override
-  Widget build(BuildContext context) {
-    final user = context.watch<AuthProvider>().currentUser;
-    // Check if the user is an AdminModel before casting
-    final adminName = user?.name ?? "Admin";
-    
-    // Global Stats
-    final totalStudents = DummyData.students.length;
-    final totalBatches = DummyData.batches.length;
-    
-    // Revenue Calculation (Mock)
-    final totalFeesCollected = DummyData.feeRecords.fold<double>(0, (sum, f) => sum + f.paidAmount);
-    final totalFeesPending = DummyData.feeRecords.fold<double>(0, (sum, f) => sum + (f.totalFees - f.paidAmount));
-    final collectionPercentage = (totalFeesCollected + totalFeesPending) > 0 
-        ? totalFeesCollected / (totalFeesCollected + totalFeesPending)
-        : 0.0;
+  State<AdminHomeScreen> createState() => _AdminHomeScreenState();
+}
 
+class _AdminHomeScreenState extends State<AdminHomeScreen> {
+  late int totalStudents;
+  late int totalProfessors;
+  late int activeBatches;
+  late double totalFeesPending;
+  late Map<String, int> branchCounts;
+  late Map<String, int> courseCounts;
+  late List<AnnouncementModel> recentNotices;
+
+  @override
+  void initState() {
+    super.initState();
+    _computeData();
+  }
+
+  void _computeData() {
+    totalStudents = DummyData.students.length;
+    totalProfessors = DummyData.professors.length;
+    activeBatches = DummyData.batches.where((b) => b.isActive).length;
+
+    // Sum of pending amounts across all fee records
+    totalFeesPending = DummyData.feeRecords.fold(0, (sum, record) => sum + record.pendingAmount);
+
+    // Branch counts
+    branchCounts = {};
+    for (var branch in AppConstants.branches) {
+      branchCounts[branch] = DummyData.students.where((s) => s.branch == branch).length;
+    }
+
+    // Course counts
+    courseCounts = {};
+    for (var course in AppConstants.courseTypes) {
+      courseCounts[course] = DummyData.students.where((s) => s.courseType == course).length;
+    }
+
+    recentNotices = DummyData.announcements.take(2).toList();
+  }
+
+  @override
+  Widget build(BuildContext context) {
     return Scaffold(
       backgroundColor: AppColors.background,
       body: CustomScrollView(
         slivers: [
-          // SLIVER 1 — Global Admin Header
-          SliverToBoxAdapter(
-            child: _AdminHeader(adminName: adminName),
+          // SLIVER 1 — NavyHeader
+          NavyHeader(
+            title: "Admin Panel",
+            subtitle: AppConstants.appName,
+            actions: [
+              CircleAvatar(
+                radius: 18,
+                backgroundColor: AppColors.gold.withAlpha((0.2 * 255).round()),
+                child: const Text('A', style: TextStyle(color: AppColors.gold, fontWeight: FontWeight.bold)),
+              ),
+            ],
           ),
 
-          // SLIVER 2 — Master KPIs
+          // SLIVER 2 — 4 Stat Cards in 2×2 Grid
           SliverPadding(
-            padding: const EdgeInsets.fromLTRB(20, 20, 20, 0),
+            padding: const EdgeInsets.all(20),
             sliver: SliverToBoxAdapter(
-              child: Row(
-                children: [
-                  Expanded(
-                    child: StatCard(
-                      label: "Academy Students",
+              child: SizedBox(
+                height: 220, // Adjust height to fit 2 rows
+                child: GridView.count(
+                  crossAxisCount: 2,
+                  crossAxisSpacing: 12,
+                  mainAxisSpacing: 12,
+                  physics: const NeverScrollableScrollPhysics(),
+                  children: [
+                    StatCard(
+                      label: "Total Students",
                       value: totalStudents.toString(),
-                      icon: Icons.people_alt_rounded,
+                      icon: Icons.school_rounded,
                       color: AppColors.navyBlueBase,
                     ),
-                  ),
-                  const SizedBox(width: 12),
-                  Expanded(
-                    child: StatCard(
-                      label: "Total Batches",
-                      value: totalBatches.toString(),
-                      icon: Icons.layers_rounded,
-                      color: AppColors.gold,
+                    StatCard(
+                      label: "Professors",
+                      value: totalProfessors.toString(),
+                      icon: Icons.person_rounded,
+                      color: AppColors.oceanBlue,
                     ),
-                  ),
-                ],
+                    StatCard(
+                      label: "Active Batches",
+                      value: activeBatches.toString(),
+                      icon: Icons.class_rounded,
+                      color: AppColors.success,
+                    ),
+                    StatCard(
+                      label: "Pending Fees",
+                      value: "₹${totalFeesPending.toStringAsFixed(0)}",
+                      icon: Icons.payments_rounded,
+                      color: AppColors.error, // Warning/Error color for collections
+                    ),
+                  ],
+                ),
               ),
             ),
           ),
 
-          // SLIVER 3 — Financial Overview
+          // SLIVER 3 — Branch Distribution DashboardCard
           SliverToBoxAdapter(
             child: Padding(
-              padding: const EdgeInsets.fromLTRB(20, 24, 20, 0),
+              padding: const EdgeInsets.symmetric(horizontal: 20),
               child: DashboardCard(
-                title: "Academy Fee Collection",
-                icon: Icons.account_balance_wallet_rounded,
-                iconColor: AppColors.success,
+                title: "Students by Branch",
+                icon: Icons.bar_chart_rounded,
+                child: SizedBox(
+                  height: 180,
+                  child: BarChart(
+                    BarChartData(
+                      alignment: BarChartAlignment.spaceAround,
+                      maxY: (branchCounts.values.isEmpty ? 10 : branchCounts.values.reduce((a, b) => a > b ? a : b) + 2).toDouble(),
+                      barTouchData: BarTouchData(
+                        touchTooltipData: BarTouchTooltipData(
+                          getTooltipColor: (_) => AppColors.navyBlueBase,
+                        ),
+                      ),
+                      titlesData: FlTitlesData(
+                        show: true,
+                        bottomTitles: AxisTitles(
+                          sideTitles: SideTitles(
+                            showTitles: true,
+                            getTitlesWidget: (value, meta) {
+                              final index = value.toInt();
+                              if (index >= 0 && index < AppConstants.branches.length) {
+                                return Padding(
+                                  padding: const EdgeInsets.only(top: 8.0),
+                                  child: Text(
+                                    AppConstants.branches[index].substring(0, 3),
+                                    style: AppTextStyles.caption,
+                                  ),
+                                );
+                              }
+                              return const SizedBox.shrink();
+                            },
+                          ),
+                        ),
+                        leftTitles: const AxisTitles(sideTitles: SideTitles(showTitles: true, reservedSize: 30)),
+                        topTitles: const AxisTitles(sideTitles: SideTitles(showTitles: false)),
+                        rightTitles: const AxisTitles(sideTitles: SideTitles(showTitles: false)),
+                      ),
+                      gridData: const FlGridData(show: true, drawVerticalLine: false),
+                      borderData: FlBorderData(show: false),
+                      barGroups: _generateBarGroups(),
+                    ),
+                  ),
+                ),
+              ),
+            ),
+          ),
+
+          const SizedBox(height: 20).toSliver,
+
+          // SLIVER 4 — Course Distribution DashboardCard
+          SliverToBoxAdapter(
+            child: Padding(
+              padding: const EdgeInsets.symmetric(horizontal: 20),
+              child: DashboardCard(
+                title: "Course Distribution",
+                icon: Icons.pie_chart_rounded,
                 child: Column(
                   children: [
+                    SizedBox(
+                      height: 200,
+                      child: PieChart(
+                        PieChartData(
+                          sectionsSpace: 2,
+                          centerSpaceRadius: 40,
+                          sections: _generatePieSections(),
+                        ),
+                      ),
+                    ),
+                    const SizedBox(height: 16),
                     Row(
+                      mainAxisAlignment: MainAxisAlignment.center,
                       children: [
-                        CircularPercentIndicator(
-                          radius: 40.0,
-                          lineWidth: 8.0,
-                          percent: collectionPercentage,
-                          center: Text(
-                            "${(collectionPercentage * 100).toInt()}%",
-                            style: AppTextStyles.labelSmall.copyWith(fontWeight: FontWeight.bold),
-                          ),
-                          progressColor: AppColors.success,
-                          backgroundColor: AppColors.success.withAlpha((0.15 * 255).round()),
-                          circularStrokeCap: CircularStrokeCap.round,
-                        ),
-                        const SizedBox(width: 20),
-                        Expanded(
-                          child: Column(
-                            crossAxisAlignment: CrossAxisAlignment.start,
-                            children: [
-                              _FeeDetailItem(
-                                label: "Collected",
-                                value: "₹${totalFeesCollected.toInt()}",
-                                color: AppColors.success,
-                              ),
-                              const SizedBox(height: 8),
-                              _FeeDetailItem(
-                                label: "Outstanding",
-                                value: "₹${totalFeesPending.toInt()}",
-                                color: AppColors.error,
-                              ),
-                            ],
-                          ),
-                        ),
+                        _AttendanceDot(color: const Color(0xFF1565C0), label: "11th"),
+                        const SizedBox(width: 16),
+                        _AttendanceDot(color: const Color(0xFF6A1B9A), label: "12th"),
+                        const SizedBox(width: 16),
+                        _AttendanceDot(color: const Color(0xFFBF360C), label: "Crash"),
                       ],
                     ),
                   ],
@@ -116,44 +205,23 @@ class AdminHomeScreen extends StatelessWidget {
             ),
           ),
 
-          // SLIVER 4 — Branch Quick-View
-          SliverPadding(
-            padding: const EdgeInsets.fromLTRB(20, 24, 20, 0),
-            sliver: SliverToBoxAdapter(
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  const SectionHeader(title: "Branch Oversight"),
-                  const SizedBox(height: 12),
-                  SizedBox(
-                    height: 140,
-                    child: ListView.builder(
-                      scrollDirection: Axis.horizontal,
-                      itemCount: AppConstants.branches.length,
-                      itemBuilder: (context, index) {
-                        final branchName = AppConstants.branches[index];
-                        final branchStudents = DummyData.students.where((s) => s.branch == branchName).length;
-                        return _BranchCard(name: branchName, studentCount: branchStudents);
-                      },
-                    ),
-                  ),
-                ],
-              ),
-            ),
-          ),
+          const SizedBox(height: 20).toSliver,
 
-          // SLIVER 5 — Faculty Quick-View
+          // SLIVER 5 — Recent Announcements DashboardCard
           SliverToBoxAdapter(
             child: Padding(
-              padding: const EdgeInsets.fromLTRB(20, 24, 20, 32),
+              padding: const EdgeInsets.fromLTRB(20, 12, 20, 32),
               child: DashboardCard(
-                title: "Academic Faculty",
-                icon: Icons.school_rounded,
-                iconColor: AppColors.oceanBlue,
-                actionLabel: "View All",
-                onAction: () {},
+                title: "Recent Notices",
+                actionLabel: "All",
+                onAction: () => context.go(AppRoutes.adminAnnouncements),
                 child: Column(
-                  children: DummyData.professors.take(3).map((prof) => _FacultyTile(professor: prof)).toList(),
+                  children: recentNotices.map((notice) => Column(
+                    children: [
+                      AnnouncementTile(announcement: notice),
+                      if (notice != recentNotices.last) const Divider(height: 24),
+                    ],
+                  )).toList(),
                 ),
               ),
             ),
@@ -162,174 +230,61 @@ class AdminHomeScreen extends StatelessWidget {
       ),
     );
   }
-}
 
-class _AdminHeader extends StatelessWidget {
-  final String adminName;
-  const _AdminHeader({required this.adminName});
-
-  @override
-  Widget build(BuildContext context) {
-    return Container(
-      width: double.infinity,
-      decoration: const BoxDecoration(
-        gradient: LinearGradient(
-          colors: [AppColors.navyBlueDark, AppColors.navyBlueBase],
-          begin: Alignment.topLeft,
-          end: Alignment.bottomRight,
-        ),
-      ),
-      child: SafeArea(
-        bottom: false,
-        child: Padding(
-          padding: const EdgeInsets.fromLTRB(20, 16, 20, 28),
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              Row(
-                mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                children: [
-                  Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      Text(
-                        "Commanding Officer,",
-                        style: AppTextStyles.bodyMedium.copyWith(color: Colors.white70),
-                      ),
-                      Text(
-                        adminName,
-                        style: AppTextStyles.headingLarge.copyWith(color: Colors.white),
-                      ),
-                    ],
-                  ),
-                  IconButton(
-                    onPressed: () => context.read<AuthProvider>().logout(),
-                    icon: const Icon(Icons.logout_rounded, color: Colors.white70),
-                  ),
-                ],
-              ),
-              const SizedBox(height: 16),
-              Container(
-                padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
-                decoration: BoxDecoration(
-                  color: AppColors.gold.withAlpha((0.2 * 255).round()),
-                  borderRadius: BorderRadius.circular(20),
-                ),
-                child: Row(
-                  mainAxisSize: MainAxisSize.min,
-                  children: [
-                    const Icon(Icons.verified_user_rounded, color: AppColors.gold, size: 14),
-                    const SizedBox(width: 6),
-                    Text(
-                      "Super Academy Admin",
-                      style: AppTextStyles.labelSmall.copyWith(color: AppColors.gold, fontWeight: FontWeight.bold),
-                    ),
-                  ],
-                ),
-              ),
-            ],
+  List<BarChartGroupData> _generateBarGroups() {
+    return List.generate(AppConstants.branches.length, (i) {
+      final branch = AppConstants.branches[i];
+      final count = branchCounts[branch] ?? 0;
+      return BarChartGroupData(
+        x: i,
+        barRods: [
+          BarChartRodData(
+            toY: count.toDouble(),
+            color: AppColors.navyBlueBase,
+            width: 16,
+            borderRadius: const BorderRadius.vertical(top: Radius.circular(4)),
           ),
-        ),
-      ),
-    );
+        ],
+      );
+    });
+  }
+
+  List<PieChartSectionData> _generatePieSections() {
+    final colors = [const Color(0xFF1565C0), const Color(0xFF6A1B9A), const Color(0xFFBF360C)];
+    int i = 0;
+    return courseCounts.entries.map((entry) {
+      final index = i++;
+      final value = entry.value.toDouble();
+      final shortLabel = entry.key.split(' ')[0];
+      return PieChartSectionData(
+        color: colors[index % colors.length],
+        value: value,
+        title: '$shortLabel\n${value.toInt()}',
+        radius: 80,
+        titleStyle: AppTextStyles.caption.copyWith(color: Colors.white, fontWeight: FontWeight.bold),
+      );
+    }).toList();
   }
 }
 
-class _FeeDetailItem extends StatelessWidget {
-  final String label;
-  final String value;
+class _AttendanceDot extends StatelessWidget {
   final Color color;
-
-  const _FeeDetailItem({required this.label, required this.value, required this.color});
+  final String label;
+  const _AttendanceDot({required this.color, required this.label});
 
   @override
   Widget build(BuildContext context) {
     return Row(
-      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+      mainAxisSize: MainAxisSize.min,
       children: [
-        Text(label, style: const TextStyle(color: AppColors.textSecondary, fontSize: 12)),
-        Text(value, style: AppTextStyles.labelLarge.copyWith(color: color)),
+        Container(width: 8, height: 8, decoration: BoxDecoration(color: color, shape: BoxShape.circle)),
+        const SizedBox(width: 6),
+        Text(label, style: AppTextStyles.caption),
       ],
     );
   }
 }
 
-class _BranchCard extends StatelessWidget {
-  final String name;
-  final int studentCount;
-
-  const _BranchCard({required this.name, required this.studentCount});
-
-  @override
-  Widget build(BuildContext context) {
-    return Container(
-      width: 140,
-      margin: const EdgeInsets.only(right: 12),
-      padding: const EdgeInsets.all(16),
-      decoration: BoxDecoration(
-        color: Colors.white,
-        borderRadius: AppRadius.cardRadius,
-        boxShadow: AppShadows.subtle,
-      ),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          Container(
-            padding: const EdgeInsets.all(8),
-            decoration: const BoxDecoration(
-              color: AppColors.background,
-              shape: BoxShape.circle,
-            ),
-            child: const Icon(Icons.location_on_rounded, color: AppColors.navyBlueBase, size: 20),
-          ),
-          const Spacer(),
-          Text(name, style: AppTextStyles.labelLarge),
-          const SizedBox(height: 4),
-          Text(
-            "$studentCount Students",
-            style: AppTextStyles.caption.copyWith(color: AppColors.textSecondary),
-          ),
-        ],
-      ),
-    );
-  }
-}
-
-class _FacultyTile extends StatelessWidget {
-  final ProfessorModel professor;
-  const _FacultyTile({required this.professor});
-
-  @override
-  Widget build(BuildContext context) {
-    return Container(
-      margin: const EdgeInsets.only(bottom: 12),
-      padding: const EdgeInsets.all(12),
-      decoration: BoxDecoration(
-        color: AppColors.background,
-        borderRadius: BorderRadius.circular(12),
-      ),
-      child: Row(
-        children: [
-          CircleAvatar(
-            backgroundColor: AppColors.oceanBlueSurface,
-            child: Text(professor.name[0], style: const TextStyle(color: AppColors.oceanBlue)),
-          ),
-          const SizedBox(width: 12),
-          Expanded(
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                Text(professor.name, style: AppTextStyles.labelLarge),
-                Text(
-                  "${professor.qualification} • ${professor.branch}",
-                  style: AppTextStyles.caption,
-                ),
-              ],
-            ),
-          ),
-          const Icon(Icons.arrow_forward_ios_rounded, size: 14, color: AppColors.textHint),
-        ],
-      ),
-    );
-  }
+extension on Widget {
+  SliverToBoxAdapter get toSliver => SliverToBoxAdapter(child: this);
 }

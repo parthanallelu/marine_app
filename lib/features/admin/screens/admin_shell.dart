@@ -25,7 +25,6 @@ class AdminShell extends StatelessWidget {
           ],
         ),
         child: SafeArea(
-          top: false,
           child: NavigationBar(
             backgroundColor: Colors.white,
             elevation: 0,
@@ -35,16 +34,16 @@ class AdminShell extends StatelessWidget {
               NavigationDestination(
                 icon: Icon(Icons.dashboard_outlined),
                 selectedIcon: Icon(Icons.dashboard_rounded, color: AppColors.navyBlueBase),
-                label: 'Home',
+                label: 'Dashboard',
               ),
               NavigationDestination(
-                icon: Icon(Icons.people_outline),
-                selectedIcon: Icon(Icons.people_rounded, color: AppColors.navyBlueBase),
+                icon: Icon(Icons.school_outlined),
+                selectedIcon: Icon(Icons.school_rounded, color: AppColors.navyBlueBase),
                 label: 'Students',
               ),
               NavigationDestination(
-                icon: Icon(Icons.group_work_outlined),
-                selectedIcon: Icon(Icons.group_work_rounded, color: AppColors.navyBlueBase),
+                icon: Icon(Icons.class_outlined),
+                selectedIcon: Icon(Icons.class_rounded, color: AppConstants.roleAdmin == 'admin' ? AppColors.navyBlueBase : AppColors.navyBlueBase),
                 label: 'Batches',
               ),
               NavigationDestination(
@@ -55,7 +54,7 @@ class AdminShell extends StatelessWidget {
               NavigationDestination(
                 icon: Icon(Icons.campaign_outlined),
                 selectedIcon: Icon(Icons.campaign_rounded, color: AppColors.navyBlueBase),
-                label: 'Updates',
+                label: 'Notices',
               ),
             ],
           ),
