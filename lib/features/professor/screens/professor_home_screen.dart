@@ -218,7 +218,7 @@ class _ProfessorHomeScreenState extends State<ProfessorHomeScreen> {
                   courseType: batch.courseType,
                   timing: batch.timing,
                   branch: batch.branch,
-                  studentCount: batch.studentIds.length,
+                  studentCount: DummyData.students.where((s) => s.batchId == batch.id).length,
                   actionLabel: 'Mark Attendance',
                   onAction: () => context.push(AppRoutes.markAttendance),
                 ),
@@ -253,7 +253,7 @@ class _ProfessorHomeScreenState extends State<ProfessorHomeScreen> {
                   courseType: batch.courseType,
                   timing: batch.timing,
                   branch: batch.branch,
-                  studentCount: batch.studentIds.length,
+                  studentCount: DummyData.students.where((s) => s.batchId == batch.id).length,
                   onTap: () {
                     // Future: Batch details screen
                   },

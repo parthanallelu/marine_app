@@ -122,7 +122,12 @@ class _AdminStudentsScreenState extends State<AdminStudentsScreen> {
                     itemCount: students.length,
                     itemBuilder: (context, index) {
                       final student = students[index];
-                      return _AdminStudentTile(student: student);
+                      return _AdminStudentTile(
+                        student: student,
+                        onBatchChanged: () {
+                          setState(() {});
+                        },
+                      );
                     },
                   ),
           ),
@@ -387,7 +392,8 @@ class _FilterButton extends StatelessWidget {
 
 class _AdminStudentTile extends StatelessWidget {
   final StudentModel student;
-  const _AdminStudentTile({required this.student});
+  final VoidCallback onBatchChanged;
+  const _AdminStudentTile({required this.student, required this.onBatchChanged});
 
   @override
   Widget build(BuildContext context) {
@@ -421,10 +427,56 @@ class _AdminStudentTile extends StatelessWidget {
                   ],
                 ),
               ),
-              IconButton(
-                onPressed: () {},
-                icon: const Icon(Icons.arrow_forward_ios_rounded, color: AppColors.textHint, size: 14),
+              PopupMenuButton<String>(
+                icon: const Icon(Icons.more_vert_rounded, color: AppColors.textHint),
+                tooltip: "Manage Student",
+                onSelected: (val) {
+                  if (val == 'batch') {
+                    _showBatchSelector(context);
+                  }
+                },
+                itemBuilder: (context) => [
+                  const PopupMenuItem(
+                    value: 'batch',
+                    child: Text("Assign to Batch"),
+                  ),
+                ],
               ),
+            ],
+          ),
+          const SizedBox(height: 8),
+          Row(
+            children: [
+              if (student.batchId.isNotEmpty)
+                Container(
+                  padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+                  decoration: BoxDecoration(
+                    color: AppColors.gold.withAlpha((0.2 * 255).round()),
+                    borderRadius: BorderRadius.circular(8),
+                  ),
+                  child: Row(
+                    children: [
+                      const Icon(Icons.class_outlined, size: 14, color: AppColors.gold),
+                      const SizedBox(width: 4),
+                      Text(student.batchName, style: AppTextStyles.caption.copyWith(color: AppColors.gold, fontWeight: FontWeight.bold)),
+                    ],
+                  ),
+                )
+              else
+                Container(
+                  padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+                  decoration: BoxDecoration(
+                    color: AppColors.warning.withAlpha((0.2 * 255).round()),
+                    borderRadius: BorderRadius.circular(8),
+                  ),
+                  child: Row(
+                    children: [
+                      const Icon(Icons.warning_amber_rounded, size: 14, color: AppColors.warning),
+                      const SizedBox(width: 4),
+                      Text("Not Assigned", style: AppTextStyles.caption.copyWith(color: AppColors.warning, fontWeight: FontWeight.bold)),
+                    ],
+                  ),
+                ),
             ],
           ),
           const Divider(height: 24),
@@ -437,6 +489,44 @@ class _AdminStudentTile extends StatelessWidget {
           ),
         ],
       ),
+    );
+  }
+
+  void _showBatchSelector(BuildContext context) {
+    showDialog(
+      context: context,
+      builder: (context) {
+        String? selectedBatchId;
+        return AlertDialog(
+          title: const Text("Assign Batch"),
+          content: DropdownButtonFormField<String>(
+            decoration: const InputDecoration(labelText: "Select Batch", prefixIcon: Icon(Icons.class_outlined, size: 20)),
+            items: DummyData.batches.map((b) => DropdownMenuItem(value: b.id, child: Text(b.name))).toList(),
+            onChanged: (val) => selectedBatchId = val,
+          ),
+          actions: [
+            TextButton(
+              onPressed: () => Navigator.pop(context),
+              child: const Text("Cancel"),
+            ),
+            ElevatedButton(
+              onPressed: () {
+                if (selectedBatchId != null) {
+                  final batch = DummyData.batches.firstWhere((b) => b.id == selectedBatchId);
+                  student.batchId = batch.id;
+                  student.batchName = batch.name;
+                  onBatchChanged();
+                  Navigator.pop(context);
+                  ScaffoldMessenger.of(context).showSnackBar(
+                    const SnackBar(content: Text("Batch updated")),
+                  );
+                }
+              },
+              child: const Text("Assign", style: TextStyle(color: Colors.white)),
+            ),
+          ],
+        );
+      },
     );
   }
 }

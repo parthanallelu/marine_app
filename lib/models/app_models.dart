@@ -164,16 +164,17 @@ class AdminModel extends UserModel {
   }
 }
 
+// ignore: must_be_immutable
 class StudentModel extends UserModel {
   final String courseType;
-  final String batchId;
-  final String batchName;
+  String batchId;
+  String batchName;
   final String rollNumber;
   final String parentPhone;
   final DateTime joiningDate;
   final String targetCompany;
 
-  const StudentModel({
+  StudentModel({
     required super.id,
     required super.name,
     required super.email,

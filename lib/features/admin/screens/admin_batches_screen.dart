@@ -5,6 +5,7 @@ import '../../../core/constants/app_constants.dart';
 import '../../../core/common_widgets/common_widgets.dart';
 import '../../../models/app_models.dart';
 import '../../../models/dummy_data.dart';
+import 'batch_students_screen.dart';
 
 class AdminBatchesScreen extends StatefulWidget {
   const AdminBatchesScreen({super.key});
@@ -69,7 +70,19 @@ class _AdminBatchesScreenState extends State<AdminBatchesScreen> {
                   ],
                 ),
               ),
-              ...batchesInBranch.map((batch) => _AdminBatchCard(batch: batch)),
+              ...batchesInBranch.map((batch) => _AdminBatchCard(
+                    batch: batch,
+                    onManageStudents: () {
+                      Navigator.push(
+                        context,
+                        MaterialPageRoute(builder: (_) => BatchStudentsScreen(batch: batch)),
+                      ).then((_) {
+                        if (context.mounted) {
+                          setState(() {});
+                        }
+                      });
+                    },
+                  )),
               const SizedBox(height: 12),
             ],
           );
@@ -233,7 +246,8 @@ class _AdminBatchesScreenState extends State<AdminBatchesScreen> {
 
 class _AdminBatchCard extends StatelessWidget {
   final BatchModel batch;
-  const _AdminBatchCard({required this.batch});
+  final VoidCallback onManageStudents;
+  const _AdminBatchCard({required this.batch, required this.onManageStudents});
 
   @override
   Widget build(BuildContext context) {
@@ -255,7 +269,7 @@ class _AdminBatchCard extends StatelessWidget {
                   color: AppColors.gold.withAlpha((0.1 * 255).round()),
                   borderRadius: BorderRadius.circular(12),
                 ),
-                child: const Icon(Icons.groups_rounded, color: AppColors.gold, size: 24),
+                child: const Icon(Icons.class_outlined, color: AppColors.gold, size: 24),
               ),
               const SizedBox(width: 16),
               Expanded(
@@ -281,11 +295,16 @@ class _AdminBatchCard extends StatelessWidget {
           const SizedBox(height: 12),
           Row(
             children: [
-              _BatchMeta(icon: Icons.people_alt_outlined, label: "${batch.studentIds.length} Students enrolled"),
+              _BatchMeta(icon: Icons.people_alt_outlined, label: "${DummyData.students.where((s) => s.batchId == batch.id).length} Students enrolled"),
               const Spacer(),
-              Text(
-                "Est. ${batch.startDate.day}/${batch.startDate.month}/${batch.startDate.year}",
-                style: AppTextStyles.caption.copyWith(fontStyle: FontStyle.italic, color: AppColors.textHint),
+              TextButton.icon(
+                onPressed: onManageStudents,
+                icon: const Icon(Icons.group_rounded, size: 18),
+                label: const Text("Manage Students"),
+                style: TextButton.styleFrom(
+                  foregroundColor: AppColors.navyBlueBase,
+                  padding: const EdgeInsets.symmetric(horizontal: 12),
+                ),
               ),
             ],
           ),

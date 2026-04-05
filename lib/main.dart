@@ -1,5 +1,4 @@
 import 'package:flutter/material.dart';
-import 'package:go_router/go_router.dart';
 import 'app.dart';
 import 'providers/auth_provider.dart';
 import 'routes/app_router.dart';
