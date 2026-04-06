@@ -78,11 +78,44 @@ class _ProfessorMaterialsScreenState extends State<ProfessorMaterialsScreen> {
   }
 
   void _deleteMaterial(String id) {
-    setState(() {
-      _materials.removeWhere((m) => m.id == id);
-    });
-    ScaffoldMessenger.of(context).showSnackBar(
-      const SnackBar(content: Text('Material deleted successfully')),
+    showDialog(
+      context: context,
+      builder: (context) => AlertDialog(
+        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(AppRadius.lg)),
+        title: const Text("Delete Material?"),
+        content: const Text("Are you sure you want to remove this study material? This action cannot be undone."),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.pop(context),
+            child: const Text("Cancel"),
+          ),
+          ElevatedButton(
+            style: ElevatedButton.styleFrom(backgroundColor: AppColors.error),
+            onPressed: () {
+              setState(() {
+                _materials.removeWhere((m) => m.id == id);
+              });
+              Navigator.pop(context);
+              ScaffoldMessenger.of(context).showSnackBar(
+                SnackBar(
+                  content: Row(
+                    children: [
+                      const Icon(Icons.check_circle_rounded, color: Colors.white, size: 20),
+                      SizedBox(width: AppSpacing.md),
+                      const Text("Material deleted successfully"),
+                    ],
+                  ),
+                  backgroundColor: AppColors.success,
+                  behavior: SnackBarBehavior.floating,
+                  shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(AppRadius.md)),
+                  margin: EdgeInsets.all(AppSpacing.lg),
+                ),
+              );
+            },
+            child: Text("Delete", style: AppTextStyles.labelLarge.copyWith(color: Colors.white)),
+          ),
+        ],
+      ),
     );
   }
 
@@ -98,16 +131,21 @@ class _ProfessorMaterialsScreenState extends State<ProfessorMaterialsScreen> {
     showModalBottomSheet(
       context: context,
       isScrollControlled: true,
-      shape: const RoundedRectangleBorder(borderRadius: BorderRadius.vertical(top: Radius.circular(24))),
+      shape: const RoundedRectangleBorder(borderRadius: BorderRadius.vertical(top: Radius.circular(AppRadius.xxl))),
       builder: (context) => StatefulBuilder(
         builder: (context, setModalState) => Padding(
-          padding: EdgeInsets.only(bottom: MediaQuery.of(context).viewInsets.bottom, left: 20, right: 20, top: 20),
+          padding: EdgeInsets.only(
+            bottom: MediaQuery.of(context).viewInsets.bottom, 
+            left: AppSpacing.xl, 
+            right: AppSpacing.xl, 
+            top: AppSpacing.xl
+          ),
           child: Column(
             mainAxisSize: MainAxisSize.min,
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
               Text('Upload Study Material', style: AppTextStyles.headingSmall),
-              const SizedBox(height: 20),
+              SizedBox(height: AppSpacing.xl),
               CustomTextField(
                 label: 'Title',
                 hintText: 'e.g. Navigation Lesson 1',
@@ -120,19 +158,19 @@ class _ProfessorMaterialsScreenState extends State<ProfessorMaterialsScreen> {
                 controller: _descriptionController,
                 maxLines: 3,
               ),
-              const SizedBox(height: 12),
+              SizedBox(height: AppSpacing.md),
               Text('Subject', style: AppTextStyles.labelLarge),
-              const SizedBox(height: 8),
+              SizedBox(height: AppSpacing.sm),
               DropdownButtonFormField<String>(
-                value: _selectedSubject,
+                initialValue: _selectedSubject,
                 decoration: InputDecoration(
-                  border: OutlineInputBorder(borderRadius: BorderRadius.circular(12)),
-                  contentPadding: const EdgeInsets.symmetric(horizontal: 16),
+                  border: OutlineInputBorder(borderRadius: BorderRadius.circular(AppRadius.md)),
+                  contentPadding: EdgeInsets.symmetric(horizontal: AppSpacing.lg),
                 ),
                 items: prof.subjects.map((s) => DropdownMenuItem(value: s, child: Text(s))).toList(),
                 onChanged: (v) => setModalState(() => _selectedSubject = v),
               ),
-              const SizedBox(height: 24),
+              SizedBox(height: AppSpacing.xl),
               SizedBox(
                 width: double.infinity,
                 child: CustomButton(
@@ -140,7 +178,7 @@ class _ProfessorMaterialsScreenState extends State<ProfessorMaterialsScreen> {
                   onPressed: () => _handleUpload(prof),
                 ),
               ),
-              const SizedBox(height: 32),
+              SizedBox(height: AppSpacing.xxxl),
             ],
           ),
         ),
@@ -198,7 +236,7 @@ class _ProfessorMaterialsScreenState extends State<ProfessorMaterialsScreen> {
     // Role security check
     if (!authProvider.isProfessor) {
       WidgetsBinding.instance.addPostFrameCallback((_) {
-        context.go(AppRoutes.roleSelection);
+        context.goNamed(AppRoutes.roleSelectionName);
       });
       return const Scaffold(body: Center(child: CircularProgressIndicator()));
     }
@@ -220,12 +258,12 @@ class _ProfessorMaterialsScreenState extends State<ProfessorMaterialsScreen> {
                   subtitle: 'Upload your first study material to get started.',
                 )
               : ListView.builder(
-                  padding: const EdgeInsets.all(16),
+                  padding: EdgeInsets.all(AppSpacing.lg),
                   itemCount: _materials.length,
                   itemBuilder: (context, index) {
                     final material = _materials[index];
                     return Padding(
-                      padding: const EdgeInsets.only(bottom: AppSpacing.md),
+                      padding: EdgeInsets.only(bottom: AppSpacing.md),
                       child: DashboardCard(
                         title: material.title,
                         subtitle: material.subject,
@@ -234,7 +272,7 @@ class _ProfessorMaterialsScreenState extends State<ProfessorMaterialsScreen> {
                           color: AppColors.navyBlueBase,
                         ),
                         trailing: IconButton(
-                          icon: const Icon(Icons.delete_outline_rounded, color: Colors.redAccent),
+                          icon: const Icon(Icons.delete_outline_rounded, color: AppColors.error),
                           onPressed: () => _deleteMaterial(material.id),
                         ),
                         onTap: () {

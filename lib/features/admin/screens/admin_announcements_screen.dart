@@ -42,7 +42,7 @@ class _AdminAnnouncementsScreenState extends State<AdminAnnouncementsScreen> {
         children: [
           // BRANCH FILTER
           Container(
-            padding: const EdgeInsets.fromLTRB(16, 0, 16, 16),
+            padding: EdgeInsets.fromLTRB(AppSpacing.lg, 0, AppSpacing.lg, AppSpacing.lg),
             color: Colors.white,
             child: SizedBox(
               height: 40,
@@ -68,16 +68,19 @@ class _AdminAnnouncementsScreenState extends State<AdminAnnouncementsScreen> {
           Expanded(
             child: announcements.isEmpty
                 ? const EmptyState(
-                    icon: Icons.campaign_rounded,
-                    title: "No Active Notices",
-                    subtitle: "No announcements have been broadcasted for this filter.",
+                    icon: Icons.campaign_outlined,
+                    title: "No Announcements",
+                    subtitle: "Create a notice to broadcast to the academy.",
                   )
                 : ListView.builder(
-                    padding: const EdgeInsets.fromLTRB(16, 12, 16, 80),
+                    padding: EdgeInsets.fromLTRB(AppSpacing.lg, AppSpacing.md, AppSpacing.lg, 80),
                     itemCount: announcements.length,
                     itemBuilder: (context, index) {
                       final announcement = announcements[index];
-                      return _AdminAnnouncementCard(announcement: announcement);
+                      return _AdminAnnouncementCard(
+                        announcement: announcement,
+                        onDelete: () => _confirmDeleteAnnouncement(announcement),
+                      );
                     },
                   ),
           ),
@@ -87,7 +90,7 @@ class _AdminAnnouncementsScreenState extends State<AdminAnnouncementsScreen> {
         onPressed: () => _showCreateAnnouncementSheet(),
         backgroundColor: AppColors.navyBlueBase,
         icon: const Icon(Icons.campaign_rounded, color: Colors.white),
-        label: const Text("Post Notice", style: TextStyle(color: Colors.white, fontWeight: FontWeight.bold)),
+        label: Text("Post Notice", style: AppTextStyles.labelLarge.copyWith(color: Colors.white)),
       ),
     );
   }
@@ -109,7 +112,7 @@ class _AdminAnnouncementsScreenState extends State<AdminAnnouncementsScreen> {
           height: MediaQuery.of(context).size.height * 0.8,
           decoration: const BoxDecoration(
             color: Colors.white,
-            borderRadius: BorderRadius.vertical(top: Radius.circular(24)),
+            borderRadius: BorderRadius.vertical(top: Radius.circular(AppRadius.xxl)),
           ),
           padding: EdgeInsets.only(bottom: MediaQuery.of(context).viewInsets.bottom),
           child: Column(
@@ -117,24 +120,24 @@ class _AdminAnnouncementsScreenState extends State<AdminAnnouncementsScreen> {
               Container(
                 width: 40,
                 height: 4,
-                margin: const EdgeInsets.symmetric(vertical: 12),
-                decoration: BoxDecoration(color: AppColors.divider, borderRadius: BorderRadius.circular(2)),
+                margin: EdgeInsets.symmetric(vertical: AppSpacing.md),
+                decoration: BoxDecoration(color: AppColors.divider, borderRadius: BorderRadius.circular(AppRadius.xs)),
               ),
               Expanded(
                 child: SingleChildScrollView(
-                  padding: const EdgeInsets.all(24),
+                  padding: const EdgeInsets.all(AppSpacing.xl),
                   child: Form(
                     key: formKey,
                     child: Column(
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
                         Text("Broadcast New Notice", style: AppTextStyles.headingMedium),
-                        const SizedBox(height: 8),
+                        SizedBox(height: AppSpacing.sm),
                         Text(
                           "This message will be visible to selected students and staff.",
                           style: AppTextStyles.bodyMedium.copyWith(color: AppColors.textSecondary),
                         ),
-                        const SizedBox(height: 24),
+                        SizedBox(height: AppSpacing.xl),
                         CustomTextField(
                           label: "Title",
                           hintText: "Enter a concise heading",
@@ -142,7 +145,7 @@ class _AdminAnnouncementsScreenState extends State<AdminAnnouncementsScreen> {
                           prefixIcon: Icons.title_rounded,
                           validator: (v) => v == null || v.isEmpty ? "Required" : null,
                         ),
-                        const SizedBox(height: 16),
+                        SizedBox(height: AppSpacing.lg),
                         CustomTextField(
                           label: "Description",
                           hintText: "Detail your announcement here...",
@@ -150,7 +153,7 @@ class _AdminAnnouncementsScreenState extends State<AdminAnnouncementsScreen> {
                           maxLines: 4,
                           validator: (v) => v == null || v.isEmpty ? "Required" : null,
                         ),
-                        const SizedBox(height: 16),
+                        SizedBox(height: AppSpacing.lg),
                         Row(
                           children: [
                             Expanded(
@@ -161,7 +164,7 @@ class _AdminAnnouncementsScreenState extends State<AdminAnnouncementsScreen> {
                                 onChanged: (val) => setModalState(() => selectedPriority = val!),
                               ),
                             ),
-                            const SizedBox(width: 16),
+                            SizedBox(width: AppSpacing.lg),
                             Expanded(
                               child: SwitchListTile(
                                 title: const Text("Pinned", style: TextStyle(fontSize: 14)),
@@ -172,15 +175,15 @@ class _AdminAnnouncementsScreenState extends State<AdminAnnouncementsScreen> {
                             ),
                           ],
                         ),
-                        const SizedBox(height: 16),
+                        SizedBox(height: AppSpacing.lg),
                         Text("Target Branches", style: AppTextStyles.labelLarge),
-                        const SizedBox(height: 8),
+                        SizedBox(height: AppSpacing.sm),
                         Wrap(
                           spacing: 8,
                           children: ["All", ...AppConstants.branches].map((branch) {
                             final isSel = selectedBranches.contains(branch);
                             return FilterChip(
-                              label: Text(branch, style: TextStyle(fontSize: 12, color: isSel ? Colors.white : AppColors.textPrimary)),
+                              label: Text(branch, style: AppTextStyles.caption.copyWith(fontSize: 12, color: isSel ? Colors.white : AppColors.textPrimary)),
                               selected: isSel,
                               selectedColor: AppColors.navyBlueBase,
                               onSelected: (sel) {
@@ -201,7 +204,7 @@ class _AdminAnnouncementsScreenState extends State<AdminAnnouncementsScreen> {
                             );
                           }).toList(),
                         ),
-                        const SizedBox(height: 32),
+                        SizedBox(height: AppSpacing.xxxl),
                         CustomButton(
                           label: "PUBLISH BROADCAST",
                           width: double.infinity,
@@ -224,12 +227,24 @@ class _AdminAnnouncementsScreenState extends State<AdminAnnouncementsScreen> {
                               });
                               Navigator.pop(context);
                               ScaffoldMessenger.of(context).showSnackBar(
-                                const SnackBar(content: Text("Notice published successfully!")),
+                                SnackBar(
+                                  content: Row(
+                                    children: [
+                                      const Icon(Icons.check_circle_rounded, color: Colors.white, size: 20),
+                                      SizedBox(width: AppSpacing.md),
+                                      const Text("Notice published successfully"),
+                                    ],
+                                  ),
+                                  backgroundColor: AppColors.success,
+                                  behavior: SnackBarBehavior.floating,
+                                  shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(AppRadius.md)),
+                                  margin: EdgeInsets.all(AppSpacing.lg),
+                                ),
                               );
                             }
                           },
                         ),
-                        const SizedBox(height: 16),
+                        SizedBox(height: AppSpacing.lg),
                       ],
                     ),
                   ),
@@ -238,6 +253,49 @@ class _AdminAnnouncementsScreenState extends State<AdminAnnouncementsScreen> {
             ],
           ),
         ),
+      ),
+    );
+  }
+
+  void _confirmDeleteAnnouncement(AnnouncementModel announcement) {
+    showDialog(
+      context: context,
+      builder: (context) => AlertDialog(
+        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(AppRadius.lg)),
+        title: const Text("Delete Announcement?"),
+        content: const Text("This action cannot be undone."),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.pop(context),
+            child: const Text("Cancel"),
+          ),
+          ElevatedButton(
+            style: ElevatedButton.styleFrom(backgroundColor: AppColors.error),
+            onPressed: () {
+              setState(() {
+                _allAnnouncements.remove(announcement);
+                DummyData.announcements.remove(announcement);
+              });
+              Navigator.pop(context);
+              ScaffoldMessenger.of(context).showSnackBar(
+                SnackBar(
+                  content: const Row(
+                    children: [
+                      Icon(Icons.check_circle_rounded, color: Colors.white, size: 20),
+                      SizedBox(width: AppSpacing.md),
+                      Text("Announcement deleted"),
+                    ],
+                  ),
+                  backgroundColor: AppColors.success,
+                  behavior: SnackBarBehavior.floating,
+                  shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(AppRadius.md)),
+                  margin: EdgeInsets.all(AppSpacing.lg),
+                ),
+              );
+            },
+            child: const Text("Delete", style: TextStyle(color: Colors.white)),
+          ),
+        ],
       ),
     );
   }
@@ -253,19 +311,19 @@ class _BranchChip extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Padding(
-      padding: const EdgeInsets.only(right: 8),
+      padding: EdgeInsets.only(right: AppSpacing.sm),
       child: GestureDetector(
         onTap: onTap,
         child: Container(
-          padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 6),
+          padding: EdgeInsets.symmetric(horizontal: AppSpacing.lg, vertical: AppSpacing.xs),
           decoration: BoxDecoration(
             color: isSelected ? AppColors.navyBlueBase : AppColors.background,
-            borderRadius: BorderRadius.circular(20),
+            borderRadius: BorderRadius.circular(AppRadius.xxl),
             border: Border.all(color: isSelected ? AppColors.navyBlueBase : AppColors.divider),
           ),
           child: Text(
             label,
-            style: TextStyle(
+            style: AppTextStyles.caption.copyWith(
               color: isSelected ? Colors.white : AppColors.textPrimary,
               fontSize: 11,
               fontWeight: isSelected ? FontWeight.bold : FontWeight.normal,
@@ -279,16 +337,17 @@ class _BranchChip extends StatelessWidget {
 
 class _AdminAnnouncementCard extends StatelessWidget {
   final AnnouncementModel announcement;
-  const _AdminAnnouncementCard({required this.announcement});
+  final VoidCallback onDelete;
+  _AdminAnnouncementCard({required this.announcement, required this.onDelete});
 
   @override
   Widget build(BuildContext context) {
     return Container(
-      margin: const EdgeInsets.only(bottom: 16),
-      padding: const EdgeInsets.all(16),
+      margin: EdgeInsets.only(bottom: AppSpacing.lg),
+      padding: EdgeInsets.all(AppSpacing.lg),
       decoration: BoxDecoration(
         color: Colors.white,
-        borderRadius: BorderRadius.circular(16),
+        borderRadius: BorderRadius.circular(AppRadius.lg),
         boxShadow: AppShadows.subtle,
       ),
       child: Column(
@@ -300,24 +359,32 @@ class _AdminAnnouncementCard extends StatelessWidget {
               const Spacer(),
               if (announcement.isPinned)
                 const Icon(Icons.push_pin_rounded, size: 16, color: AppColors.gold),
+              SizedBox(width: AppSpacing.xs),
+              IconButton(
+                icon: const Icon(Icons.delete_outline, size: 18, color: AppColors.error),
+                onPressed: onDelete,
+                tooltip: "Delete",
+                padding: EdgeInsets.zero,
+                constraints: const BoxConstraints(),
+              ),
             ],
           ),
-          const SizedBox(height: 12),
+          SizedBox(height: AppSpacing.md),
           Text(announcement.title, style: AppTextStyles.labelLarge),
-          const SizedBox(height: 4),
+          SizedBox(height: AppSpacing.xs),
           Text(
             announcement.description,
             style: AppTextStyles.bodySmall.copyWith(color: AppColors.textSecondary),
           ),
-          const Divider(height: 24),
+          Divider(height: AppSpacing.xl),
           Row(
             children: [
               CircleAvatar(
-                radius: 12,
+                radius: AppRadius.md,
                 backgroundColor: AppColors.navyBlueSurface,
-                child: Text(announcement.authorName[0], style: const TextStyle(fontSize: 10, color: AppColors.navyBlueBase)),
+                child: Text(announcement.authorName[0], style: AppTextStyles.caption.copyWith(color: AppColors.navyBlueBase, fontSize: 10)),
               ),
-              const SizedBox(width: 8),
+              SizedBox(width: AppSpacing.sm),
               Text(
                 "By ${announcement.authorName}",
                 style: AppTextStyles.caption.copyWith(color: AppColors.textSecondary),

@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:go_router/go_router.dart';
 import '../../../core/theme/app_theme.dart';
+import '../../../core/constants/app_constants.dart';
 import '../../../core/common_widgets/common_widgets.dart';
 import '../../../providers/auth_provider.dart';
 import '../../../models/app_models.dart';
@@ -57,7 +58,7 @@ class _StudentProfileScreenState extends State<StudentProfileScreen> {
     // Access Control Safety
     if (!authProvider.isStudent) {
       WidgetsBinding.instance.addPostFrameCallback((_) {
-        context.goNamed('role_selection');
+        context.goNamed(AppRoutes.roleSelectionName);
       });
       return const Scaffold(body: Center(child: CircularProgressIndicator()));
     }
@@ -87,9 +88,8 @@ class _StudentProfileScreenState extends State<StudentProfileScreen> {
                 ),
               ),
               child: SafeArea(
-                bottom: false,
                 child: Padding(
-                  padding: const EdgeInsets.fromLTRB(20, 16, 20, 28),
+                  padding: EdgeInsets.fromLTRB(AppSpacing.xl, AppSpacing.lg, AppSpacing.xl, AppSpacing.xxl),
                   child: Column(
                     children: [
                       CircleAvatar(
@@ -100,7 +100,7 @@ class _StudentProfileScreenState extends State<StudentProfileScreen> {
                           style: AppTextStyles.headingLarge.copyWith(color: AppColors.gold, fontSize: 32),
                         ),
                       ),
-                      const SizedBox(height: 12),
+                      SizedBox(height: AppSpacing.md),
                       Text(
                         student.name,
                         style: AppTextStyles.headingMedium.copyWith(color: Colors.white),
@@ -110,12 +110,12 @@ class _StudentProfileScreenState extends State<StudentProfileScreen> {
                         "Roll No: ${student.rollNumber}",
                         style: AppTextStyles.bodySmall.copyWith(color: Colors.white54),
                       ),
-                      const SizedBox(height: 12),
+                      SizedBox(height: AppSpacing.md),
                       Row(
                         mainAxisAlignment: MainAxisAlignment.center,
                         children: [
                           CourseBadge(courseType: student.courseType),
-                          const SizedBox(width: 8),
+                          SizedBox(width: AppSpacing.sm),
                           BranchBadge(branch: student.branch),
                         ],
                       ),
@@ -131,9 +131,9 @@ class _StudentProfileScreenState extends State<StudentProfileScreen> {
             child: Transform.translate(
               offset: const Offset(0, -16),
               child: Padding(
-                padding: const EdgeInsets.symmetric(horizontal: 20),
+                padding: EdgeInsets.symmetric(horizontal: AppSpacing.xl),
                 child: Container(
-                  padding: const EdgeInsets.all(16),
+                  padding: EdgeInsets.all(AppSpacing.lg),
                   decoration: BoxDecoration(
                     color: Colors.white,
                     borderRadius: AppRadius.cardRadius,
@@ -148,14 +148,14 @@ class _StudentProfileScreenState extends State<StudentProfileScreen> {
                           icon: Icons.calendar_today,
                           color: AppColors.success,
                         ),
-                        const VerticalDivider(width: 32),
+                        VerticalDivider(width: AppSpacing.xxxl),
                         _ProfileStat(
                           label: "Test Avg",
                           value: "${_avgScore.toStringAsFixed(0)}%",
                           icon: Icons.quiz_rounded,
                           color: AppColors.oceanBlue,
                         ),
-                        const VerticalDivider(width: 32),
+                        VerticalDivider(width: AppSpacing.xxxl),
                         _ProfileStat(
                           label: "Fees Paid",
                           value: "${_feeRecord.percentagePaid.toStringAsFixed(0)}%",
@@ -173,7 +173,7 @@ class _StudentProfileScreenState extends State<StudentProfileScreen> {
           // SLIVER 3 — Personal Info
           SliverToBoxAdapter(
             child: Padding(
-              padding: const EdgeInsets.fromLTRB(20, 0, 20, 24),
+              padding: EdgeInsets.fromLTRB(AppSpacing.xl, 0, AppSpacing.xl, AppSpacing.xxl),
               child: DashboardCard(
                 title: "Personal Information",
                 child: Column(
@@ -205,7 +205,7 @@ class _StudentProfileScreenState extends State<StudentProfileScreen> {
           // SLIVER 4 — Quick Links
           SliverToBoxAdapter(
             child: Padding(
-              padding: const EdgeInsets.fromLTRB(20, 0, 20, 24),
+              padding: EdgeInsets.fromLTRB(AppSpacing.xl, 0, AppSpacing.xl, AppSpacing.xxl),
               child: DashboardCard(
                 title: "Quick Links",
                 padding: EdgeInsets.zero,
@@ -213,26 +213,26 @@ class _StudentProfileScreenState extends State<StudentProfileScreen> {
                   children: [
                     ListTile(
                       leading: Container(
-                        padding: const EdgeInsets.all(8),
-                        decoration: BoxDecoration(color: AppColors.gold.withAlpha((0.1 * 255).round()), borderRadius: BorderRadius.circular(8)),
+                        padding: EdgeInsets.all(AppSpacing.sm),
+                        decoration: BoxDecoration(color: AppColors.gold.withAlpha((0.1 * 255).round()), borderRadius: BorderRadius.circular(AppRadius.sm)),
                         child: const Icon(Icons.receipt_long_rounded, color: AppColors.gold, size: 20),
                       ),
                       title: Text("Fee Details", style: AppTextStyles.labelLarge),
                       trailing: const Icon(Icons.chevron_right_rounded),
                       // NAVIGATION SAFETY: Using goNamed
-                      onTap: () => context.pushNamed('student_fees'),
+                      onTap: () => context.pushNamed(AppRoutes.studentFeesName),
                     ),
                     const Divider(height: 1, indent: 52),
                     ListTile(
                       leading: Container(
-                        padding: const EdgeInsets.all(8),
-                        decoration: BoxDecoration(color: AppColors.warning.withAlpha((0.1 * 255).round()), borderRadius: BorderRadius.circular(8)),
+                        padding: EdgeInsets.all(AppSpacing.sm),
+                        decoration: BoxDecoration(color: AppColors.warning.withAlpha((0.1 * 255).round()), borderRadius: BorderRadius.circular(AppRadius.sm)),
                         child: const Icon(Icons.campaign_rounded, color: AppColors.warning, size: 20),
                       ),
                       title: Text("Announcements", style: AppTextStyles.labelLarge),
                       trailing: const Icon(Icons.chevron_right_rounded),
                       // NAVIGATION SAFETY: Using goNamed
-                      onTap: () => context.pushNamed('student_announcements'),
+                      onTap: () => context.pushNamed(AppRoutes.studentAnnouncementsName),
                     ),
                   ],
                 ),
@@ -243,7 +243,7 @@ class _StudentProfileScreenState extends State<StudentProfileScreen> {
           // SLIVER 5 — Logout button
           SliverToBoxAdapter(
             child: Padding(
-              padding: const EdgeInsets.fromLTRB(20, 0, 20, 32),
+              padding: EdgeInsets.fromLTRB(AppSpacing.xl, 0, AppSpacing.xl, AppSpacing.xxxl),
               child: CustomButton(
                 label: "Logout",
                 isOutlined: true,
@@ -260,9 +260,9 @@ class _StudentProfileScreenState extends State<StudentProfileScreen> {
                         TextButton(
                           onPressed: () {
                             Navigator.pop(context);
-                            context.read<AuthProvider>().logout();
+                            authProvider.logout();
                           },
-                          child: const Text("LOGOUT", style: TextStyle(color: AppColors.error)),
+                          child: Text("LOGOUT", style: AppTextStyles.labelLarge.copyWith(color: AppColors.error)),
                         ),
                       ],
                     ),
@@ -296,12 +296,12 @@ class _ProfileStat extends StatelessWidget {
       child: Column(
         children: [
           Icon(icon, color: color, size: 20),
-          const SizedBox(height: 4),
+          const SizedBox(height: AppSpacing.xs),
           Text(
             value,
-            style: AppTextStyles.headingMedium.copyWith(color: color, fontSize: 18),
+            style: AppTextStyles.headingSmall.copyWith(color: color, fontSize: 18),
           ),
-          const SizedBox(height: 2),
+          SizedBox(height: AppSpacing.xxs),
           Text(
             label,
             style: AppTextStyles.caption.copyWith(fontSize: 10),
@@ -356,7 +356,7 @@ class _StudentFeesScreenState extends State<StudentFeesScreen> {
     // Access Control Safety
     if (!authProvider.isStudent) {
       WidgetsBinding.instance.addPostFrameCallback((_) {
-        context.goNamed('role_selection');
+        context.goNamed(AppRoutes.roleSelectionName);
       });
       return const Scaffold(body: Center(child: CircularProgressIndicator()));
     }
@@ -371,7 +371,7 @@ class _StudentFeesScreenState extends State<StudentFeesScreen> {
     return Scaffold(
       backgroundColor: AppColors.background,
       appBar: AppBar(
-        title: Text("Fee Details", style: AppTextStyles.headingMedium),
+        title: Text("Fee Details", style: AppTextStyles.headingSmall),
         backgroundColor: Colors.white,
         elevation: 0,
         foregroundColor: AppColors.navyBlueBase,
@@ -381,8 +381,8 @@ class _StudentFeesScreenState extends State<StudentFeesScreen> {
           // SLIVER 1 — Summary card
           SliverToBoxAdapter(
             child: Container(
-              margin: const EdgeInsets.all(20),
-              padding: const EdgeInsets.all(20),
+              margin: EdgeInsets.all(AppSpacing.xl),
+              padding: EdgeInsets.all(AppSpacing.xl),
               decoration: BoxDecoration(
                 gradient: const LinearGradient(
                   colors: [AppColors.navyBlueDark, AppColors.navyBlueBase],
@@ -397,14 +397,14 @@ class _StudentFeesScreenState extends State<StudentFeesScreen> {
                   Row(
                     children: [
                       const Icon(Icons.receipt_rounded, color: AppColors.gold, size: 28),
-                      const SizedBox(width: 12),
+                      const SizedBox(width: AppSpacing.md),
                       Text(
                         "Fee Summary",
                         style: AppTextStyles.headingSmall.copyWith(color: Colors.white),
                       ),
                     ],
                   ),
-                  const SizedBox(height: 20),
+                  const SizedBox(height: AppSpacing.xl),
                   Row(
                     mainAxisAlignment: MainAxisAlignment.spaceEvenly,
                     children: [
@@ -413,13 +413,13 @@ class _StudentFeesScreenState extends State<StudentFeesScreen> {
                       _FeeSummaryItem(
                         label: "Pending", 
                         value: "₹${_feeRecord.pendingAmount.toInt()}",
-                        valueColor: _feeRecord.pendingAmount > 0 ? Colors.orange : AppColors.gold,
+                        valueColor: _feeRecord.pendingAmount > 0 ? AppColors.warning : AppColors.gold,
                       ),
                     ],
                   ),
-                  const SizedBox(height: 16),
+                  const SizedBox(height: AppSpacing.lg),
                   ClipRRect(
-                    borderRadius: BorderRadius.circular(8),
+                    borderRadius: BorderRadius.circular(AppRadius.sm),
                     child: LinearProgressIndicator(
                       value: _feeRecord.paidAmount / _feeRecord.totalFees,
                       minHeight: 8,
@@ -427,7 +427,8 @@ class _StudentFeesScreenState extends State<StudentFeesScreen> {
                       valueColor: const AlwaysStoppedAnimation<Color>(AppColors.gold),
                     ),
                   ),
-                  const SizedBox(height: 6),
+                  const SizedBox(height: AppSpacing.lg),
+                  SizedBox(height: AppSpacing.xxs),
                   Align(
                     alignment: Alignment.centerRight,
                     child: Text(
@@ -442,15 +443,14 @@ class _StudentFeesScreenState extends State<StudentFeesScreen> {
 
           // SLIVER 2 — Installments heading
           const SliverPadding(
-            padding: EdgeInsets.symmetric(horizontal: 20),
+            padding: EdgeInsets.symmetric(horizontal: AppSpacing.xl),
             sliver: SliverToBoxAdapter(
               child: SectionHeader(title: "Payment History"),
             ),
           ),
-
-          // SLIVER 3 — LIST PERFORMANCE: Using SliverList.builder
+          
           SliverPadding(
-            padding: const EdgeInsets.all(20),
+            padding: EdgeInsets.all(AppSpacing.xl),
             sliver: SliverList(
               delegate: SliverChildBuilderDelegate(
                 (context, index) {
@@ -459,11 +459,11 @@ class _StudentFeesScreenState extends State<StudentFeesScreen> {
                   final color = isPaid ? AppColors.success : AppColors.warning;
 
                   return Container(
-                    margin: const EdgeInsets.only(bottom: 12),
-                    padding: const EdgeInsets.all(12),
+                    margin: EdgeInsets.only(bottom: AppSpacing.md),
+                    padding: EdgeInsets.all(AppSpacing.md),
                     decoration: BoxDecoration(
                       color: Colors.white,
-                      borderRadius: BorderRadius.circular(16),
+                      borderRadius: BorderRadius.circular(AppRadius.lg),
                       boxShadow: AppShadows.subtle,
                     ),
                     child: Row(
@@ -482,7 +482,7 @@ class _StudentFeesScreenState extends State<StudentFeesScreen> {
                             size: 24,
                           ),
                         ),
-                        const SizedBox(width: 12),
+                        const SizedBox(width: AppSpacing.md),
                         Expanded(
                           child: Column(
                             crossAxisAlignment: CrossAxisAlignment.start,
@@ -505,18 +505,18 @@ class _StudentFeesScreenState extends State<StudentFeesScreen> {
                           children: [
                             Text(
                               "₹${installment.amount.toInt()}",
-                              style: AppTextStyles.headingSmall.copyWith(fontSize: 16),
+                              style: AppTextStyles.labelLarge,
                             ),
-                            const SizedBox(height: 4),
+                            const SizedBox(height: AppSpacing.xs),
                             Container(
                               padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 2),
                               decoration: BoxDecoration(
                                 color: color.withAlpha((0.1 * 255).round()),
-                                borderRadius: BorderRadius.circular(4),
+                                borderRadius: BorderRadius.circular(AppRadius.xxs),
                               ),
                               child: Text(
                                 installment.status.name.toUpperCase(),
-                                style: TextStyle(color: color, fontSize: 10, fontWeight: FontWeight.bold),
+                                style: AppTextStyles.labelSmall.copyWith(color: color, fontSize: 10),
                               ),
                             ),
                           ],
@@ -529,7 +529,7 @@ class _StudentFeesScreenState extends State<StudentFeesScreen> {
               ),
             ),
           ),
-          const SliverToBoxAdapter(child: SizedBox(height: 32)),
+          const SliverToBoxAdapter(child: SizedBox(height: AppSpacing.xxxl)),
         ],
       ),
     );
@@ -551,6 +551,7 @@ class _FeeSummaryItem extends StatelessWidget {
           value,
           style: AppTextStyles.headingSmall.copyWith(color: valueColor ?? Colors.white, fontSize: 18),
         ),
+        SizedBox(height: AppSpacing.xxs),
         Text(
           label,
           style: AppTextStyles.caption.copyWith(color: Colors.white70),

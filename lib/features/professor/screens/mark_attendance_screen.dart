@@ -73,7 +73,7 @@ class _MarkAttendanceScreenState extends State<MarkAttendanceScreen> {
     // Role security check
     if (!authProvider.isProfessor) {
       WidgetsBinding.instance.addPostFrameCallback((_) {
-        context.go(AppRoutes.roleSelection);
+        context.goNamed(AppRoutes.roleSelectionName);
       });
       return const Scaffold(body: Center(child: CircularProgressIndicator()));
     }
@@ -89,25 +89,25 @@ class _MarkAttendanceScreenState extends State<MarkAttendanceScreen> {
       body: Column(
         children: [
           Padding(
-            padding: const EdgeInsets.all(AppSpacing.lg),
+            padding: EdgeInsets.all(AppSpacing.lg),
             child: Column(
               children: [
                 // Batch Selector
                 Container(
-                  padding: const EdgeInsets.symmetric(horizontal: 16),
+                  padding: EdgeInsets.symmetric(horizontal: AppSpacing.lg),
                   decoration: BoxDecoration(
                     color: Colors.white.withAlpha((0.1 * 255).round()),
-                    borderRadius: BorderRadius.circular(12),
+                    borderRadius: BorderRadius.circular(AppRadius.md),
                     border: Border.all(color: Colors.white.withAlpha((0.2 * 255).round())),
                   ),
                   child: DropdownButtonHideUnderline(
                     child: DropdownButton<String>(
                       value: _selectedBatch,
-                      hint: const Text('Select Batch', style: TextStyle(color: Colors.white70)),
+                      hint: Text('Select Batch', style: AppTextStyles.bodyMedium.copyWith(color: Colors.white70)),
                       dropdownColor: AppColors.navyBlueBase,
                       icon: const Icon(Icons.keyboard_arrow_down_rounded, color: Colors.white),
                       isExpanded: true,
-                      style: const TextStyle(color: Colors.white, fontSize: 16),
+                      style: AppTextStyles.bodyMedium.copyWith(color: Colors.white),
                       items: DummyData.batches.where((b) => b.professorId == (authProvider.currentUser?.id ?? '')).map((batch) {
                         return DropdownMenuItem(
                           value: batch.id,
@@ -118,23 +118,23 @@ class _MarkAttendanceScreenState extends State<MarkAttendanceScreen> {
                     ),
                   ),
                 ),
-                const SizedBox(height: AppSpacing.md),
+                SizedBox(height: AppSpacing.md),
                 // Date Selector
                 GestureDetector(
                   onTap: _selectDate,
                   child: Container(
-                    padding: const EdgeInsets.all(16),
+                    padding: EdgeInsets.all(AppSpacing.lg),
                     decoration: BoxDecoration(
                       color: Colors.white.withAlpha((0.1 * 255).round()),
-                      borderRadius: BorderRadius.circular(12),
+                      borderRadius: BorderRadius.circular(AppRadius.md),
                     ),
                     child: Row(
                       children: [
                         const Icon(Icons.calendar_today_rounded, color: Colors.white, size: 20),
-                        const SizedBox(width: 12),
+                        SizedBox(width: AppSpacing.md),
                         Text(
                           DateFormat('EEEE, MMM d, yyyy').format(_selectedDate),
-                          style: const TextStyle(color: Colors.white, fontWeight: FontWeight.w500),
+                          style: AppTextStyles.labelLarge.copyWith(color: Colors.white, fontWeight: FontWeight.w500),
                         ),
                         const Spacer(),
                         const Icon(Icons.edit_calendar_rounded, color: Colors.white70, size: 18),
@@ -151,8 +151,8 @@ class _MarkAttendanceScreenState extends State<MarkAttendanceScreen> {
               decoration: const BoxDecoration(
                 color: AppColors.background,
                 borderRadius: BorderRadius.only(
-                  topLeft: Radius.circular(32),
-                  topRight: Radius.circular(32),
+                  topLeft: Radius.circular(AppRadius.xxl),
+                  topRight: Radius.circular(AppRadius.xxl),
                 ),
               ),
               child: _isLoading
@@ -185,7 +185,7 @@ class _MarkAttendanceScreenState extends State<MarkAttendanceScreen> {
     return Column(
       children: [
         Padding(
-          padding: const EdgeInsets.all(AppSpacing.lg),
+          padding: EdgeInsets.all(AppSpacing.lg),
           child: Row(
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
@@ -196,7 +196,7 @@ class _MarkAttendanceScreenState extends State<MarkAttendanceScreen> {
               Row(
                 children: [
                   _bulkActionChip('All P', AppColors.success, () => _markAll(AttendanceStatus.present)),
-                  const SizedBox(width: 8),
+                  SizedBox(width: AppSpacing.sm),
                   _bulkActionChip('All A', AppColors.absent, () => _markAll(AttendanceStatus.absent)),
                 ],
               ),
@@ -205,7 +205,7 @@ class _MarkAttendanceScreenState extends State<MarkAttendanceScreen> {
         ),
         Expanded(
           child: ListView.builder(
-            padding: const EdgeInsets.symmetric(horizontal: AppSpacing.lg),
+            padding: EdgeInsets.symmetric(horizontal: AppSpacing.lg),
             itemCount: _students.length,
             itemBuilder: (context, index) {
               final student = _students[index];
@@ -218,7 +218,7 @@ class _MarkAttendanceScreenState extends State<MarkAttendanceScreen> {
                   mainAxisSize: MainAxisSize.min,
                   children: [
                     _statusToggle(student.id, AttendanceStatus.present, Icons.check_circle_rounded, AppColors.success, status == AttendanceStatus.present),
-                    const SizedBox(width: 12),
+                    SizedBox(width: AppSpacing.md),
                     _statusToggle(student.id, AttendanceStatus.absent, Icons.cancel_rounded, AppColors.absent, status == AttendanceStatus.absent),
                   ],
                 ),
@@ -227,12 +227,12 @@ class _MarkAttendanceScreenState extends State<MarkAttendanceScreen> {
           ),
         ),
         Container(
-          padding: const EdgeInsets.all(AppSpacing.lg),
+          padding: EdgeInsets.all(AppSpacing.lg),
           decoration: BoxDecoration(
             color: Colors.white,
             boxShadow: [
               BoxShadow(
-                color: Colors.black.withAlpha((0.05 * 255).round()),
+                color: AppColors.textPrimary.withAlpha((0.05 * 255).round()),
                 blurRadius: 10,
                 offset: const Offset(0, -5),
               ),
@@ -254,13 +254,16 @@ class _MarkAttendanceScreenState extends State<MarkAttendanceScreen> {
     return InkWell(
       onTap: onTap,
       child: Container(
-        padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
+        padding: EdgeInsets.symmetric(horizontal: AppSpacing.md, vertical: AppSpacing.xs),
         decoration: BoxDecoration(
           color: color.withAlpha((0.1 * 255).round()),
-          borderRadius: BorderRadius.circular(20),
+          borderRadius: BorderRadius.circular(AppRadius.xl),
           border: Border.all(color: color.withAlpha((0.3 * 255).round())),
         ),
-        child: Text(label, style: TextStyle(color: color, fontSize: 12, fontWeight: FontWeight.bold)),
+        child: Text(
+          label, 
+          style: AppTextStyles.labelSmall.copyWith(color: color, fontWeight: FontWeight.bold),
+        ),
       ),
     );
   }

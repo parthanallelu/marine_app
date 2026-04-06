@@ -1,5 +1,6 @@
 import 'package:equatable/equatable.dart';
 import 'package:flutter/material.dart';
+import '../core/theme/app_theme.dart';
 import 'base_model.dart';
 
 // ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
@@ -52,18 +53,19 @@ enum FeeStatus {
 // MODELS
 // ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 
+// ignore: must_be_immutable
 class UserModel extends Equatable implements BaseModel {
-  final String id;
-  final String name;
-  final String email;
-  final String phone;
-  final String role;
-  final String? photoUrl;
-  final String branch;
-  final DateTime createdAt;
-  final bool isActive;
+  String id;
+  String name;
+  String email;
+  String phone;
+  String role;
+  String? photoUrl;
+  String branch;
+  DateTime createdAt;
+  bool isActive;
 
-  const UserModel({
+  UserModel({
     required this.id,
     required this.name,
     required this.email,
@@ -134,8 +136,9 @@ class UserModel extends Equatable implements BaseModel {
   List<Object?> get props => [id, name, email, phone, role, photoUrl, branch, createdAt, isActive];
 }
 
+// ignore: must_be_immutable
 class AdminModel extends UserModel {
-  const AdminModel({
+  AdminModel({
     required super.id,
     required super.name,
     required super.email,
@@ -166,13 +169,13 @@ class AdminModel extends UserModel {
 
 // ignore: must_be_immutable
 class StudentModel extends UserModel {
-  final String courseType;
+  String courseType;
   String batchId;
   String batchName;
-  final String rollNumber;
-  final String parentPhone;
-  final DateTime joiningDate;
-  final String targetCompany;
+  String rollNumber;
+  String parentPhone;
+  DateTime joiningDate;
+  String targetCompany;
 
   StudentModel({
     required super.id,
@@ -272,9 +275,9 @@ class StudentModel extends UserModel {
   }
 
   Color get courseColor {
-    if (courseType.contains('11th')) return const Color(0xFF1565C0);
-    if (courseType.contains('12th')) return const Color(0xFF6A1B9A);
-    return const Color(0xFFBF360C);
+    if (courseType.contains('11th')) return AppColors.course11th;
+    if (courseType.contains('12th')) return AppColors.course12th;
+    return AppColors.courseCrash;
   }
 
   String get courseShortLabel {
@@ -296,14 +299,15 @@ class StudentModel extends UserModel {
       ];
 }
 
+// ignore: must_be_immutable
 class ProfessorModel extends UserModel {
-  final List<String> subjects;
-  final List<String> batchIds;
-  final String qualification;
-  final int experienceYears;
-  final String specialization;
+  List<String> subjects;
+  List<String> batchIds;
+  String qualification;
+  int experienceYears;
+  String specialization;
 
-  const ProfessorModel({
+  ProfessorModel({
     required super.id,
     required super.name,
     required super.email,
@@ -399,21 +403,22 @@ class ProfessorModel extends UserModel {
       ];
 }
 
+// ignore: must_be_immutable
 class BatchModel extends Equatable implements BaseModel {
   final String id;
-  final String name;
-  final String courseType;
-  final String professorId;
-  final String professorName;
+  String name;
+  String courseType;
+  String professorId;
+  String professorName;
   final List<String> studentIds;
-  final String branch;
-  final String timing;
-  final List<String> days;
+  String branch;
+  String timing;
+  List<String> days;
   final DateTime startDate;
   final DateTime? endDate;
   final bool isActive;
 
-  const BatchModel({
+  BatchModel({
     required this.id,
     required this.name,
     required this.courseType,
@@ -538,13 +543,13 @@ class AttendanceRecord extends Equatable implements BaseModel {
   Color get statusColor {
     switch (status) {
       case AttendanceStatus.present:
-        return const Color(0xFF2E7D32);
+        return AppColors.present;
       case AttendanceStatus.absent:
-        return const Color(0xFFC62828);
+        return AppColors.absent;
       case AttendanceStatus.halfDay:
-        return const Color(0xFFF57F17);
+        return AppColors.halfDay;
       case AttendanceStatus.holiday:
-        return const Color(0xFF1565C0);
+        return AppColors.course11th; // Using blue for holiday
     }
   }
 

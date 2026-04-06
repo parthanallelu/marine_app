@@ -39,7 +39,7 @@ class _BatchStudentsScreenState extends State<BatchStudentsScreen> {
       builder: (context) => AlertDialog(
         title: const Text("Remove Student"),
         content: Text("Remove ${student.name} from ${widget.batch.name}?"),
-        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
+        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(AppRadius.lg)),
         actions: [
           TextButton(
             onPressed: () => Navigator.pop(context),
@@ -112,16 +112,16 @@ class _BatchStudentsScreenState extends State<BatchStudentsScreen> {
                     subtitle: "Assign students to this batch",
                   )
                 : ListView.builder(
-                    padding: const EdgeInsets.all(16),
+                    padding: EdgeInsets.all(AppSpacing.lg),
                     itemCount: _batchStudents.length,
                     itemBuilder: (context, index) {
                       final student = _batchStudents[index];
                       return Container(
-                        margin: const EdgeInsets.only(bottom: 8),
-                        padding: const EdgeInsets.all(12),
+                        margin: EdgeInsets.only(bottom: AppSpacing.sm),
+                        padding: EdgeInsets.all(AppSpacing.md),
                         decoration: BoxDecoration(
                           color: Colors.white,
-                          borderRadius: BorderRadius.circular(12),
+                          borderRadius: BorderRadius.circular(AppRadius.md),
                           boxShadow: AppShadows.subtle,
                         ),
                         child: Row(
@@ -132,19 +132,19 @@ class _BatchStudentsScreenState extends State<BatchStudentsScreen> {
                                 student.name[0].toUpperCase(),
                                 style: const TextStyle(fontWeight: FontWeight.bold, color: AppColors.navyBlueBase),
                               ),
-                            ),
-                            const SizedBox(width: 16),
+                             ),
+                            SizedBox(width: AppSpacing.lg),
                             Expanded(
                               child: Column(
                                 crossAxisAlignment: CrossAxisAlignment.start,
                                 children: [
                                   Text(student.name, style: AppTextStyles.labelLarge),
                                   Text(student.rollNumber.isEmpty ? 'No roll number' : student.rollNumber, style: AppTextStyles.caption),
-                                  const SizedBox(height: 4),
+                                  SizedBox(height: AppSpacing.xs),
                                   Row(
                                     children: [
                                       CourseBadge(courseType: student.courseType),
-                                      const SizedBox(width: 8),
+                                      SizedBox(width: AppSpacing.sm),
                                       BranchBadge(branch: student.branch),
                                     ],
                                   ),
@@ -162,7 +162,7 @@ class _BatchStudentsScreenState extends State<BatchStudentsScreen> {
                   ),
           ),
           Container(
-            padding: const EdgeInsets.all(16),
+            padding: EdgeInsets.all(AppSpacing.lg),
             decoration: const BoxDecoration(
               color: Colors.white,
               boxShadow: [BoxShadow(color: Colors.black12, blurRadius: 10, offset: Offset(0, -2))],
@@ -213,21 +213,21 @@ class _AddStudentsSheetState extends State<_AddStudentsSheet> {
         return Container(
           decoration: const BoxDecoration(
             color: AppColors.background,
-            borderRadius: BorderRadius.vertical(top: Radius.circular(24)),
+            borderRadius: BorderRadius.vertical(top: Radius.circular(AppRadius.xxl)),
           ),
           child: Column(
             children: [
               Container(
                 width: 40,
                 height: 4,
-                margin: const EdgeInsets.symmetric(vertical: 12),
+                margin: EdgeInsets.symmetric(vertical: AppSpacing.md),
                 decoration: BoxDecoration(
                   color: AppColors.divider,
-                  borderRadius: BorderRadius.circular(2),
+                  borderRadius: BorderRadius.circular(AppRadius.xs),
                 ),
               ),
               Padding(
-                padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 8),
+                padding: EdgeInsets.symmetric(horizontal: AppSpacing.xl, vertical: AppSpacing.sm),
                 child: Row(
                   mainAxisAlignment: MainAxisAlignment.spaceBetween,
                   children: [
@@ -240,7 +240,7 @@ class _AddStudentsSheetState extends State<_AddStudentsSheet> {
                 ),
               ),
               Padding(
-                padding: const EdgeInsets.symmetric(horizontal: 24),
+                padding: EdgeInsets.symmetric(horizontal: AppSpacing.xl),
                 child: CustomTextField(
                   hintText: "Search studens...",
                   prefixIcon: Icons.search,
@@ -251,11 +251,11 @@ class _AddStudentsSheetState extends State<_AddStudentsSheet> {
                   },
                 ),
               ),
-              const SizedBox(height: 16),
+              SizedBox(height: AppSpacing.lg),
               Expanded(
                 child: ListView.builder(
                   controller: scrollController,
-                  padding: const EdgeInsets.symmetric(horizontal: 16),
+                  padding: EdgeInsets.symmetric(horizontal: AppSpacing.lg),
                   itemCount: filteredStudents.length,
                   itemBuilder: (context, index) {
                     final student = filteredStudents[index];
@@ -272,11 +272,11 @@ class _AddStudentsSheetState extends State<_AddStudentsSheet> {
                       },
                       title: Text(student.name, style: AppTextStyles.labelLarge),
                       subtitle: Padding(
-                        padding: const EdgeInsets.only(top: 4),
+                        padding: EdgeInsets.only(top: AppSpacing.xs),
                         child: Row(
                           children: [
                             CourseBadge(courseType: student.courseType),
-                            const SizedBox(width: 8),
+                            SizedBox(width: AppSpacing.sm),
                             BranchBadge(branch: student.branch),
                           ],
                         ),
@@ -290,7 +290,7 @@ class _AddStudentsSheetState extends State<_AddStudentsSheet> {
                 ),
               ),
               Container(
-                padding: const EdgeInsets.all(24),
+                padding: EdgeInsets.all(AppSpacing.xl),
                 decoration: const BoxDecoration(
                   color: Colors.white,
                   boxShadow: [BoxShadow(color: Colors.black12, blurRadius: 10, offset: Offset(0, -2))],

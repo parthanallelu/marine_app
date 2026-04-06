@@ -73,7 +73,7 @@ class _LoginScreenState extends State<LoginScreen> {
             child: SafeArea(
               bottom: false,
               child: Padding(
-                padding: const EdgeInsets.fromLTRB(20, 8, 20, 32),
+                padding: const EdgeInsets.fromLTRB(AppSpacing.lg, AppSpacing.md, AppSpacing.lg, AppSpacing.xxl),
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
@@ -87,14 +87,14 @@ class _LoginScreenState extends State<LoginScreen> {
                     Row(
                       children: [
                         Container(
-                          padding: const EdgeInsets.all(10),
+                          padding: const EdgeInsets.all(AppSpacing.sm),
                           decoration: BoxDecoration(
                             color: Colors.white.withAlpha((0.15 * 255).round()),
-                            borderRadius: BorderRadius.circular(12),
+                            borderRadius: BorderRadius.circular(AppRadius.md),
                           ),
                           child: Icon(roleIcon, color: Colors.white, size: 32),
                         ),
-                        const SizedBox(width: 16),
+                        const SizedBox(width: AppSpacing.lg),
                         Column(
                           crossAxisAlignment: CrossAxisAlignment.start,
                           children: [
@@ -123,7 +123,7 @@ class _LoginScreenState extends State<LoginScreen> {
           // ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
           Expanded(
             child: SingleChildScrollView(
-              padding: const EdgeInsets.all(24),
+              padding: const EdgeInsets.all(AppSpacing.xl),
               child: Form(
                 key: _formKey,
                 child: Column(
@@ -131,10 +131,10 @@ class _LoginScreenState extends State<LoginScreen> {
                   children: [
                     // Info Banner
                     Container(
-                      padding: const EdgeInsets.all(12),
+                      padding: const EdgeInsets.all(AppSpacing.md),
                       decoration: BoxDecoration(
                         color: AppColors.oceanBlueSurface,
-                        borderRadius: BorderRadius.circular(12),
+                        borderRadius: BorderRadius.circular(AppRadius.md),
                         border: Border.all(color: AppColors.oceanBlue.withAlpha((0.3 * 255).round())),
                       ),
                       child: Row(
@@ -153,7 +153,7 @@ class _LoginScreenState extends State<LoginScreen> {
                     const SizedBox(height: 24),
 
                     Text("Email or Phone", style: AppTextStyles.labelLarge),
-                    const SizedBox(height: 8),
+                    const SizedBox(height: AppSpacing.sm),
                     TextFormField(
                       controller: _emailController,
                       keyboardType: TextInputType.emailAddress,
@@ -164,9 +164,9 @@ class _LoginScreenState extends State<LoginScreen> {
                       validator: (value) => value == null || value.isEmpty ? 'Please enter email' : null,
                     ),
 
-                    const SizedBox(height: 16),
+                    const SizedBox(height: AppSpacing.lg),
                     Text("Password", style: AppTextStyles.labelLarge),
-                    const SizedBox(height: 8),
+                    const SizedBox(height: AppSpacing.sm),
                     TextFormField(
                       controller: _passwordController,
                       obscureText: !_isPasswordVisible,
@@ -185,29 +185,13 @@ class _LoginScreenState extends State<LoginScreen> {
                           value == null || value.length < 6 ? 'Password must be at least 6 characters' : null,
                     ),
 
-                    const SizedBox(height: 12),
-                    Align(
-                      alignment: Alignment.centerRight,
-                      child: TextButton(
-                        onPressed: () {
-                          ScaffoldMessenger.of(context).showSnackBar(
-                            const SnackBar(content: Text("Feature coming soon!")),
-                          );
-                        },
-                        child: Text(
-                          "Forgot Password?",
-                          style: AppTextStyles.labelMedium.copyWith(color: AppColors.textSecondary),
-                        ),
-                      ),
-                    ),
-
-                    const SizedBox(height: 24),
+                    const SizedBox(height: AppSpacing.xl),
                     if (auth.errorMessage != null) ...[
                       Text(
                         auth.errorMessage!,
                         style: const TextStyle(color: AppColors.error, fontSize: 13),
                       ),
-                      const SizedBox(height: 12),
+                      const SizedBox(height: AppSpacing.md),
                     ],
 
                     CustomButton(
@@ -229,7 +213,7 @@ class _LoginScreenState extends State<LoginScreen> {
                       },
                     ),
 
-                    const SizedBox(height: 16),
+                    const SizedBox(height: AppSpacing.lg),
                     CustomButton(
                       label: "Back to Role Selection",
                       width: double.infinity,

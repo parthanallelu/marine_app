@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:go_router/go_router.dart';
 import '../../../core/theme/app_theme.dart';
+import '../../../core/constants/app_constants.dart';
 import '../../../core/common_widgets/common_widgets.dart';
 import '../../../providers/auth_provider.dart';
 import '../../../models/app_models.dart';
@@ -77,7 +78,7 @@ class _StudentHomeScreenState extends State<StudentHomeScreen> {
     // Access Control Safety
     if (!authProvider.isStudent) {
       WidgetsBinding.instance.addPostFrameCallback((_) {
-        context.goNamed('role_selection');
+        context.goNamed(AppRoutes.roleSelectionName);
       });
       return const Scaffold(body: Center(child: CircularProgressIndicator()));
     }
@@ -102,7 +103,7 @@ class _StudentHomeScreenState extends State<StudentHomeScreen> {
 
           // SLIVER 2 — Stats Row
           SliverPadding(
-            padding: const EdgeInsets.fromLTRB(20, 20, 20, 0),
+            padding: EdgeInsets.fromLTRB(AppSpacing.xl, AppSpacing.xl, AppSpacing.xl, 0),
             sliver: SliverToBoxAdapter(
               child: Row(
                 children: [
@@ -111,12 +112,12 @@ class _StudentHomeScreenState extends State<StudentHomeScreen> {
                       label: "Attendance",
                       value: _attendanceSummary.percentageLabel,
                       icon: Icons.calendar_month_rounded,
-                      color: _attendanceSummary.percentage >= 85
+                      color: _attendanceSummary.percentage >= AppConstants.attendanceGood
                           ? AppColors.success
-                          : (_attendanceSummary.percentage >= 75 ? AppColors.warning : AppColors.error),
+                          : (_attendanceSummary.percentage >= AppConstants.attendanceWarning ? AppColors.warning : AppColors.error),
                     ),
                   ),
-                  const SizedBox(width: 12),
+                  const SizedBox(width: AppSpacing.md),
                   Expanded(
                     child: StatCard(
                       label: "Test Average",
@@ -125,7 +126,7 @@ class _StudentHomeScreenState extends State<StudentHomeScreen> {
                       color: AppColors.oceanBlue,
                     ),
                   ),
-                  const SizedBox(width: 12),
+                  const SizedBox(width: AppSpacing.md),
                   Expanded(
                     child: StatCard(
                       label: "Fees Paid",
@@ -141,13 +142,13 @@ class _StudentHomeScreenState extends State<StudentHomeScreen> {
 
           // SLIVER 3 — Quick Actions
           SliverPadding(
-            padding: const EdgeInsets.fromLTRB(20, 24, 20, 0),
+            padding: EdgeInsets.fromLTRB(AppSpacing.xl, AppSpacing.xxl, AppSpacing.xl, 0),
             sliver: SliverToBoxAdapter(
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
                   const SectionHeader(title: "Quick Actions"),
-                  const SizedBox(height: 12),
+                  const SizedBox(height: AppSpacing.md),
                   GridView.count(
                     crossAxisCount: 4,
                     crossAxisSpacing: 10,
@@ -160,37 +161,37 @@ class _StudentHomeScreenState extends State<StudentHomeScreen> {
                         label: "Attendance",
                         icon: Icons.calendar_today_rounded,
                         color: AppColors.navyBlueBase,
-                        onTap: () => context.goNamed('student_attendance'),
+                        onTap: () => context.goNamed(AppRoutes.studentAttendanceName),
                       ),
                       QuickActionTile(
                         label: "Mock Tests",
                         icon: Icons.quiz_rounded,
                         color: AppColors.oceanBlue,
-                        onTap: () => context.goNamed('student_tests'),
+                        onTap: () => context.goNamed(AppRoutes.studentTestsName),
                       ),
                       QuickActionTile(
                         label: "Study Mat.",
                         icon: Icons.menu_book_rounded,
                         color: AppColors.success,
-                        onTap: () => context.goNamed('student_materials'),
+                        onTap: () => context.goNamed(AppRoutes.studentMaterialsName),
                       ),
                       QuickActionTile(
                         label: "Interview",
                         icon: Icons.record_voice_over_rounded,
                         color: AppColors.gold,
-                        onTap: () => context.goNamed('student_materials'),
+                        onTap: () => context.goNamed(AppRoutes.studentMaterialsName),
                       ),
                       QuickActionTile(
                         label: "Maritime GK",
                         icon: Icons.anchor_rounded,
                         color: AppColors.courseCrash,
-                        onTap: () => context.goNamed('student_materials'),
+                        onTap: () => context.goNamed(AppRoutes.studentMaterialsName),
                       ),
                       QuickActionTile(
                         label: "Fees",
                         icon: Icons.receipt_rounded,
                         color: AppColors.course12th,
-                        onTap: () => context.pushNamed('student_fees'),
+                        onTap: () => context.pushNamed(AppRoutes.studentFeesName),
                       ),
                       QuickActionTile(
                         label: "Schedule",
@@ -205,7 +206,7 @@ class _StudentHomeScreenState extends State<StudentHomeScreen> {
                         icon: Icons.announcement_rounded,
                         color: AppColors.warning,
                         badgeCount: _announcements.length,
-                        onTap: () => context.pushNamed('student_announcements'),
+                        onTap: () => context.pushNamed(AppRoutes.studentAnnouncementsName),
                       ),
                     ],
                   ),
@@ -217,22 +218,22 @@ class _StudentHomeScreenState extends State<StudentHomeScreen> {
           // SLIVER 4 — Upcoming Tests
           SliverToBoxAdapter(
             child: Padding(
-              padding: const EdgeInsets.fromLTRB(20, 24, 20, 0),
+              padding: EdgeInsets.fromLTRB(AppSpacing.xl, AppSpacing.xxl, AppSpacing.xl, 0),
               child: DashboardCard(
                 title: "Upcoming Tests",
                 icon: Icons.quiz_rounded,
                 iconColor: AppColors.oceanBlue,
                 actionLabel: "All Tests",
-                onAction: () => context.goNamed('student_tests'),
+                onAction: () => context.goNamed(AppRoutes.studentTestsName),
                 child: _upcomingTests.isEmpty 
                     ? Padding(
-                        padding: const EdgeInsets.symmetric(vertical: 20),
+                        padding: EdgeInsets.symmetric(vertical: AppSpacing.xl),
                         child: Text("No upcoming tests scheduled", style: AppTextStyles.bodyMedium),
                       )
                     : Column(
                         children: _upcomingTests.take(3).map((t) => UpcomingTestTile(
                           test: t, 
-                          onTap: () => context.pushNamed('test_attempt', pathParameters: {'testId': t.id}),
+                          onTap: () => context.pushNamed(AppRoutes.testAttemptName, pathParameters: {'testId': t.id}),
                         )).toList(),
                       ),
               ),
@@ -243,17 +244,17 @@ class _StudentHomeScreenState extends State<StudentHomeScreen> {
           if (_announcements.isNotEmpty)
             SliverToBoxAdapter(
               child: Padding(
-                padding: const EdgeInsets.fromLTRB(20, 24, 20, 0),
+                padding: EdgeInsets.fromLTRB(AppSpacing.xl, AppSpacing.xxl, AppSpacing.xl, 0),
                 child: DashboardCard(
                   title: "Announcements",
                   icon: Icons.announcement_rounded,
                   iconColor: AppColors.warning,
                   actionLabel: "View All",
-                  onAction: () => context.pushNamed('student_announcements'),
+                  onAction: () => context.pushNamed(AppRoutes.studentAnnouncementsName),
                   child: Column(
                     children: _announcements.take(2).map((a) => AnnouncementTile(
                       announcement: a,
-                      onTap: () => context.pushNamed('student_announcements'),
+                      onTap: () => context.pushNamed(AppRoutes.studentAnnouncementsName),
                     )).toList(),
                   ),
                 ),
@@ -264,11 +265,11 @@ class _StudentHomeScreenState extends State<StudentHomeScreen> {
           if (student.targetCompany.isNotEmpty)
             SliverToBoxAdapter(
               child: Padding(
-                padding: const EdgeInsets.fromLTRB(20, 24, 20, 32),
+                padding: EdgeInsets.fromLTRB(AppSpacing.xl, AppSpacing.xxl, AppSpacing.xl, AppSpacing.xxxl),
                 child: Container(
-                  padding: const EdgeInsets.all(20),
+                  padding: EdgeInsets.all(AppSpacing.xl),
                   decoration: BoxDecoration(
-                    gradient: const LinearGradient(
+                    gradient: LinearGradient(
                       colors: [AppColors.navyBlueDark, AppColors.navyBlueBase],
                       begin: Alignment.topLeft,
                       end: Alignment.bottomRight,
@@ -279,14 +280,14 @@ class _StudentHomeScreenState extends State<StudentHomeScreen> {
                   child: Row(
                     children: [
                       Container(
-                        padding: const EdgeInsets.all(12),
+                        padding: EdgeInsets.all(AppSpacing.md),
                         decoration: BoxDecoration(
                           color: AppColors.gold.withAlpha((0.2 * 255).round()),
                           shape: BoxShape.circle,
                         ),
                         child: const Icon(Icons.directions_boat_filled_rounded, color: AppColors.gold, size: 28),
                       ),
-                      const SizedBox(width: 16),
+                      const SizedBox(width: AppSpacing.lg),
                       Expanded(
                         child: Column(
                           crossAxisAlignment: CrossAxisAlignment.start,
@@ -295,15 +296,15 @@ class _StudentHomeScreenState extends State<StudentHomeScreen> {
                               student.targetCompany,
                               style: AppTextStyles.labelLarge.copyWith(color: AppColors.gold),
                             ),
-                            const Text(
+                            Text(
                               "Focus on your dream company",
-                              style: TextStyle(color: Colors.white70, fontSize: 12),
+                              style: AppTextStyles.bodySmall.copyWith(color: Colors.white70),
                             ),
                           ],
                         ),
                       ),
                       OutlinedButton(
-                        onPressed: () => context.goNamed('student_tests'),
+                        onPressed: () => context.goNamed(AppRoutes.studentTestsName),
                         style: OutlinedButton.styleFrom(
                           foregroundColor: AppColors.gold,
                           side: const BorderSide(color: AppColors.gold),
@@ -316,7 +317,7 @@ class _StudentHomeScreenState extends State<StudentHomeScreen> {
               ),
             )
           else
-            const SliverToBoxAdapter(child: SizedBox(height: 32)),
+            const SliverToBoxAdapter(child: SizedBox(height: AppSpacing.xxxl)),
         ],
       ),
     );
@@ -348,7 +349,7 @@ class _StudentHeader extends StatelessWidget {
       child: SafeArea(
         bottom: false,
         child: Padding(
-          padding: const EdgeInsets.fromLTRB(20, 12, 20, 24),
+          padding: EdgeInsets.fromLTRB(AppSpacing.xl, AppSpacing.md, AppSpacing.xl, AppSpacing.xxl),
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
@@ -359,21 +360,21 @@ class _StudentHeader extends StatelessWidget {
                     children: [
                       Text(
                         greeting,
-                        style: const TextStyle(color: Colors.white70, fontSize: 14),
+                        style: AppTextStyles.bodySmall.copyWith(color: Colors.white70),
                       ),
                       Text(
                         student.name.split(' ')[0],
-                        style: const TextStyle(color: Colors.white, fontSize: 22, fontWeight: FontWeight.bold),
+                        style: AppTextStyles.headingLarge.copyWith(color: Colors.white),
                       ),
                     ],
                   ),
                   const Spacer(),
                   Stack(
                     children: [
-                      IconButton(
-                        onPressed: () => context.pushNamed('student_announcements'),
-                        icon: const Icon(Icons.notifications_none_rounded, color: Colors.white),
-                      ),
+                  IconButton(
+                    onPressed: () => context.pushNamed(AppRoutes.studentAnnouncementsName),
+                    icon: const Icon(Icons.notifications_none_rounded, color: Colors.white),
+                  ),
                       if (announcementCount > 0)
                         Positioned(
                           right: 8,
@@ -383,49 +384,49 @@ class _StudentHeader extends StatelessWidget {
                             height: 14,
                             decoration: const BoxDecoration(color: AppColors.gold, shape: BoxShape.circle),
                             alignment: Alignment.center,
-                            child: Text(
-                              announcementCount.toString(),
-                              style: const TextStyle(fontSize: 8, fontWeight: FontWeight.bold, color: AppColors.navyBlueDark),
-                            ),
-                          ),
-                        ),
-                    ],
+                      child: Text(
+                        announcementCount.toString(),
+                        style: AppTextStyles.labelSmall.copyWith(fontSize: 8, color: AppColors.navyBlueDark),
+                      ),
+                    ),
                   ),
-                  const SizedBox(width: 4),
+                ],
+              ),
+              const SizedBox(width: AppSpacing.xs),
                   CircleAvatar(
                     radius: 20,
                     backgroundColor: AppColors.gold.withAlpha((0.2 * 255).round()),
                     child: Text(
                       student.name[0],
-                      style: const TextStyle(color: AppColors.gold, fontWeight: FontWeight.bold),
+                      style: AppTextStyles.labelLarge.copyWith(color: AppColors.gold),
                     ),
                   ),
                 ],
               ),
-              const SizedBox(height: 14),
+              const SizedBox(height: AppSpacing.md),
               Row(
                 children: [
                   CourseBadge(courseType: student.courseType),
-                  const SizedBox(width: 8),
+                  const SizedBox(width: AppSpacing.sm),
                   BranchBadge(branch: student.branch),
-                  const SizedBox(width: 8),
+                  const SizedBox(width: AppSpacing.sm),
                   Container(
                     padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
                     decoration: BoxDecoration(
                       color: Colors.white.withAlpha((0.12 * 255).round()),
-                      borderRadius: BorderRadius.circular(20),
+                      borderRadius: BorderRadius.circular(AppRadius.xl),
                     ),
                     child: Text(
                       student.batchName,
-                      style: const TextStyle(color: Colors.white, fontSize: 11),
+                      style: AppTextStyles.bodySmall.copyWith(color: Colors.white),
                     ),
                   ),
                 ],
               ),
-              const SizedBox(height: 12),
+              const SizedBox(height: AppSpacing.md),
               Text(
                 "${DateTime.now().toUtc().day}/${DateTime.now().toUtc().month}/${DateTime.now().toUtc().year}",
-                style: const TextStyle(color: Colors.white60, fontSize: 12),
+                style: AppTextStyles.bodySmall.copyWith(color: Colors.white60),
               ),
             ],
           ),

@@ -14,6 +14,7 @@ import '../features/student/screens/student_announcements_screen.dart';
 import '../features/professor/screens/professor_home_screen.dart';
 import '../features/professor/screens/mark_attendance_screen.dart';
 import '../features/professor/screens/professor_materials_screen.dart';
+import '../features/professor/screens/professor_tests_screen.dart';
 import '../features/professor/screens/professor_profile_screen.dart';
 import '../features/professor/screens/professor_shell.dart';
 import '../features/admin/screens/admin_home_screen.dart';
@@ -201,6 +202,15 @@ class AppRouter {
                   path: AppRoutes.professorAttendance,
                   name: 'professor_attendance',
                   builder: (context, state) => const MarkAttendanceScreen(),
+                ),
+              ],
+            ),
+            StatefulShellBranch(
+              routes: [
+                GoRoute(
+                  path: AppRoutes.professorTests,
+                  name: 'professor_tests',
+                  builder: (context, state) => const ProfessorTestsScreen(),
                 ),
               ],
             ),

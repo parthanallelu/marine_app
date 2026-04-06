@@ -3,6 +3,7 @@ import 'package:provider/provider.dart';
 import 'package:table_calendar/table_calendar.dart';
 import 'package:go_router/go_router.dart';
 import '../../../core/theme/app_theme.dart';
+import '../../../core/constants/app_constants.dart';
 import '../../../core/common_widgets/common_widgets.dart';
 import '../../../providers/auth_provider.dart';
 import '../../../models/app_models.dart';
@@ -59,7 +60,7 @@ class _StudentAttendanceScreenState extends State<StudentAttendanceScreen> {
     // Access Control Safety
     if (!authProvider.isStudent) {
       WidgetsBinding.instance.addPostFrameCallback((_) {
-        context.goNamed('role_selection');
+        context.goNamed(AppRoutes.roleSelectionName);
       });
       return const Scaffold(body: Center(child: CircularProgressIndicator()));
     }
@@ -91,7 +92,7 @@ class _StudentAttendanceScreenState extends State<StudentAttendanceScreen> {
 
                 // SLIVER 2 — 4 stat chips
                 SliverPadding(
-                  padding: const EdgeInsets.all(20),
+                  padding: EdgeInsets.all(AppSpacing.xl),
                   sliver: SliverToBoxAdapter(
                     child: Row(
                       children: [
@@ -99,23 +100,23 @@ class _StudentAttendanceScreenState extends State<StudentAttendanceScreen> {
                           label: "Present",
                           value: _summary.presentDays.toString(),
                           icon: Icons.check_circle_rounded,
-                          color: const Color(0xFF2E7D32),
+                          color: AppColors.present,
                         ),
-                        const SizedBox(width: 8),
+                        const SizedBox(width: AppSpacing.sm),
                         _AttendanceStat(
                           label: "Absent",
                           value: _summary.absentDays.toString(),
                           icon: Icons.cancel_rounded,
-                          color: const Color(0xFFC62828),
+                          color: AppColors.absent,
                         ),
-                        const SizedBox(width: 8),
+                        const SizedBox(width: AppSpacing.sm),
                         _AttendanceStat(
                           label: "Half Day",
                           value: _summary.halfDays.toString(),
                           icon: Icons.timelapse_rounded,
-                          color: const Color(0xFFF57F17),
+                          color: AppColors.halfDay,
                         ),
-                        const SizedBox(width: 8),
+                        const SizedBox(width: AppSpacing.sm),
                         _AttendanceStat(
                           label: "Total",
                           value: _summary.totalDays.toString(),
@@ -129,10 +130,10 @@ class _StudentAttendanceScreenState extends State<StudentAttendanceScreen> {
 
                 // SLIVER 3 — Progress card
                 SliverPadding(
-                  padding: const EdgeInsets.fromLTRB(20, 0, 20, 20),
+                  padding: EdgeInsets.fromLTRB(AppSpacing.xl, 0, AppSpacing.xl, AppSpacing.xl),
                   sliver: SliverToBoxAdapter(
                     child: Container(
-                      padding: const EdgeInsets.all(16),
+                      padding: EdgeInsets.all(AppSpacing.lg),
                       decoration: BoxDecoration(
                         color: Colors.white,
                         borderRadius: AppRadius.cardRadius,
@@ -152,27 +153,27 @@ class _StudentAttendanceScreenState extends State<StudentAttendanceScreen> {
                               ),
                             ],
                           ),
-                          const SizedBox(height: 10),
+                          SizedBox(height: AppSpacing.sm),
                           ClipRRect(
-                            borderRadius: BorderRadius.circular(8),
+                            borderRadius: BorderRadius.circular(AppRadius.sm),
                             child: LinearProgressIndicator(
                               value: _summary.percentage / 100,
                               minHeight: 10,
                               backgroundColor: AppColors.navyBlueSurface,
                               valueColor: AlwaysStoppedAnimation<Color>(
-                                _summary.percentage >= 75 ? AppColors.success : AppColors.error,
+                                _summary.percentage >= AppConstants.attendanceWarning ? AppColors.success : AppColors.error,
                               ),
                             ),
                           ),
-                          const SizedBox(height: 8),
+                          SizedBox(height: AppSpacing.sm),
                           Row(
                             children: [
                               Text(
-                                _summary.percentage >= 75 ? "Excellent! 🚢" : "Be careful! ⚠️",
+                                _summary.percentage >= AppConstants.attendanceWarning ? "Excellent! 🚢" : "Be careful! ⚠️",
                                 style: AppTextStyles.bodySmall,
                               ),
-                              const Spacer(),
-                              const Text("Min: 75%", style: TextStyle(color: AppColors.textHint, fontSize: 10)),
+                              Spacer(),
+                              Text("Min: 75%", style: AppTextStyles.caption.copyWith(fontSize: 10)),
                             ],
                           ),
                         ],
@@ -183,7 +184,7 @@ class _StudentAttendanceScreenState extends State<StudentAttendanceScreen> {
 
                 // SLIVER 4 — TableCalendar
                 SliverPadding(
-                  padding: const EdgeInsets.symmetric(horizontal: 20),
+                  padding: EdgeInsets.symmetric(horizontal: 20),
                   sliver: SliverToBoxAdapter(
                     child: Container(
                       decoration: BoxDecoration(
@@ -192,8 +193,8 @@ class _StudentAttendanceScreenState extends State<StudentAttendanceScreen> {
                         boxShadow: AppShadows.card,
                       ),
                       child: TableCalendar(
-                        firstDay: DateTime.now().toUtc().subtract(const Duration(days: 90)),
-                        lastDay: DateTime.now().toUtc().add(const Duration(days: 30)),
+                        firstDay: DateTime.now().toUtc().subtract(Duration(days: 90)),
+                        lastDay: DateTime.now().toUtc().add(Duration(days: 30)),
                         focusedDay: _focusedDay,
                         calendarFormat: _calendarFormat,
                         selectedDayPredicate: (day) => isSameDay(_selectedDay, day),
@@ -209,18 +210,18 @@ class _StudentAttendanceScreenState extends State<StudentAttendanceScreen> {
                         onPageChanged: (focusedDay) {
                           _focusedDay = focusedDay;
                         },
-                        calendarStyle: const CalendarStyle(
+                        calendarStyle: CalendarStyle(
                           todayDecoration: BoxDecoration(color: AppColors.navyBlueSurface, shape: BoxShape.circle),
                           selectedDecoration: BoxDecoration(color: AppColors.navyBlueBase, shape: BoxShape.circle),
                         ),
                         headerStyle: HeaderStyle(
                           formatButtonDecoration: BoxDecoration(
                             border: Border.all(color: AppColors.navyBlueBase),
-                            borderRadius: BorderRadius.circular(12),
+                            borderRadius: BorderRadius.circular(AppRadius.md),
                           ),
-                          formatButtonTextStyle: const TextStyle(color: AppColors.navyBlueBase),
-                          leftChevronIcon: const Icon(Icons.chevron_left, color: AppColors.navyBlueBase),
-                          rightChevronIcon: const Icon(Icons.chevron_right, color: AppColors.navyBlueBase),
+                          formatButtonTextStyle: AppTextStyles.labelSmall.copyWith(color: AppColors.navyBlueBase),
+                          leftChevronIcon: Icon(Icons.chevron_left, color: AppColors.navyBlueBase),
+                          rightChevronIcon: Icon(Icons.chevron_right, color: AppColors.navyBlueBase),
                         ),
                         calendarBuilders: CalendarBuilders(
                           defaultBuilder: (context, day, focusedDay) {
@@ -230,13 +231,13 @@ class _StudentAttendanceScreenState extends State<StudentAttendanceScreen> {
                             Color color;
                             switch (status) {
                               case AttendanceStatus.present:
-                                color = const Color(0xFF2E7D32);
+                                color = AppColors.present;
                                 break;
                               case AttendanceStatus.absent:
-                                color = const Color(0xFFC62828);
+                                color = AppColors.absent;
                                 break;
                               case AttendanceStatus.halfDay:
-                                color = const Color(0xFFF57F17);
+                                color = AppColors.halfDay;
                                 break;
                               case AttendanceStatus.holiday:
                                 color = AppColors.oceanBlue;
@@ -244,7 +245,7 @@ class _StudentAttendanceScreenState extends State<StudentAttendanceScreen> {
                             }
 
                             return Container(
-                              margin: const EdgeInsets.all(4),
+                              padding: EdgeInsets.all(AppSpacing.sm),
                               alignment: Alignment.center,
                               decoration: BoxDecoration(
                                 color: color.withAlpha((0.15 * 255).round()),
@@ -253,7 +254,7 @@ class _StudentAttendanceScreenState extends State<StudentAttendanceScreen> {
                               ),
                               child: Text(
                                 day.day.toString(),
-                                style: TextStyle(color: color, fontWeight: FontWeight.bold),
+                                style: AppTextStyles.labelMedium.copyWith(color: color),
                               ),
                             );
                           },
@@ -265,21 +266,21 @@ class _StudentAttendanceScreenState extends State<StudentAttendanceScreen> {
 
                 // SLIVER 5 — Legend row
                 const SliverPadding(
-                  padding: EdgeInsets.all(20),
+                  padding: EdgeInsets.all(AppSpacing.xl),
                   sliver: SliverToBoxAdapter(
                     child: Row(
                       mainAxisAlignment: MainAxisAlignment.center,
                       children: [
-                        AttendanceDot(color: Color(0xFF2E7D32), label: "Present"),
-                        SizedBox(width: 16),
-                        AttendanceDot(color: Color(0xFFC62828), label: "Absent"),
-                        SizedBox(width: 16),
-                        AttendanceDot(color: Color(0xFFF57F17), label: "Half Day"),
+                        AttendanceDot(color: AppColors.present, label: "Present"),
+                        SizedBox(width: AppSpacing.lg),
+                        AttendanceDot(color: AppColors.absent, label: "Absent"),
+                        SizedBox(width: AppSpacing.lg),
+                        AttendanceDot(color: AppColors.halfDay, label: "Half Day"),
                       ],
                     ),
                   ),
                 ),
-                const SliverToBoxAdapter(child: SizedBox(height: 32)),
+                const SliverToBoxAdapter(child: SizedBox(height: AppSpacing.xxxl)),
               ],
             ),
     );
@@ -303,23 +304,23 @@ class _AttendanceStat extends StatelessWidget {
   Widget build(BuildContext context) {
     return Expanded(
       child: Container(
-        padding: const EdgeInsets.symmetric(vertical: 12, horizontal: 4),
+        padding: EdgeInsets.symmetric(vertical: AppSpacing.md, horizontal: AppSpacing.xs),
         decoration: BoxDecoration(
           color: color.withAlpha((0.08 * 255).round()),
-          borderRadius: BorderRadius.circular(12),
+          borderRadius: BorderRadius.circular(AppRadius.md),
           border: Border.all(color: color.withAlpha((0.20 * 255).round())),
         ),
         child: Column(
           children: [
             Icon(icon, color: color, size: 18),
-            const SizedBox(height: 4),
+            const SizedBox(height: AppSpacing.xs),
             Text(
               value,
-              style: TextStyle(color: color, fontSize: 20, fontWeight: FontWeight.bold),
+              style: AppTextStyles.headingSmall.copyWith(color: color, fontSize: 20),
             ),
             Text(
               label,
-              style: TextStyle(color: color.withAlpha((0.8 * 255).round()), fontSize: 10),
+              style: AppTextStyles.labelSmall.copyWith(color: color.withAlpha((0.8 * 255).round()), fontSize: 10),
               textAlign: TextAlign.center,
             ),
           ],

@@ -56,7 +56,7 @@ class AuthProvider extends ChangeNotifier {
           email: 'admin@academy.com',
           phone: '9988776655',
           role: AppConstants.roleAdmin,
-          branch: 'Camp',
+          branch: AppConstants.branches[0],
           createdAt: DateTime.now(),
         );
       } else {

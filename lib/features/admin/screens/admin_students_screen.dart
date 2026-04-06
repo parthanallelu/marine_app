@@ -22,19 +22,39 @@ class _AdminStudentsScreenState extends State<AdminStudentsScreen> {
   @override
   void initState() {
     super.initState();
-    // Initialize with dummy data for local session state
     _allStudents = List.from(DummyData.students);
   }
 
   List<StudentModel> get _filteredStudents {
     return _allStudents.where((s) {
-      final matchesSearch = s.name.toLowerCase().contains(_searchQuery.toLowerCase()) || 
-                          s.rollNumber.toLowerCase().contains(_searchQuery.toLowerCase()) ||
-                          s.email.toLowerCase().contains(_searchQuery.toLowerCase());
+      final q = _searchQuery.toLowerCase();
+      final matchesSearch = s.name.toLowerCase().contains(q) ||
+          s.rollNumber.toLowerCase().contains(q) ||
+          s.email.toLowerCase().contains(q) ||
+          s.phone.toLowerCase().contains(q) ||
+          s.batchName.toLowerCase().contains(q);
       final matchesBranch = _selectedBranch == "All" || s.branch == _selectedBranch;
       final matchesCourse = _selectedCourse == "All" || s.courseType == _selectedCourse;
       return matchesSearch && matchesBranch && matchesCourse;
     }).toList();
+  }
+
+  void _showSuccessSnackbar(String message) {
+    ScaffoldMessenger.of(context).showSnackBar(
+      SnackBar(
+        content: Row(
+          children: [
+            const Icon(Icons.check_circle_rounded, color: Colors.white, size: 20),
+            SizedBox(width: AppSpacing.md),
+            Expanded(child: Text(message)),
+          ],
+        ),
+        backgroundColor: AppColors.success,
+        behavior: SnackBarBehavior.floating,
+        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(AppRadius.md)),
+        margin: EdgeInsets.all(AppSpacing.lg),
+      ),
+    );
   }
 
   @override
@@ -53,16 +73,16 @@ class _AdminStudentsScreenState extends State<AdminStudentsScreen> {
         children: [
           // SEARCH & FILTER BAR
           Container(
-            padding: const EdgeInsets.fromLTRB(16, 8, 16, 16),
+            padding: EdgeInsets.fromLTRB(AppSpacing.lg, AppSpacing.sm, AppSpacing.lg, AppSpacing.lg),
             color: Colors.white,
             child: Column(
               children: [
                 CustomTextField(
-                  hintText: "Search by name, roll no, or email...",
+                  hintText: "Search by name, roll no, email, batch...",
                   prefixIcon: Icons.search_rounded,
                   onChanged: (val) => setState(() => _searchQuery = val),
                 ),
-                const SizedBox(height: 12),
+                SizedBox(height: AppSpacing.md),
                 Row(
                   children: [
                     Expanded(
@@ -72,7 +92,7 @@ class _AdminStudentsScreenState extends State<AdminStudentsScreen> {
                         onTap: () => _showBranchSelector(),
                       ),
                     ),
-                    const SizedBox(width: 12),
+                    SizedBox(width: AppSpacing.md),
                     Expanded(
                       child: _FilterButton(
                         label: _selectedCourse,
@@ -88,7 +108,7 @@ class _AdminStudentsScreenState extends State<AdminStudentsScreen> {
 
           // STUDENT COUNT
           Padding(
-            padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
+            padding: EdgeInsets.symmetric(horizontal: AppSpacing.lg, vertical: AppSpacing.md),
             child: Row(
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
               children: [
@@ -113,20 +133,20 @@ class _AdminStudentsScreenState extends State<AdminStudentsScreen> {
           Expanded(
             child: students.isEmpty
                 ? const EmptyState(
-                    icon: Icons.person_off_rounded,
+                    icon: Icons.school_outlined,
                     title: "No Students Found",
-                    subtitle: "Try adjusting your filters or search terms.",
+                    subtitle: "Add students to get started or adjust your filters.",
                   )
                 : ListView.builder(
-                    padding: const EdgeInsets.fromLTRB(16, 0, 16, 80), // Extra bottom padding for FAB
+                    padding: EdgeInsets.fromLTRB(AppSpacing.lg, 0, AppSpacing.lg, 80),
                     itemCount: students.length,
                     itemBuilder: (context, index) {
                       final student = students[index];
                       return _AdminStudentTile(
                         student: student,
-                        onBatchChanged: () {
-                          setState(() {});
-                        },
+                        onEdit: () => _showEditStudentSheet(student),
+                        onDelete: () => _confirmDeleteStudent(student),
+                        onBatchChanged: () => setState(() {}),
                       );
                     },
                   ),
@@ -137,10 +157,14 @@ class _AdminStudentsScreenState extends State<AdminStudentsScreen> {
         onPressed: () => _showAddStudentSheet(),
         backgroundColor: AppColors.navyBlueBase,
         icon: const Icon(Icons.person_add_alt_1_rounded, color: Colors.white),
-        label: const Text("Add Student", style: TextStyle(color: Colors.white, fontWeight: FontWeight.bold)),
+        label: Text("Add Student", style: AppTextStyles.labelLarge.copyWith(color: Colors.white)),
       ),
     );
   }
+
+  // ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+  // ADD STUDENT
+  // ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 
   void _showAddStudentSheet() {
     final formKey = GlobalKey<FormState>();
@@ -148,6 +172,8 @@ class _AdminStudentsScreenState extends State<AdminStudentsScreen> {
     final emailController = TextEditingController();
     final phoneController = TextEditingController();
     final rollController = TextEditingController();
+    final parentPhoneController = TextEditingController();
+    final targetCompanyController = TextEditingController();
     String? selectedBranch;
     String? selectedCourse;
 
@@ -159,7 +185,7 @@ class _AdminStudentsScreenState extends State<AdminStudentsScreen> {
         height: MediaQuery.of(context).size.height * 0.85,
         decoration: const BoxDecoration(
           color: Colors.white,
-          borderRadius: BorderRadius.vertical(top: Radius.circular(24)),
+          borderRadius: BorderRadius.vertical(top: Radius.circular(AppRadius.xxl)),
         ),
         padding: EdgeInsets.only(
           bottom: MediaQuery.of(context).viewInsets.bottom,
@@ -169,44 +195,59 @@ class _AdminStudentsScreenState extends State<AdminStudentsScreen> {
             Container(
               width: 40,
               height: 4,
-              margin: const EdgeInsets.symmetric(vertical: 12),
+              margin: EdgeInsets.symmetric(vertical: AppSpacing.md),
               decoration: BoxDecoration(
                 color: AppColors.divider,
-                borderRadius: BorderRadius.circular(2),
+        decoration: BoxDecoration(
+          color: Colors.white,
+          borderRadius: BorderRadius.vertical(top: Radius.circular(AppRadius.xxl)),
+        ),
+        padding: EdgeInsets.only(
+          bottom: MediaQuery.of(context).viewInsets.bottom,
+        ),
+        child: Column(
+          children: [
+            Container(
+              width: 40,
+              height: 4,
+              margin: EdgeInsets.symmetric(vertical: AppSpacing.md),
+              decoration: BoxDecoration(
+                color: AppColors.divider,
+                borderRadius: BorderRadius.circular(AppRadius.xs),
               ),
             ),
             Expanded(
               child: SingleChildScrollView(
-                padding: const EdgeInsets.all(24),
+                padding: EdgeInsets.all(AppSpacing.xl),
                 child: Form(
                   key: formKey,
                   child: Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
                       Text("Enroll New Student", style: AppTextStyles.headingMedium),
-                      const SizedBox(height: 8),
+                      const SizedBox(height: AppSpacing.sm),
                       Text(
                         "Fill in the details below to add a student to the academy database.",
                         style: AppTextStyles.bodyMedium.copyWith(color: AppColors.textSecondary),
                       ),
-                      const SizedBox(height: 24),
+                      const SizedBox(height: AppSpacing.xl),
                       CustomTextField(
                         label: "Full Name",
                         hintText: "Enter student's full name",
                         controller: nameController,
                         prefixIcon: Icons.person_outline_rounded,
-                        validator: (v) => v == null || v.isEmpty ? "Required" : null,
+                        validator: (v) => v == null || v.isEmpty ? "Name is required" : null,
                       ),
-                      const SizedBox(height: 16),
+                      const SizedBox(height: AppSpacing.lg),
                       CustomTextField(
                         label: "Email Address",
                         hintText: "example@academy.com",
                         controller: emailController,
                         keyboardType: TextInputType.emailAddress,
                         prefixIcon: Icons.email_outlined,
-                        validator: (v) => v == null || !v.contains('@') ? "Invalid email" : null,
+                        validator: (v) => v == null || !v.contains('@') ? "Enter a valid email" : null,
                       ),
-                      const SizedBox(height: 16),
+                      const SizedBox(height: AppSpacing.lg),
                       Row(
                         children: [
                           Expanded(
@@ -216,10 +257,10 @@ class _AdminStudentsScreenState extends State<AdminStudentsScreen> {
                               controller: phoneController,
                               keyboardType: TextInputType.phone,
                               prefixIcon: Icons.phone_outlined,
-                              validator: (v) => v == null || v.length < 10 ? "Invalid phone" : null,
+                              validator: (v) => v == null || v.length < 10 ? "Min 10 digits" : null,
                             ),
                           ),
-                          const SizedBox(width: 16),
+                          const SizedBox(width: AppSpacing.lg),
                           Expanded(
                             child: CustomTextField(
                               label: "Roll Number",
@@ -231,21 +272,37 @@ class _AdminStudentsScreenState extends State<AdminStudentsScreen> {
                           ),
                         ],
                       ),
-                      const SizedBox(height: 16),
+                      const SizedBox(height: AppSpacing.lg),
+                      CustomTextField(
+                        label: "Parent Phone",
+                        hintText: "Parent's 10-digit number",
+                        controller: parentPhoneController,
+                        keyboardType: TextInputType.phone,
+                        prefixIcon: Icons.family_restroom_outlined,
+                        validator: (v) => v == null || v.length < 10 ? "Min 10 digits" : null,
+                      ),
+                      const SizedBox(height: AppSpacing.lg),
+                      CustomTextField(
+                        label: "Target Company (Optional)",
+                        hintText: "e.g. Synergy, Anglo Eastern",
+                        controller: targetCompanyController,
+                        prefixIcon: Icons.business_outlined,
+                      ),
+                      const SizedBox(height: AppSpacing.lg),
                       DropdownButtonFormField<String>(
                         decoration: const InputDecoration(labelText: "Branch", prefixIcon: Icon(Icons.location_on_outlined, size: 20)),
                         items: AppConstants.branches.map((b) => DropdownMenuItem(value: b, child: Text(b))).toList(),
                         onChanged: (val) => selectedBranch = val,
                         validator: (v) => v == null ? "Required" : null,
                       ),
-                      const SizedBox(height: 16),
+                      const SizedBox(height: AppSpacing.lg),
                       DropdownButtonFormField<String>(
                         decoration: const InputDecoration(labelText: "Course Type", prefixIcon: Icon(Icons.school_outlined, size: 20)),
                         items: AppConstants.courseTypes.map((c) => DropdownMenuItem(value: c, child: Text(c))).toList(),
                         onChanged: (val) => selectedCourse = val,
                         validator: (v) => v == null ? "Required" : null,
                       ),
-                      const SizedBox(height: 32),
+                      const SizedBox(height: AppSpacing.xxxl),
                       CustomButton(
                         label: "Add Student to Records",
                         width: double.infinity,
@@ -256,27 +313,26 @@ class _AdminStudentsScreenState extends State<AdminStudentsScreen> {
                                 name: nameController.text,
                                 email: emailController.text,
                                 phone: phoneController.text,
-                                parentPhone: phoneController.text, // Using student phone as a fallback
+                                parentPhone: parentPhoneController.text,
                                 role: AppConstants.roleStudent,
                                 branch: selectedBranch!,
                                 courseType: selectedCourse!,
                                 rollNumber: rollController.text,
-                                batchId: "unassigned",
-                                batchName: "Unassigned",
+                                batchId: "",
+                                batchName: "",
                                 createdAt: DateTime.now(),
                                 joiningDate: DateTime.now(),
+                                targetCompany: targetCompanyController.text,
                               );
                             setState(() {
                               _allStudents.insert(0, newStudent);
                             });
                             Navigator.pop(context);
-                            ScaffoldMessenger.of(context).showSnackBar(
-                              const SnackBar(content: Text("Student added successfully!")),
-                            );
+                            _showSuccessSnackbar("Student enrolled successfully");
                           }
                         },
                       ),
-                      const SizedBox(height: 16),
+                      const SizedBox(height: AppSpacing.lg),
                     ],
                   ),
                 ),
@@ -288,16 +344,215 @@ class _AdminStudentsScreenState extends State<AdminStudentsScreen> {
     );
   }
 
+  // ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+  // EDIT STUDENT
+  // ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+  void _showEditStudentSheet(StudentModel student) {
+    final formKey = GlobalKey<FormState>();
+    final nameController = TextEditingController(text: student.name);
+    final emailController = TextEditingController(text: student.email);
+    final phoneController = TextEditingController(text: student.phone);
+    final rollController = TextEditingController(text: student.rollNumber);
+    final parentPhoneController = TextEditingController(text: student.parentPhone);
+    final targetCompanyController = TextEditingController(text: student.targetCompany);
+    String selectedBranch = student.branch;
+    String selectedCourse = student.courseType;
+
+    showModalBottomSheet(
+      context: context,
+      isScrollControlled: true,
+      backgroundColor: Colors.transparent,
+      builder: (context) => Container(
+        height: MediaQuery.of(context).size.height * 0.85,
+        decoration: const BoxDecoration(
+          color: Colors.white,
+          borderRadius: BorderRadius.vertical(top: Radius.circular(AppRadius.xxl)),
+        ),
+        padding: EdgeInsets.only(
+          bottom: MediaQuery.of(context).viewInsets.bottom,
+        ),
+        child: Column(
+          children: [
+            Container(
+              width: 40,
+              height: 4,
+              margin: EdgeInsets.symmetric(vertical: AppSpacing.md),
+              decoration: BoxDecoration(
+                color: AppColors.divider,
+                borderRadius: BorderRadius.circular(AppRadius.xs),
+              ),
+            ),
+            Expanded(
+              child: SingleChildScrollView(
+                padding: EdgeInsets.all(AppSpacing.xl),
+                child: Form(
+                  key: formKey,
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Text("Edit Student", style: AppTextStyles.headingMedium),
+                      const SizedBox(height: AppSpacing.sm),
+                      Text(
+                        "Update ${student.name}'s information below.",
+                        style: AppTextStyles.bodyMedium.copyWith(color: AppColors.textSecondary),
+                      ),
+                      const SizedBox(height: AppSpacing.xl),
+                      CustomTextField(
+                        label: "Full Name",
+                        hintText: "Enter student's full name",
+                        controller: nameController,
+                        prefixIcon: Icons.person_outline_rounded,
+                        validator: (v) => v == null || v.isEmpty ? "Name is required" : null,
+                      ),
+                      const SizedBox(height: AppSpacing.lg),
+                      CustomTextField(
+                        label: "Email Address",
+                        hintText: "example@academy.com",
+                        controller: emailController,
+                        keyboardType: TextInputType.emailAddress,
+                        prefixIcon: Icons.email_outlined,
+                        validator: (v) => v == null || !v.contains('@') ? "Enter a valid email" : null,
+                      ),
+                      const SizedBox(height: AppSpacing.lg),
+                      Row(
+                        children: [
+                          Expanded(
+                            child: CustomTextField(
+                              label: "Phone",
+                              hintText: "10-digit number",
+                              controller: phoneController,
+                              keyboardType: TextInputType.phone,
+                              prefixIcon: Icons.phone_outlined,
+                              validator: (v) => v == null || v.length < 10 ? "Min 10 digits" : null,
+                            ),
+                          ),
+                          const SizedBox(width: AppSpacing.lg),
+                          Expanded(
+                            child: CustomTextField(
+                              label: "Roll Number",
+                              hintText: "MA-2024-XXX",
+                              controller: rollController,
+                              prefixIcon: Icons.badge_outlined,
+                              validator: (v) => v == null || v.isEmpty ? "Required" : null,
+                            ),
+                          ),
+                        ],
+                      ),
+                      const SizedBox(height: AppSpacing.lg),
+                      CustomTextField(
+                        label: "Parent Phone",
+                        hintText: "Parent's 10-digit number",
+                        controller: parentPhoneController,
+                        keyboardType: TextInputType.phone,
+                        prefixIcon: Icons.family_restroom_outlined,
+                        validator: (v) => v == null || v.length < 10 ? "Min 10 digits" : null,
+                      ),
+                      const SizedBox(height: AppSpacing.lg),
+                      CustomTextField(
+                        label: "Target Company (Optional)",
+                        hintText: "e.g. Synergy, Anglo Eastern",
+                        controller: targetCompanyController,
+                        prefixIcon: Icons.business_outlined,
+                      ),
+                      const SizedBox(height: AppSpacing.lg),
+                      DropdownButtonFormField<String>(
+                        decoration: const InputDecoration(labelText: "Branch", prefixIcon: Icon(Icons.location_on_outlined, size: 20)),
+                        initialValue: selectedBranch,
+                        items: AppConstants.branches.map((b) => DropdownMenuItem(value: b, child: Text(b))).toList(),
+                        onChanged: (val) => selectedBranch = val!,
+                        validator: (v) => v == null ? "Required" : null,
+                      ),
+                      const SizedBox(height: AppSpacing.lg),
+                      DropdownButtonFormField<String>(
+                        decoration: const InputDecoration(labelText: "Course Type", prefixIcon: Icon(Icons.school_outlined, size: 20)),
+                        initialValue: selectedCourse,
+                        items: AppConstants.courseTypes.map((c) => DropdownMenuItem(value: c, child: Text(c))).toList(),
+                        onChanged: (val) => selectedCourse = val!,
+                        validator: (v) => v == null ? "Required" : null,
+                      ),
+                      const SizedBox(height: AppSpacing.xxxl),
+                      CustomButton(
+                        label: "Save Changes",
+                        width: double.infinity,
+                        onPressed: () {
+                          if (formKey.currentState!.validate()) {
+                            setState(() {
+                              student.name = nameController.text;
+                              student.email = emailController.text;
+                              student.phone = phoneController.text;
+                              student.rollNumber = rollController.text;
+                              student.courseType = selectedCourse;
+                              student.branch = selectedBranch;
+                              student.parentPhone = parentPhoneController.text;
+                              student.targetCompany = targetCompanyController.text;
+                            });
+                            Navigator.pop(context);
+                            _showSuccessSnackbar("Student updated successfully");
+                          }
+                        },
+                      ),
+                      const SizedBox(height: AppSpacing.lg),
+                    ],
+                  ),
+                ),
+              ),
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+
+  // ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+  // DELETE STUDENT
+  // ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+  void _confirmDeleteStudent(StudentModel student) {
+    showDialog(
+      context: context,
+      builder: (context) => AlertDialog(
+        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(AppRadius.lg)),
+        title: const Text("Delete Student?"),
+        content: Text(
+          "Are you sure you want to remove ${student.name}? This action cannot be undone.",
+        ),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.pop(context),
+            child: const Text("Cancel"),
+          ),
+          ElevatedButton(
+            style: ElevatedButton.styleFrom(backgroundColor: AppColors.error),
+            onPressed: () {
+              setState(() {
+                _allStudents.remove(student);
+                DummyData.students.remove(student);
+              });
+              Navigator.pop(context);
+              _showSuccessSnackbar("Student deleted");
+            },
+            child: Text("Delete", style: AppTextStyles.labelLarge.copyWith(color: Colors.white)),
+          ),
+        ],
+      ),
+    );
+  }
+
+  // ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+  // FILTER SELECTORS
+  // ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
   void _showBranchSelector() {
     showModalBottomSheet(
       context: context,
-      shape: const RoundedRectangleBorder(borderRadius: BorderRadius.vertical(top: Radius.circular(20))),
+      shape: const RoundedRectangleBorder(borderRadius: BorderRadius.vertical(top: Radius.circular(AppRadius.xl))),
       builder: (context) => ListView(
         shrinkWrap: true,
-        padding: const EdgeInsets.symmetric(vertical: 20),
+        padding: EdgeInsets.symmetric(vertical: AppSpacing.xl),
         children: [
           Padding(
-            padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 8),
+            padding: EdgeInsets.symmetric(horizontal: AppSpacing.xl, vertical: AppSpacing.sm),
             child: Text("Filter by Branch", style: AppTextStyles.headingSmall),
           ),
           ...["All", ...AppConstants.branches].map((branch) => ListTile(
@@ -323,13 +578,13 @@ class _AdminStudentsScreenState extends State<AdminStudentsScreen> {
   void _showCourseSelector() {
     showModalBottomSheet(
       context: context,
-      shape: const RoundedRectangleBorder(borderRadius: BorderRadius.vertical(top: Radius.circular(20))),
+      shape: const RoundedRectangleBorder(borderRadius: BorderRadius.vertical(top: Radius.circular(AppRadius.xl))),
       builder: (context) => ListView(
         shrinkWrap: true,
-        padding: const EdgeInsets.symmetric(vertical: 20),
+        padding: EdgeInsets.symmetric(vertical: AppSpacing.xl),
         children: [
           Padding(
-            padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 8),
+            padding: EdgeInsets.symmetric(horizontal: AppSpacing.xl, vertical: AppSpacing.sm),
             child: Text("Filter by Course", style: AppTextStyles.headingSmall),
           ),
           ...["All", ...AppConstants.courseTypes].map((course) => ListTile(
@@ -353,6 +608,10 @@ class _AdminStudentsScreenState extends State<AdminStudentsScreen> {
   }
 }
 
+// ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+// FILTER BUTTON
+// ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
 class _FilterButton extends StatelessWidget {
   final String label;
   final IconData icon;
@@ -365,16 +624,16 @@ class _FilterButton extends StatelessWidget {
     return GestureDetector(
       onTap: onTap,
       child: Container(
-        padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 10),
+        padding: EdgeInsets.symmetric(horizontal: AppSpacing.lg, vertical: 10),
         decoration: BoxDecoration(
           color: AppColors.background,
-          borderRadius: BorderRadius.circular(10),
+          borderRadius: BorderRadius.circular(AppRadius.md),
           border: Border.all(color: AppColors.divider),
         ),
         child: Row(
           children: [
             Icon(icon, size: 16, color: AppColors.navyBlueBase),
-            const SizedBox(width: 8),
+            SizedBox(width: AppSpacing.sm),
             Expanded(
               child: Text(
                 label,
@@ -390,19 +649,30 @@ class _FilterButton extends StatelessWidget {
   }
 }
 
+// ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+// STUDENT TILE
+// ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
 class _AdminStudentTile extends StatelessWidget {
   final StudentModel student;
+  final VoidCallback onEdit;
+  final VoidCallback onDelete;
   final VoidCallback onBatchChanged;
-  const _AdminStudentTile({required this.student, required this.onBatchChanged});
+  const _AdminStudentTile({
+    required this.student,
+    required this.onEdit,
+    required this.onDelete,
+    required this.onBatchChanged,
+  });
 
   @override
   Widget build(BuildContext context) {
     return Container(
-      margin: const EdgeInsets.only(bottom: 12),
-      padding: const EdgeInsets.all(16),
+      margin: EdgeInsets.only(bottom: AppSpacing.md),
+      padding: EdgeInsets.all(AppSpacing.lg),
       decoration: BoxDecoration(
         color: Colors.white,
-        borderRadius: BorderRadius.circular(16),
+        borderRadius: BorderRadius.circular(AppRadius.lg),
         boxShadow: AppShadows.subtle,
       ),
       child: Column(
@@ -410,14 +680,14 @@ class _AdminStudentTile extends StatelessWidget {
           Row(
             children: [
               CircleAvatar(
-                radius: 24,
+                radius: AppRadius.xxl,
                 backgroundColor: AppColors.navyBlueSurface,
                 child: Text(
                   student.name.isNotEmpty ? student.name[0] : 'S',
-                  style: const TextStyle(fontWeight: FontWeight.bold, color: AppColors.navyBlueBase),
+                  style: AppTextStyles.labelLarge.copyWith(color: AppColors.navyBlueBase),
                 ),
               ),
-              const SizedBox(width: 16),
+              const SizedBox(width: AppSpacing.lg),
               Expanded(
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
@@ -431,55 +701,89 @@ class _AdminStudentTile extends StatelessWidget {
                 icon: const Icon(Icons.more_vert_rounded, color: AppColors.textHint),
                 tooltip: "Manage Student",
                 onSelected: (val) {
-                  if (val == 'batch') {
-                    _showBatchSelector(context);
+                  switch (val) {
+                    case 'edit':
+                      onEdit();
+                      break;
+                    case 'assign':
+                      _showBatchSelector(context);
+                      break;
+                    case 'delete':
+                      onDelete();
+                      break;
                   }
                 },
                 itemBuilder: (context) => [
-                  const PopupMenuItem(
+                  PopupMenuItem(
+                    value: 'edit',
+                    child: Row(
+                      children: [
+                        const Icon(Icons.edit_outlined, size: 18),
+                        SizedBox(width: AppSpacing.sm),
+                        const Text("Edit"),
+                      ],
+                    ),
+                  ),
+                  PopupMenuItem(
                     value: 'batch',
-                    child: Text("Assign to Batch"),
+                    child: Row(
+                      children: [
+                        const Icon(Icons.class_outlined, size: 18),
+                        SizedBox(width: AppSpacing.sm),
+                        const Text("Assign to Batch"),
+                      ],
+                    ),
+                  ),
+                  PopupMenuItem(
+                    value: 'delete',
+                    child: Row(
+                      children: [
+                        const Icon(Icons.delete_outline, size: 18, color: AppColors.error),
+                        SizedBox(width: AppSpacing.sm),
+                        Text("Delete", style: AppTextStyles.labelMedium.copyWith(color: AppColors.error)),
+                      ],
+                    ),
                   ),
                 ],
               ),
             ],
           ),
-          const SizedBox(height: 8),
+          SizedBox(height: AppSpacing.sm),
           Row(
             children: [
               if (student.batchId.isNotEmpty)
                 Container(
-                  padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+                  padding: EdgeInsets.symmetric(horizontal: AppSpacing.sm, vertical: AppSpacing.xs),
                   decoration: BoxDecoration(
                     color: AppColors.gold.withAlpha((0.2 * 255).round()),
-                    borderRadius: BorderRadius.circular(8),
+                    borderRadius: BorderRadius.circular(AppRadius.sm),
                   ),
                   child: Row(
                     children: [
                       const Icon(Icons.class_outlined, size: 14, color: AppColors.gold),
-                      const SizedBox(width: 4),
+                      SizedBox(width: AppSpacing.xs),
                       Text(student.batchName, style: AppTextStyles.caption.copyWith(color: AppColors.gold, fontWeight: FontWeight.bold)),
                     ],
                   ),
                 )
               else
                 Container(
-                  padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+                  padding: const EdgeInsets.symmetric(horizontal: AppSpacing.sm, vertical: AppSpacing.xs),
                   decoration: BoxDecoration(
                     color: AppColors.warning.withAlpha((0.2 * 255).round()),
-                    borderRadius: BorderRadius.circular(8),
+                    borderRadius: BorderRadius.circular(AppRadius.sm),
                   ),
                   child: Row(
                     children: [
                       const Icon(Icons.warning_amber_rounded, size: 14, color: AppColors.warning),
-                      const SizedBox(width: 4),
+                      SizedBox(width: AppSpacing.xs),
                       Text("Not Assigned", style: AppTextStyles.caption.copyWith(color: AppColors.warning, fontWeight: FontWeight.bold)),
                     ],
                   ),
                 ),
             ],
           ),
-          const Divider(height: 24),
+          Divider(height: AppSpacing.xxl),
           Row(
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
@@ -498,6 +802,7 @@ class _AdminStudentTile extends StatelessWidget {
       builder: (context) {
         String? selectedBatchId;
         return AlertDialog(
+          shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(AppRadius.lg)),
           title: const Text("Assign Batch"),
           content: DropdownButtonFormField<String>(
             decoration: const InputDecoration(labelText: "Select Batch", prefixIcon: Icon(Icons.class_outlined, size: 20)),
@@ -518,11 +823,23 @@ class _AdminStudentTile extends StatelessWidget {
                   onBatchChanged();
                   Navigator.pop(context);
                   ScaffoldMessenger.of(context).showSnackBar(
-                    const SnackBar(content: Text("Batch updated")),
+                    SnackBar(
+                      content: Row(
+                        children: [
+                          const Icon(Icons.check_circle_rounded, color: Colors.white, size: 20),
+                          SizedBox(width: AppSpacing.md),
+                          Text("Assigned to ${batch.name}"),
+                        ],
+                      ),
+                      backgroundColor: AppColors.success,
+                      behavior: SnackBarBehavior.floating,
+                      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(AppRadius.md)),
+                      margin: EdgeInsets.all(AppSpacing.lg),
+                    ),
                   );
                 }
               },
-              child: const Text("Assign", style: TextStyle(color: Colors.white)),
+              child: Text("Assign", style: AppTextStyles.labelLarge.copyWith(color: Colors.white)),
             ),
           ],
         );

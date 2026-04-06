@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:go_router/go_router.dart';
 import '../../../core/theme/app_theme.dart';
+import '../../../core/constants/app_constants.dart';
 import '../../../core/common_widgets/common_widgets.dart';
 import '../../../providers/auth_provider.dart';
 import '../../../models/app_models.dart';
@@ -57,7 +58,7 @@ class _StudentTestsScreenState extends State<StudentTestsScreen> with SingleTick
     // Access Control Safety
     if (!authProvider.isStudent) {
       WidgetsBinding.instance.addPostFrameCallback((_) {
-        context.goNamed('role_selection');
+        context.goNamed(AppRoutes.roleSelectionName);
       });
       return const Scaffold(body: Center(child: CircularProgressIndicator()));
     }
@@ -88,7 +89,7 @@ class _StudentTestsScreenState extends State<StudentTestsScreen> with SingleTick
               child: Column(
                 children: [
                   Padding(
-                    padding: const EdgeInsets.fromLTRB(20, 12, 20, 8),
+                    padding: EdgeInsets.fromLTRB(AppSpacing.lg, AppSpacing.md, AppSpacing.lg, AppSpacing.sm),
                     child: Row(
                       children: [
                         Text(
@@ -148,7 +149,7 @@ class _TestList extends StatelessWidget {
 
     // LIST PERFORMANCE: Using ListView.builder for dynamic lists
     return ListView.builder(
-      padding: const EdgeInsets.all(20),
+      padding: EdgeInsets.all(AppSpacing.lg),
       itemCount: tests.length,
       itemBuilder: (context, index) {
         final test = tests[index];
@@ -190,7 +191,7 @@ class _TestCard extends StatelessWidget {
     }
 
     return Container(
-      margin: const EdgeInsets.only(bottom: 16),
+      margin: EdgeInsets.only(bottom: AppSpacing.lg),
       decoration: BoxDecoration(
         color: Colors.white,
         borderRadius: AppRadius.cardRadius,
@@ -203,11 +204,11 @@ class _TestCard extends StatelessWidget {
             height: 4,
             decoration: BoxDecoration(
               color: typeColor,
-              borderRadius: const BorderRadius.vertical(top: Radius.circular(16)),
+              borderRadius: const BorderRadius.vertical(top: Radius.circular(AppRadius.lg)),
             ),
           ),
           Padding(
-            padding: const EdgeInsets.all(16),
+            padding: EdgeInsets.all(AppSpacing.lg),
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
@@ -217,7 +218,7 @@ class _TestCard extends StatelessWidget {
                       padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
                       decoration: BoxDecoration(
                         color: typeColor.withAlpha((0.10 * 255).round()),
-                        borderRadius: BorderRadius.circular(12),
+                        borderRadius: BorderRadius.circular(AppRadius.md),
                         border: Border.all(color: typeColor.withAlpha((0.30 * 255).round())),
                       ),
                       child: Text(
@@ -231,7 +232,7 @@ class _TestCard extends StatelessWidget {
                         padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
                         decoration: BoxDecoration(
                           color: AppColors.navyBlueSurface,
-                          borderRadius: BorderRadius.circular(12),
+                          borderRadius: BorderRadius.circular(AppRadius.md),
                         ),
                         child: Text(
                           test.companyTarget!,
@@ -241,23 +242,23 @@ class _TestCard extends StatelessWidget {
                     ],
                   ],
                 ),
-                const SizedBox(height: 12),
+                SizedBox(height: AppSpacing.md),
                 Text(test.title, style: AppTextStyles.headingSmall),
-                const SizedBox(height: 16),
+                SizedBox(height: AppSpacing.lg),
                 Row(
                   children: [
                     _MetaChip(icon: Icons.help_outline, label: "${test.questions.length} Qns"),
-                    const SizedBox(width: 8),
+                    SizedBox(width: AppSpacing.sm),
                     _MetaChip(icon: Icons.timer_outlined, label: "${test.durationMinutes}m"),
-                    const SizedBox(width: 8),
+                    SizedBox(width: AppSpacing.sm),
                     _MetaChip(icon: Icons.stars_rounded, label: "${test.totalMarks.toInt()} Marks"),
                   ],
                 ),
-                const SizedBox(height: 16),
+                SizedBox(height: AppSpacing.lg),
                 Row(
                   children: [
                     const Icon(Icons.event_note, size: 16, color: AppColors.textHint),
-                    const SizedBox(width: 4),
+                    SizedBox(width: AppSpacing.xs),
                     Text(
                       test.scheduledDate.toString().split(' ')[0],
                       style: AppTextStyles.caption.copyWith(color: AppColors.textSecondary),
@@ -269,7 +270,7 @@ class _TestCard extends StatelessWidget {
                         height: 40,
                         color: typeColor,
                         // NAVIGATION SAFETY: Using goNamed
-                        onPressed: () => context.pushNamed('test_attempt', pathParameters: {'testId': test.id}),
+                        onPressed: () => context.pushNamed(AppRoutes.testAttemptName, pathParameters: {'testId': test.id}),
                       ),
                   ],
                 ),
@@ -290,11 +291,11 @@ class _MetaChip extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Container(
-      padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
-      decoration: BoxDecoration(
-        color: AppColors.background,
-        borderRadius: BorderRadius.circular(8),
-      ),
+        padding: EdgeInsets.symmetric(horizontal: AppSpacing.sm, vertical: AppSpacing.xs),
+        decoration: BoxDecoration(
+          color: AppColors.background,
+          borderRadius: BorderRadius.circular(AppRadius.sm),
+        ),
       child: Row(
         children: [
           Icon(icon, size: 12, color: AppColors.textSecondary),
@@ -321,7 +322,7 @@ class _ResultList extends StatelessWidget {
     }
 
     return ListView.builder(
-      padding: const EdgeInsets.all(20),
+      padding: EdgeInsets.all(AppSpacing.lg),
       itemCount: results.length,
       itemBuilder: (context, index) {
         final result = results[index];
@@ -342,10 +343,10 @@ class _ResultCard extends StatelessWidget {
     final bgColor = hasPassed ? AppColors.successSurface : AppColors.errorSurface;
 
     return GestureDetector(
-      onTap: () => context.pushNamed('test_result', pathParameters: {'resultId': result.id}),
+      onTap: () => context.pushNamed(AppRoutes.testResultName, pathParameters: {'resultId': result.id}),
       child: Container(
-        margin: const EdgeInsets.only(bottom: 16),
-        padding: const EdgeInsets.all(16),
+        margin: EdgeInsets.only(bottom: AppSpacing.lg),
+        padding: EdgeInsets.all(AppSpacing.lg),
         decoration: BoxDecoration(
           color: Colors.white,
           borderRadius: AppRadius.cardRadius,
@@ -366,7 +367,7 @@ class _ResultCard extends StatelessWidget {
                 style: AppTextStyles.headingMedium.copyWith(color: color, fontWeight: FontWeight.bold),
               ),
             ),
-            const SizedBox(width: 16),
+            SizedBox(width: AppSpacing.lg),
             Expanded(
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
@@ -385,10 +386,10 @@ class _ResultCard extends StatelessWidget {
               ),
             ),
             Container(
-              padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+              padding: EdgeInsets.symmetric(horizontal: AppSpacing.sm, vertical: AppSpacing.xs),
               decoration: BoxDecoration(
                 color: bgColor,
-                borderRadius: BorderRadius.circular(20),
+                borderRadius: BorderRadius.circular(AppRadius.xxl),
               ),
               child: Text(
                 hasPassed ? "PASSED" : "FAILED",

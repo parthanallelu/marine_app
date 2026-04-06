@@ -45,19 +45,19 @@ class StatCard extends StatelessWidget {
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
               children: [
                 Container(
-                  padding: const EdgeInsets.all(8),
+                  padding: EdgeInsets.all(AppSpacing.sm),
                   decoration: BoxDecoration(
                     color: (bgColor ?? cardColor).withAlpha((0.08 * 255).round()),
-                    borderRadius: BorderRadius.circular(10),
+                    borderRadius: BorderRadius.circular(AppRadius.md),
                   ),
                   child: Icon(icon, color: cardColor, size: 24),
                 ),
                 if (subtitle != null)
                   Container(
-                    padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+                    padding: EdgeInsets.symmetric(horizontal: AppSpacing.sm, vertical: AppSpacing.xs),
                     decoration: BoxDecoration(
                       color: AppColors.navyBlueSurface,
-                      borderRadius: BorderRadius.circular(20),
+                      borderRadius: BorderRadius.circular(AppRadius.xxl),
                     ),
                     child: Text(
                       subtitle!,
@@ -66,10 +66,10 @@ class StatCard extends StatelessWidget {
                   ),
               ],
             ),
-            const SizedBox(height: 12),
+            const SizedBox(height: AppSpacing.md),
             Text(
               value,
-              style: AppTextStyles.statNumber.copyWith(color: cardColor, fontSize: 24),
+              style: AppTextStyles.statNumber.copyWith(color: cardColor),
             ),
             Text(label, style: AppTextStyles.bodySmall),
           ],
@@ -132,10 +132,10 @@ class DashboardCard extends StatelessWidget {
                 children: [
                   if (leading != null) ...[
                     leading!,
-                    const SizedBox(width: 12),
+                    SizedBox(width: AppSpacing.md),
                   ] else if (icon != null) ...[
                     Icon(icon, size: 20, color: iconColor ?? AppColors.navyBlueBase),
-                    const SizedBox(width: 8),
+                    SizedBox(width: AppSpacing.sm),
                   ],
                   Expanded(
                     child: Column(
@@ -165,7 +165,7 @@ class DashboardCard extends StatelessWidget {
               ),
             ),
             Padding(
-              padding: padding ?? const EdgeInsets.fromLTRB(16, 0, 16, 16),
+              padding: padding ?? EdgeInsets.fromLTRB(AppSpacing.lg, 0, AppSpacing.lg, AppSpacing.lg),
               child: child,
             ),
           ],
@@ -216,11 +216,11 @@ class QuickActionTile extends StatelessWidget {
                   height: 48,
                   decoration: BoxDecoration(
                     color: color.withAlpha((0.10 * 255).round()),
-                    borderRadius: BorderRadius.circular(14),
+                    borderRadius: BorderRadius.circular(AppRadius.lg),
                   ),
                   child: Icon(icon, color: color, size: 24),
                 ),
-                const SizedBox(height: 8),
+                SizedBox(height: AppSpacing.sm),
                 Text(
                   label,
                   style: AppTextStyles.labelMedium.copyWith(fontSize: 11),
@@ -230,8 +230,8 @@ class QuickActionTile extends StatelessWidget {
             ),
             if (badgeCount != null && badgeCount! > 0)
               Positioned(
-                top: 8,
-                right: 8,
+                top: AppSpacing.sm,
+                right: AppSpacing.sm,
                 child: Container(
                   width: 18,
                   height: 18,
@@ -352,7 +352,7 @@ class CourseBadge extends StatelessWidget {
       padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
       decoration: BoxDecoration(
         color: baseColor.withAlpha((0.10 * 255).round()),
-        borderRadius: BorderRadius.circular(20),
+        borderRadius: BorderRadius.circular(AppRadius.xxl),
         border: Border.all(color: baseColor.withAlpha((0.30 * 255).round())),
       ),
       child: Text(
@@ -370,10 +370,10 @@ class BranchBadge extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Container(
-      padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+      padding: EdgeInsets.symmetric(horizontal: AppSpacing.sm, vertical: AppSpacing.xs),
       decoration: BoxDecoration(
         color: AppColors.navyBlueSurface,
-        borderRadius: BorderRadius.circular(20),
+        borderRadius: BorderRadius.circular(AppRadius.xxl),
       ),
       child: Row(
         mainAxisSize: MainAxisSize.min,
@@ -413,7 +413,7 @@ class AttendanceDot extends StatelessWidget {
           height: size,
           decoration: BoxDecoration(color: color, shape: BoxShape.circle),
         ),
-        const SizedBox(width: 6),
+        SizedBox(width: AppSpacing.sm),
         Text(label, style: AppTextStyles.caption),
       ],
     );
@@ -441,11 +441,11 @@ class InfoRow extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Padding(
-      padding: const EdgeInsets.symmetric(vertical: 6),
+      padding: EdgeInsets.symmetric(vertical: AppSpacing.sm),
       child: Row(
         children: [
           Icon(icon, size: 16, color: iconColor ?? AppColors.textHint),
-          const SizedBox(width: 8),
+          SizedBox(width: AppSpacing.sm),
           Text(label, style: AppTextStyles.bodyMedium.copyWith(color: AppColors.textHint)),
           const Spacer(),
           Text(value, style: AppTextStyles.labelLarge),
@@ -514,7 +514,7 @@ class EmptyState extends StatelessWidget {
   Widget build(BuildContext context) {
     return Center(
       child: Padding(
-        padding: const EdgeInsets.all(32),
+        padding: EdgeInsets.all(AppSpacing.xxl),
         child: Column(
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
@@ -523,16 +523,16 @@ class EmptyState extends StatelessWidget {
               height: 80,
               decoration: BoxDecoration(
                 color: AppColors.navyBlueSurface,
-                borderRadius: BorderRadius.circular(20),
+                borderRadius: BorderRadius.circular(AppRadius.lg),
               ),
               child: Icon(icon, size: 40, color: AppColors.navyBlueBase),
             ),
-            const SizedBox(height: 24),
+            SizedBox(height: AppSpacing.xl),
             Text(title, style: AppTextStyles.headingSmall, textAlign: TextAlign.center),
-            const SizedBox(height: 8),
+            SizedBox(height: AppSpacing.sm),
             Text(subtitle, style: AppTextStyles.bodyMedium, textAlign: TextAlign.center),
             if (actionLabel != null) ...[
-              const SizedBox(height: 24),
+              SizedBox(height: AppSpacing.xl),
               CustomButton(label: actionLabel!, onPressed: onAction),
             ],
           ],
@@ -581,7 +581,7 @@ class NavyHeader extends StatelessWidget {
       child: SafeArea(
         bottom: false,
         child: Padding(
-          padding: const EdgeInsets.fromLTRB(20, 12, 20, 20),
+          padding: EdgeInsets.fromLTRB(AppSpacing.lg, AppSpacing.md, AppSpacing.lg, AppSpacing.lg),
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             mainAxisSize: MainAxisSize.min,
@@ -593,13 +593,13 @@ class NavyHeader extends StatelessWidget {
                   ...?actionsList,
                 ],
               ),
-              const SizedBox(height: 16),
+              SizedBox(height: AppSpacing.lg),
               Text(title, style: AppTextStyles.headingLarge.copyWith(color: Colors.white)),
               if (subtitleText != null) ...[
-                const SizedBox(height: 4),
+                SizedBox(height: AppSpacing.xs),
                 Text(
                   subtitleText,
-                  style: AppTextStyles.bodyMedium.copyWith(color: Colors.white.withAlpha((0.7 * 255).round())),
+                  style: AppTextStyles.bodyMedium.copyWith(color: Colors.white70),
                 ),
               ],
             ],
@@ -633,10 +633,10 @@ class PriorityTag extends StatelessWidget {
     }
 
     return Container(
-      padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
+      padding: EdgeInsets.symmetric(horizontal: AppSpacing.sm, vertical: AppSpacing.xs),
       decoration: BoxDecoration(
         color: baseColor.withAlpha((0.10 * 255).round()),
-        borderRadius: BorderRadius.circular(12),
+        borderRadius: BorderRadius.circular(AppRadius.md),
         border: Border.all(color: baseColor.withAlpha((0.30 * 255).round())),
       ),
       child: Text(
@@ -684,7 +684,7 @@ class CustomTextField extends StatelessWidget {
       children: [
         if (label != null) ...[
           Text(label!, style: AppTextStyles.labelLarge),
-          const SizedBox(height: 8),
+          SizedBox(height: AppSpacing.sm),
         ],
         TextFormField(
           controller: controller,
@@ -733,23 +733,23 @@ class UpcomingTestTile extends StatelessWidget {
     return GestureDetector(
       onTap: onTap,
       child: Container(
-        margin: const EdgeInsets.only(bottom: 10),
-        padding: const EdgeInsets.all(12),
+        margin: EdgeInsets.only(bottom: AppSpacing.sm),
+        padding: EdgeInsets.all(AppSpacing.md),
         decoration: BoxDecoration(
           color: AppColors.oceanBlueSurface,
-          borderRadius: BorderRadius.circular(12),
+          borderRadius: BorderRadius.circular(AppRadius.md),
         ),
         child: Row(
           children: [
             Container(
-              padding: const EdgeInsets.all(8),
+              padding: EdgeInsets.all(AppSpacing.sm),
               decoration: BoxDecoration(
                 color: AppColors.oceanBlue.withAlpha((0.15 * 255).round()),
-                borderRadius: BorderRadius.circular(10),
+                borderRadius: BorderRadius.circular(AppRadius.md),
               ),
               child: const Icon(Icons.quiz_rounded, color: AppColors.oceanBlue, size: 24),
             ),
-            const SizedBox(width: 12),
+            SizedBox(width: AppSpacing.md),
             Expanded(
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
@@ -763,10 +763,10 @@ class UpcomingTestTile extends StatelessWidget {
               ),
             ),
             Container(
-              padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+              padding: EdgeInsets.symmetric(horizontal: AppSpacing.sm, vertical: AppSpacing.xs),
               decoration: BoxDecoration(
                 color: isUrgent ? AppColors.errorSurface : AppColors.navyBlueSurface,
-                borderRadius: BorderRadius.circular(6),
+                borderRadius: BorderRadius.circular(AppRadius.xs),
               ),
               child: Text(
                 daysLabel,
@@ -803,7 +803,7 @@ class AnnouncementTile extends StatelessWidget {
       onTap: onTap,
       child: Container(
         margin: const EdgeInsets.only(bottom: 10),
-        padding: const EdgeInsets.all(12),
+        padding: const EdgeInsets.all(AppSpacing.md),
         decoration: BoxDecoration(
           color: bgColor,
           borderRadius: BorderRadius.circular(12),
@@ -876,7 +876,7 @@ class MaterialCard extends StatelessWidget {
 
     return Container(
       margin: const EdgeInsets.only(bottom: 12),
-      padding: const EdgeInsets.all(12),
+      padding: const EdgeInsets.all(AppSpacing.md),
       decoration: BoxDecoration(
         color: Colors.white,
         borderRadius: BorderRadius.circular(16),

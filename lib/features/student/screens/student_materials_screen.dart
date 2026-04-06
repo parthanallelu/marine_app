@@ -61,7 +61,7 @@ class _StudentMaterialsScreenState extends State<StudentMaterialsScreen> {
     // Access Control Safety
     if (!authProvider.isStudent) {
       WidgetsBinding.instance.addPostFrameCallback((_) {
-        context.goNamed('role_selection');
+        context.goNamed(AppRoutes.roleSelectionName);
       });
       return const Scaffold(body: Center(child: CircularProgressIndicator()));
     }
@@ -87,7 +87,7 @@ class _StudentMaterialsScreenState extends State<StudentMaterialsScreen> {
           
           // Search Field
           Padding(
-            padding: const EdgeInsets.fromLTRB(20, 16, 20, 8),
+            padding: EdgeInsets.fromLTRB(AppSpacing.lg, AppSpacing.lg, AppSpacing.lg, AppSpacing.sm),
             child: TextField(
               controller: _searchController,
               onChanged: (val) => setState(() => _searchQuery = val),
@@ -105,7 +105,7 @@ class _StudentMaterialsScreenState extends State<StudentMaterialsScreen> {
                 filled: true,
                 fillColor: Colors.white,
                 border: OutlineInputBorder(
-                  borderRadius: BorderRadius.circular(12),
+                  borderRadius: BorderRadius.circular(AppRadius.md),
                   borderSide: BorderSide.none,
                 ),
               ),
@@ -117,13 +117,13 @@ class _StudentMaterialsScreenState extends State<StudentMaterialsScreen> {
             height: 44,
             child: ListView.builder(
               scrollDirection: Axis.horizontal,
-              padding: const EdgeInsets.symmetric(horizontal: 16),
+              padding: EdgeInsets.symmetric(horizontal: AppSpacing.lg),
               itemCount: categories.length,
               itemBuilder: (context, index) {
                 final category = categories[index];
                 final isSelected = _selectedCategory == category;
                 return Padding(
-                  padding: const EdgeInsets.symmetric(horizontal: 4),
+                  padding: EdgeInsets.symmetric(horizontal: AppSpacing.xs),
                   child: ChoiceChip(
                     label: Text(category),
                     selected: isSelected,
@@ -137,7 +137,7 @@ class _StudentMaterialsScreenState extends State<StudentMaterialsScreen> {
                     ),
                     backgroundColor: Colors.white,
                     shape: RoundedRectangleBorder(
-                      borderRadius: BorderRadius.circular(20),
+                      borderRadius: BorderRadius.circular(AppRadius.xxl),
                       side: BorderSide(
                         color: isSelected ? AppColors.navyBlueBase : AppColors.navyBlueSurface,
                       ),
@@ -148,7 +148,7 @@ class _StudentMaterialsScreenState extends State<StudentMaterialsScreen> {
             ),
           ),
 
-          const SizedBox(height: 12),
+          const SizedBox(height: AppSpacing.md),
 
           // LIST PERFORMANCE: Using ListView.builder for dynamic lists
           Expanded(
@@ -159,7 +159,7 @@ class _StudentMaterialsScreenState extends State<StudentMaterialsScreen> {
                     subtitle: "Try adjusting your filters or search query.",
                   )
                 : ListView.builder(
-                    padding: const EdgeInsets.all(20),
+                    padding: EdgeInsets.all(AppSpacing.lg),
                     itemCount: filteredMaterials.length,
                     itemBuilder: (context, index) {
                       final material = filteredMaterials[index];

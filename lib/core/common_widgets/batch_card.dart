@@ -33,10 +33,10 @@ class BatchCard extends StatelessWidget {
       onAction: onAction,
       actionLabel: actionLabel,
       leading: Container(
-        padding: const EdgeInsets.all(10),
+        padding: const EdgeInsets.all(AppSpacing.sm),
         decoration: BoxDecoration(
           color: AppColors.navyBlueSurface,
-          borderRadius: BorderRadius.circular(12),
+          borderRadius: BorderRadius.circular(AppRadius.md),
         ),
         child: const Icon(Icons.school_rounded, color: AppColors.navyBlueBase),
       ),
@@ -52,11 +52,11 @@ class BatchCard extends StatelessWidget {
               ),
             ],
           ),
-          const SizedBox(height: 8),
+          const SizedBox(height: AppSpacing.sm),
           Row(
             children: [
               const Icon(Icons.location_on_rounded, size: 14, color: AppColors.textHint),
-              const SizedBox(width: 4),
+              const SizedBox(width: AppSpacing.xs),
               Text(
                 branch,
                 style: AppTextStyles.bodySmall.copyWith(color: AppColors.textHint),

@@ -52,7 +52,7 @@ class _AdminFeesScreenState extends State<AdminFeesScreen> {
         children: [
           // SEARCH & BRANCH SELECTOR
           Container(
-            padding: const EdgeInsets.fromLTRB(16, 8, 16, 16),
+            padding: EdgeInsets.fromLTRB(AppSpacing.lg, AppSpacing.sm, AppSpacing.lg, AppSpacing.lg),
             color: Colors.white,
             child: Column(
               children: [
@@ -61,7 +61,7 @@ class _AdminFeesScreenState extends State<AdminFeesScreen> {
                   prefixIcon: Icons.search_rounded,
                   onChanged: (val) => setState(() => _searchQuery = val),
                 ),
-                const SizedBox(height: 12),
+                SizedBox(height: AppSpacing.md),
                 SizedBox(
                   height: 36,
                   child: ListView(
@@ -86,9 +86,9 @@ class _AdminFeesScreenState extends State<AdminFeesScreen> {
 
           // FINANCIAL OVERVIEW CARD
           Padding(
-            padding: const EdgeInsets.all(16),
+            padding: EdgeInsets.all(AppSpacing.lg),
             child: Container(
-              padding: const EdgeInsets.all(20),
+              padding: EdgeInsets.all(AppSpacing.xl),
               decoration: BoxDecoration(
                 gradient: const LinearGradient(
                   colors: [AppColors.navyBlueDark, AppColors.navyBlueBase],
@@ -106,8 +106,8 @@ class _AdminFeesScreenState extends State<AdminFeesScreen> {
                       Column(
                         crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
-                          Text("Collection Performance", style: AppTextStyles.bodyMedium.copyWith(color: Colors.white70)),
-                          const SizedBox(height: 4),
+                          Text("Collection Performance", style: AppTextStyles.bodyMedium.copyWith(color: Colors.white.withAlpha((0.7 * 255).round()))),
+                          SizedBox(height: AppSpacing.xs),
                           Text(
                             "₹${totalCollected.toInt()}",
                             style: AppTextStyles.headingLarge.copyWith(color: Colors.white, fontSize: 32),
@@ -128,13 +128,13 @@ class _AdminFeesScreenState extends State<AdminFeesScreen> {
                       ),
                     ],
                   ),
-                  const SizedBox(height: 20),
-                  const Divider(color: Colors.white24, height: 1),
-                  const SizedBox(height: 16),
+                  SizedBox(height: AppSpacing.xl),
+                  Divider(color: Colors.white.withAlpha((0.24 * 255).round()), height: 1),
+                  SizedBox(height: AppSpacing.lg),
                   Row(
                     children: [
                       _CompactStat(label: "Pending", value: "₹${totalPending.toInt()}", color: AppColors.error),
-                      const SizedBox(width: 32),
+                      SizedBox(width: AppSpacing.xxl * 1.5),
                       _CompactStat(label: "Total Target", value: "₹${totalPlanned.toInt()}", color: AppColors.gold),
                       const Spacer(),
                       _CompactStat(label: "Records", value: filteredRecords.length.toString(), color: Colors.white),
@@ -154,7 +154,7 @@ class _AdminFeesScreenState extends State<AdminFeesScreen> {
                     subtitle: "Try adjusting filters or search criteria.",
                   )
                 : ListView.builder(
-                    padding: const EdgeInsets.symmetric(horizontal: 16),
+                    padding: EdgeInsets.symmetric(horizontal: AppSpacing.lg),
                     itemCount: filteredRecords.length,
                     itemBuilder: (context, index) {
                       final record = filteredRecords[index];
@@ -183,25 +183,25 @@ class _AdminFeesScreenState extends State<AdminFeesScreen> {
             height: MediaQuery.of(context).size.height * 0.8,
             decoration: const BoxDecoration(
               color: AppColors.background,
-              borderRadius: BorderRadius.vertical(top: Radius.circular(24)),
+              borderRadius: BorderRadius.vertical(top: Radius.circular(AppRadius.xxl)),
             ),
             child: Column(
               children: [
                 Container(
                   width: 40,
                   height: 4,
-                  margin: const EdgeInsets.symmetric(vertical: 12),
-                  decoration: BoxDecoration(color: AppColors.divider, borderRadius: BorderRadius.circular(2)),
+                  margin: EdgeInsets.symmetric(vertical: AppSpacing.md),
+                  decoration: BoxDecoration(color: AppColors.divider, borderRadius: BorderRadius.circular(AppRadius.xs)),
                 ),
                 Padding(
-                  padding: const EdgeInsets.fromLTRB(24, 8, 24, 20),
+                  padding: EdgeInsets.fromLTRB(AppSpacing.xl, AppSpacing.sm, AppSpacing.xl, AppSpacing.lg),
                   child: Row(
                     children: [
                       CircleAvatar(
                         backgroundColor: AppColors.navyBlueSurface,
-                        child: Text(record.studentName[0], style: const TextStyle(color: AppColors.navyBlueBase, fontWeight: FontWeight.bold)),
+                        child: Text(record.studentName[0], style: AppTextStyles.labelLarge.copyWith(color: AppColors.navyBlueBase)),
                       ),
-                      const SizedBox(width: 16),
+                      SizedBox(width: AppSpacing.lg),
                       Expanded(
                         child: Column(
                           crossAxisAlignment: CrossAxisAlignment.start,
@@ -215,9 +215,9 @@ class _AdminFeesScreenState extends State<AdminFeesScreen> {
                   ),
                 ),
                 Container(
-                  margin: const EdgeInsets.symmetric(horizontal: 24),
-                  padding: const EdgeInsets.all(16),
-                  decoration: BoxDecoration(color: Colors.white, borderRadius: BorderRadius.circular(16), boxShadow: AppShadows.subtle),
+                  margin: EdgeInsets.symmetric(horizontal: AppSpacing.xl),
+                  padding: EdgeInsets.all(AppSpacing.lg),
+                  decoration: BoxDecoration(color: Colors.white, borderRadius: BorderRadius.circular(AppRadius.lg), boxShadow: AppShadows.subtle),
                   child: Row(
                     mainAxisAlignment: MainAxisAlignment.spaceAround,
                     children: [
@@ -227,28 +227,28 @@ class _AdminFeesScreenState extends State<AdminFeesScreen> {
                     ],
                   ),
                 ),
-                const SizedBox(height: 24),
+                SizedBox(height: AppSpacing.xl),
                 Padding(
-                  padding: const EdgeInsets.symmetric(horizontal: 24),
+                  padding: const EdgeInsets.symmetric(horizontal: AppSpacing.xl),
                   child: Row(
                     children: [
                       const Icon(Icons.history_rounded, size: 18, color: AppColors.navyBlueBase),
-                      const SizedBox(width: 8),
+                      SizedBox(width: AppSpacing.sm),
                       Text("Payment Installments", style: AppTextStyles.labelLarge),
                     ],
                   ),
                 ),
-                const SizedBox(height: 12),
+                SizedBox(height: AppSpacing.md),
                 Expanded(
                   child: ListView.builder(
-                    padding: const EdgeInsets.symmetric(horizontal: 24),
+                    padding: EdgeInsets.symmetric(horizontal: AppSpacing.xl),
                     itemCount: record.installments.length,
                     itemBuilder: (context, idx) {
                       final inst = record.installments[idx];
                       return Container(
-                        margin: const EdgeInsets.only(bottom: 12),
-                        padding: const EdgeInsets.all(16),
-                        decoration: BoxDecoration(color: Colors.white, borderRadius: BorderRadius.circular(12), border: Border.all(color: AppColors.divider)),
+                        margin: EdgeInsets.only(bottom: AppSpacing.md),
+                        padding: EdgeInsets.all(AppSpacing.lg),
+                        decoration: BoxDecoration(color: Colors.white, borderRadius: BorderRadius.circular(AppRadius.md), border: Border.all(color: AppColors.divider)),
                         child: Row(
                           children: [
                             Column(
@@ -260,14 +260,14 @@ class _AdminFeesScreenState extends State<AdminFeesScreen> {
                             ),
                             const Spacer(),
                             Text("₹${inst.amount.toInt()}", style: AppTextStyles.labelLarge),
-                            const SizedBox(width: 16),
+                            SizedBox(width: AppSpacing.lg),
                             if (inst.status == FeeStatus.paid)
                               const Icon(Icons.check_circle_rounded, color: AppColors.success)
                             else
                               TextButton(
                                 style: TextButton.styleFrom(
                                   backgroundColor: AppColors.navyBlueSurface,
-                                  padding: const EdgeInsets.symmetric(horizontal: 12),
+                                  padding: EdgeInsets.symmetric(horizontal: AppSpacing.lg),
                                 ),
                                 onPressed: () {
                                   setState(() {
@@ -290,7 +290,7 @@ class _AdminFeesScreenState extends State<AdminFeesScreen> {
                                   });
                                   setModalState(() {});
                                 },
-                                child: const Text("Pay Now", style: TextStyle(fontSize: 12, fontWeight: FontWeight.bold, color: AppColors.navyBlueBase)),
+                                child: Text("Pay Now", style: AppTextStyles.labelSmall.copyWith(color: AppColors.navyBlueBase, fontWeight: FontWeight.bold)),
                               ),
                           ],
                         ),
@@ -299,7 +299,7 @@ class _AdminFeesScreenState extends State<AdminFeesScreen> {
                   ),
                 ),
                 Padding(
-                  padding: const EdgeInsets.all(24),
+                  padding: EdgeInsets.all(AppSpacing.xl),
                   child: CustomButton(
                     label: "Close Detail View",
                     width: double.infinity,
@@ -325,19 +325,19 @@ class _Chip extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Padding(
-      padding: const EdgeInsets.only(right: 8),
+      padding: EdgeInsets.only(right: AppSpacing.sm),
       child: GestureDetector(
         onTap: onTap,
         child: Container(
-          padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 6),
+          padding: EdgeInsets.symmetric(horizontal: AppSpacing.lg, vertical: AppSpacing.xs),
           decoration: BoxDecoration(
             color: isSelected ? AppColors.navyBlueBase : AppColors.background,
-            borderRadius: BorderRadius.circular(20),
+            borderRadius: BorderRadius.circular(AppRadius.xxl),
             border: Border.all(color: isSelected ? AppColors.navyBlueBase : AppColors.divider),
           ),
           child: Text(
             label,
-            style: TextStyle(
+            style: AppTextStyles.caption.copyWith(
               color: isSelected ? Colors.white : AppColors.textPrimary,
               fontSize: 11,
               fontWeight: isSelected ? FontWeight.bold : FontWeight.normal,
@@ -399,11 +399,11 @@ class _AdminFeeTile extends StatelessWidget {
     return GestureDetector(
       onTap: onTap,
       child: Container(
-        margin: const EdgeInsets.only(bottom: 12),
-        padding: const EdgeInsets.all(16),
+        margin: EdgeInsets.only(bottom: AppSpacing.md),
+        padding: EdgeInsets.all(AppSpacing.lg),
         decoration: BoxDecoration(
           color: Colors.white,
-          borderRadius: BorderRadius.circular(16),
+          borderRadius: BorderRadius.circular(AppRadius.lg),
           boxShadow: AppShadows.subtle,
         ),
         child: Row(
@@ -421,7 +421,7 @@ class _AdminFeeTile extends StatelessWidget {
                 size: 20,
               ),
             ),
-            const SizedBox(width: 16),
+            SizedBox(width: AppSpacing.lg),
             Expanded(
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,

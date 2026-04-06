@@ -64,23 +64,23 @@ class _AdminHomeScreenState extends State<AdminHomeScreen> {
             subtitle: AppConstants.appName,
             actions: [
               CircleAvatar(
-                radius: 18,
+                radius: AppRadius.lg,
                 backgroundColor: AppColors.gold.withAlpha((0.2 * 255).round()),
-                child: const Text('A', style: TextStyle(color: AppColors.gold, fontWeight: FontWeight.bold)),
+                child: Text('A', style: AppTextStyles.labelLarge.copyWith(color: AppColors.gold)),
               ),
             ],
           ),
 
           // SLIVER 2 — 4 Stat Cards in 2×2 Grid
           SliverPadding(
-            padding: const EdgeInsets.all(20),
+            padding: EdgeInsets.all(AppSpacing.xl),
             sliver: SliverToBoxAdapter(
               child: SizedBox(
                 height: 220, // Adjust height to fit 2 rows
                 child: GridView.count(
                   crossAxisCount: 2,
-                  crossAxisSpacing: 12,
-                  mainAxisSpacing: 12,
+                  crossAxisSpacing: AppSpacing.md,
+                  mainAxisSpacing: AppSpacing.md,
                   physics: const NeverScrollableScrollPhysics(),
                   children: [
                     StatCard(
@@ -116,7 +116,7 @@ class _AdminHomeScreenState extends State<AdminHomeScreen> {
           // SLIVER 3 — Branch Distribution DashboardCard
           SliverToBoxAdapter(
             child: Padding(
-              padding: const EdgeInsets.symmetric(horizontal: 20),
+              padding: EdgeInsets.symmetric(horizontal: AppSpacing.xl),
               child: DashboardCard(
                 title: "Students by Branch",
                 icon: Icons.bar_chart_rounded,
@@ -140,7 +140,7 @@ class _AdminHomeScreenState extends State<AdminHomeScreen> {
                               final index = value.toInt();
                               if (index >= 0 && index < AppConstants.branches.length) {
                                 return Padding(
-                                  padding: const EdgeInsets.only(top: 8.0),
+                                  padding: EdgeInsets.only(top: AppSpacing.sm),
                                   child: Text(
                                     AppConstants.branches[index].substring(0, 3),
                                     style: AppTextStyles.caption,
@@ -165,12 +165,12 @@ class _AdminHomeScreenState extends State<AdminHomeScreen> {
             ),
           ),
 
-          const SizedBox(height: 20).toSliver,
+          SizedBox(height: AppSpacing.xl).toSliver,
 
           // SLIVER 4 — Course Distribution DashboardCard
           SliverToBoxAdapter(
             child: Padding(
-              padding: const EdgeInsets.symmetric(horizontal: 20),
+              padding: EdgeInsets.symmetric(horizontal: AppSpacing.xl),
               child: DashboardCard(
                 title: "Course Distribution",
                 icon: Icons.pie_chart_rounded,
@@ -186,15 +186,15 @@ class _AdminHomeScreenState extends State<AdminHomeScreen> {
                         ),
                       ),
                     ),
-                    const SizedBox(height: 16),
+                    SizedBox(height: AppSpacing.lg),
                     Row(
                       mainAxisAlignment: MainAxisAlignment.center,
                       children: [
-                        _AttendanceDot(color: const Color(0xFF1565C0), label: "11th"),
-                        const SizedBox(width: 16),
-                        _AttendanceDot(color: const Color(0xFF6A1B9A), label: "12th"),
-                        const SizedBox(width: 16),
-                        _AttendanceDot(color: const Color(0xFFBF360C), label: "Crash"),
+                        _AttendanceDot(color: AppColors.course11th, label: "11th"),
+                        SizedBox(width: AppSpacing.lg),
+                        _AttendanceDot(color: AppColors.course12th, label: "12th"),
+                        SizedBox(width: AppSpacing.lg),
+                        _AttendanceDot(color: AppColors.courseCrash, label: "Crash"),
                       ],
                     ),
                   ],
@@ -203,21 +203,21 @@ class _AdminHomeScreenState extends State<AdminHomeScreen> {
             ),
           ),
 
-          const SizedBox(height: 20).toSliver,
+          SizedBox(height: AppSpacing.xl).toSliver,
 
           // SLIVER 5 — Recent Announcements DashboardCard
           SliverToBoxAdapter(
             child: Padding(
-              padding: const EdgeInsets.fromLTRB(20, 12, 20, 32),
+              padding: EdgeInsets.fromLTRB(AppSpacing.xl, AppSpacing.md, AppSpacing.xl, AppSpacing.xxxl),
               child: DashboardCard(
                 title: "Recent Notices",
                 actionLabel: "All",
-                onAction: () => context.go(AppRoutes.adminAnnouncements),
+                onAction: () => context.goNamed(AppRoutes.adminAnnouncementsName),
                 child: Column(
                   children: recentNotices.map((notice) => Column(
                     children: [
                       AnnouncementTile(announcement: notice),
-                      if (notice != recentNotices.last) const Divider(height: 24),
+                      if (notice != recentNotices.last) Divider(height: AppSpacing.xxl),
                     ],
                   )).toList(),
                 ),
@@ -239,8 +239,8 @@ class _AdminHomeScreenState extends State<AdminHomeScreen> {
           BarChartRodData(
             toY: count.toDouble(),
             color: AppColors.navyBlueBase,
-            width: 16,
-            borderRadius: const BorderRadius.vertical(top: Radius.circular(4)),
+            width: AppSpacing.lg,
+            borderRadius: BorderRadius.vertical(top: Radius.circular(AppRadius.xs)),
           ),
         ],
       );
@@ -248,7 +248,7 @@ class _AdminHomeScreenState extends State<AdminHomeScreen> {
   }
 
   List<PieChartSectionData> _generatePieSections() {
-    final colors = [const Color(0xFF1565C0), const Color(0xFF6A1B9A), const Color(0xFFBF360C)];
+    final colors = [AppColors.course11th, AppColors.course12th, AppColors.courseCrash];
     int i = 0;
     return courseCounts.entries.map((entry) {
       final index = i++;
@@ -275,8 +275,8 @@ class _AttendanceDot extends StatelessWidget {
     return Row(
       mainAxisSize: MainAxisSize.min,
       children: [
-        Container(width: 8, height: 8, decoration: BoxDecoration(color: color, shape: BoxShape.circle)),
-        const SizedBox(width: 6),
+        Container(width: AppSpacing.sm, height: AppSpacing.sm, decoration: BoxDecoration(color: color, shape: BoxShape.circle)),
+        SizedBox(width: AppSpacing.sm),
         Text(label, style: AppTextStyles.caption),
       ],
     );

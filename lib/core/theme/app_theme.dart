@@ -32,6 +32,10 @@ class AppColors {
   static const Color course11th = Color(0xFF1565C0);
   static const Color course12th = Color(0xFF6A1B9A);
   static const Color courseCrash = Color(0xFFBF360C);
+  
+  // Semantic Colors for Results
+  static const Color testPassed = Color(0xFF1B5E20);
+  static const Color testFailed = Color(0xFF7F0000);
 }
 
 class AppTextStyles {
@@ -51,9 +55,13 @@ class AppTextStyles {
   static TextStyle statNumber = _base.copyWith(fontSize: 28, fontWeight: FontWeight.w700, color: AppColors.navyBlueBase);
   static TextStyle buttonText = _base.copyWith(fontSize: 15, fontWeight: FontWeight.w600, color: Colors.white);
   static TextStyle caption = _base.copyWith(fontSize: 11, fontWeight: FontWeight.w400, color: AppColors.textHint);
+  
+  // Custom variations for specific UI elements
+  static TextStyle gradeLarge = _base.copyWith(fontSize: 48, fontWeight: FontWeight.w700, color: Colors.white);
 }
 
 class AppSpacing {
+  static const double xxs = 2.0;
   static const double xs = 4.0;
   static const double sm = 8.0;
   static const double md = 12.0;
@@ -66,10 +74,12 @@ class AppSpacing {
 }
 
 class AppRadius {
+  static const double xs = 4.0;
   static const double sm = 8.0;
   static const double md = 12.0;
   static const double lg = 16.0;
   static const double xl = 20.0;
+  static const double xxl = 24.0;
   static const double circle = 100.0;
   
   static const BorderRadius cardRadius = BorderRadius.all(Radius.circular(16.0));

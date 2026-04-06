@@ -79,7 +79,7 @@ class _ProfessorHomeScreenState extends State<ProfessorHomeScreen> {
     // Role security check
     if (!authProvider.isProfessor) {
       WidgetsBinding.instance.addPostFrameCallback((_) {
-        context.go(AppRoutes.roleSelection);
+        context.goNamed(AppRoutes.roleSelectionName);
       });
       return const Scaffold(body: Center(child: CircularProgressIndicator()));
     }
@@ -101,18 +101,18 @@ class _ProfessorHomeScreenState extends State<ProfessorHomeScreen> {
           ),
           SliverToBoxAdapter(
             child: Padding(
-              padding: const EdgeInsets.all(AppSpacing.lg),
+              padding: EdgeInsets.all(AppSpacing.lg),
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
                   _buildStatsGrid(professor),
-                  const SizedBox(height: AppSpacing.xxl),
+                  SizedBox(height: AppSpacing.xxl),
                   _buildQuickActions(context),
-                  const SizedBox(height: AppSpacing.xxl),
+                  SizedBox(height: AppSpacing.xxl),
                   _buildTodaySchedule(context),
-                  const SizedBox(height: AppSpacing.xxl),
+                  SizedBox(height: AppSpacing.xxl),
                   _buildMyBatches(),
-                  const SizedBox(height: AppSpacing.xxxl),
+                  SizedBox(height: AppSpacing.xxxl),
                 ],
               ),
             ),
@@ -157,7 +157,7 @@ class _ProfessorHomeScreenState extends State<ProfessorHomeScreen> {
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
         const SectionHeader(title: 'Quick Actions'),
-        const SizedBox(height: AppSpacing.md),
+        SizedBox(height: AppSpacing.md),
         GridView.count(
           crossAxisCount: 3,
           shrinkWrap: true,
@@ -203,7 +203,7 @@ class _ProfessorHomeScreenState extends State<ProfessorHomeScreen> {
             ),
           ],
         ),
-        const SizedBox(height: AppSpacing.md),
+        SizedBox(height: AppSpacing.md),
         if (_todaysClasses.isEmpty)
           const EmptyState(
             icon: Icons.calendar_today_outlined,
@@ -212,7 +212,7 @@ class _ProfessorHomeScreenState extends State<ProfessorHomeScreen> {
           )
         else
           ..._todaysClasses.map((batch) => Padding(
-                padding: const EdgeInsets.only(bottom: AppSpacing.md),
+                padding: EdgeInsets.only(bottom: AppSpacing.md),
                 child: BatchCard(
                   name: batch.name,
                   courseType: batch.courseType,
@@ -232,7 +232,7 @@ class _ProfessorHomeScreenState extends State<ProfessorHomeScreen> {
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
         const SectionHeader(title: 'My Batches'),
-        const SizedBox(height: AppSpacing.md),
+        SizedBox(height: AppSpacing.md),
         if (_assignedBatches.isEmpty)
           const EmptyState(
             icon: Icons.class_outlined,
@@ -247,7 +247,7 @@ class _ProfessorHomeScreenState extends State<ProfessorHomeScreen> {
             itemBuilder: (context, index) {
               final batch = _assignedBatches[index];
               return Padding(
-                padding: const EdgeInsets.only(bottom: AppSpacing.md),
+                padding: EdgeInsets.only(bottom: AppSpacing.md),
                 child: BatchCard(
                   name: batch.name,
                   courseType: batch.courseType,
@@ -272,7 +272,7 @@ class _ProfessorHomeScreenState extends State<ProfessorHomeScreen> {
     showModalBottomSheet(
       context: context,
       isScrollControlled: true,
-      shape: const RoundedRectangleBorder(borderRadius: BorderRadius.vertical(top: Radius.circular(24))),
+      shape: const RoundedRectangleBorder(borderRadius: BorderRadius.vertical(top: Radius.circular(AppRadius.xxl))),
       builder: (context) => DraggableScrollableSheet(
         initialChildSize: 0.7,
         maxChildSize: 0.9,
@@ -280,14 +280,14 @@ class _ProfessorHomeScreenState extends State<ProfessorHomeScreen> {
         expand: false,
         builder: (context, scrollController) => Column(
           children: [
-            const SizedBox(height: 12),
-            Container(width: 40, height: 4, decoration: BoxDecoration(color: Colors.grey[300], borderRadius: BorderRadius.circular(2))),
-            const SizedBox(height: 16),
+            SizedBox(height: AppSpacing.md),
+            Container(width: 40, height: 4, decoration: BoxDecoration(color: AppColors.navyBlueSurface, borderRadius: BorderRadius.circular(AppRadius.xs))),
+            SizedBox(height: AppSpacing.lg),
             Padding(
-              padding: const EdgeInsets.symmetric(horizontal: 20),
+              padding: EdgeInsets.symmetric(horizontal: AppSpacing.xl),
               child: Text('Assigned Students', style: AppTextStyles.headingSmall),
             ),
-            const SizedBox(height: 20),
+            SizedBox(height: AppSpacing.xl),
             if (students.isEmpty)
               const Expanded(
                 child: EmptyState(
@@ -300,7 +300,7 @@ class _ProfessorHomeScreenState extends State<ProfessorHomeScreen> {
               Expanded(
                 child: ListView.builder(
                   controller: scrollController,
-                  padding: const EdgeInsets.symmetric(horizontal: 20),
+                  padding: EdgeInsets.symmetric(horizontal: AppSpacing.xl),
                   itemCount: students.length,
                   itemBuilder: (context, index) {
                     final student = students[index];

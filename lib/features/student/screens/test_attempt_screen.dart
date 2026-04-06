@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 import 'package:provider/provider.dart';
 import '../../../core/theme/app_theme.dart';
+import '../../../core/constants/app_constants.dart';
 import '../../../core/common_widgets/common_widgets.dart';
 import '../../../providers/auth_provider.dart';
 import '../../../models/app_models.dart';
@@ -68,7 +69,7 @@ class _TestAttemptScreenState extends State<TestAttemptScreen> {
   Color _getTimerColor() {
     if (_secondsLeft < 60) return AppColors.error;
     if (_secondsLeft < 300) return AppColors.warning;
-    return const Color(0xFF2E7D32);
+    return AppColors.success;
   }
 
   void _submitTest() {
@@ -103,7 +104,7 @@ class _TestAttemptScreenState extends State<TestAttemptScreen> {
     // await studentRepository.saveTestResult(result);
 
     if (mounted) {
-      context.pushReplacementNamed('test_result', pathParameters: {'resultId': result.id}, extra: result);
+      context.pushReplacementNamed(AppRoutes.testResultName, pathParameters: {'resultId': result.id}, extra: result);
     }
   }
 
@@ -122,13 +123,13 @@ class _TestAttemptScreenState extends State<TestAttemptScreen> {
           children: [
             Text("Answered: $answeredCount / $totalCount"),
             if (!isComplete) ...[
-              const SizedBox(height: 12),
-              const Text(
+              SizedBox(height: AppSpacing.md),
+              Text(
                 "Warning: You have un-answered questions!",
-                style: TextStyle(color: AppColors.error, fontWeight: FontWeight.bold),
+                style: AppTextStyles.labelMedium.copyWith(color: AppColors.error),
               ),
             ],
-            const SizedBox(height: 12),
+            SizedBox(height: AppSpacing.md),
             const Text("Are you sure you want to finish the test?"),
           ],
         ),
@@ -150,9 +151,9 @@ class _TestAttemptScreenState extends State<TestAttemptScreen> {
   void _showQuestionNavigator() {
     showModalBottomSheet(
       context: context,
-      shape: const RoundedRectangleBorder(borderRadius: BorderRadius.vertical(top: Radius.circular(20))),
+      shape: const RoundedRectangleBorder(borderRadius: BorderRadius.vertical(top: Radius.circular(AppRadius.xxl))),
       builder: (context) => Container(
-        padding: const EdgeInsets.all(20),
+        padding: EdgeInsets.all(AppSpacing.xl),
         child: Column(
           mainAxisSize: MainAxisSize.min,
           children: [
@@ -163,14 +164,14 @@ class _TestAttemptScreenState extends State<TestAttemptScreen> {
                 IconButton(onPressed: () => Navigator.pop(context), icon: const Icon(Icons.close)),
               ],
             ),
-            const SizedBox(height: 16),
+            SizedBox(height: AppSpacing.lg),
             Flexible(
               child: GridView.builder(
                 shrinkWrap: true,
                 gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
                   crossAxisCount: 5,
-                  crossAxisSpacing: 10,
-                  mainAxisSpacing: 10,
+                  crossAxisSpacing: AppSpacing.md,
+                  mainAxisSpacing: AppSpacing.md,
                 ),
                 itemCount: _test.questions.length,
                 itemBuilder: (context, index) {
@@ -188,7 +189,7 @@ class _TestAttemptScreenState extends State<TestAttemptScreen> {
                         color: isCurrent 
                           ? AppColors.navyBlueBase 
                           : (isAnswered ? AppColors.successSurface : AppColors.background),
-                        borderRadius: BorderRadius.circular(8),
+                        borderRadius: BorderRadius.circular(AppRadius.sm),
                         border: Border.all(
                           color: isCurrent ? AppColors.navyBlueBase : AppColors.navyBlueSurface,
                         ),
@@ -196,9 +197,8 @@ class _TestAttemptScreenState extends State<TestAttemptScreen> {
                       alignment: Alignment.center,
                       child: Text(
                         (index + 1).toString(),
-                        style: TextStyle(
+                        style: AppTextStyles.labelLarge.copyWith(
                           color: isCurrent ? Colors.white : (isAnswered ? AppColors.success : AppColors.textPrimary),
-                          fontWeight: FontWeight.bold,
                         ),
                       ),
                     ),
@@ -206,7 +206,7 @@ class _TestAttemptScreenState extends State<TestAttemptScreen> {
                 },
               ),
             ),
-            const SizedBox(height: 24),
+            SizedBox(height: AppSpacing.xxl),
             Row(
               mainAxisAlignment: MainAxisAlignment.spaceEvenly,
               children: [
@@ -227,7 +227,7 @@ class _TestAttemptScreenState extends State<TestAttemptScreen> {
     final auth = context.watch<AuthProvider>();
     if (!auth.isStudent) {
       WidgetsBinding.instance.addPostFrameCallback((_) {
-        context.goNamed('role_selection');
+        context.goNamed(AppRoutes.roleSelectionName);
       });
       return const Scaffold(body: Center(child: CircularProgressIndicator()));
     }
@@ -251,24 +251,24 @@ class _TestAttemptScreenState extends State<TestAttemptScreen> {
           ),
           title: Text(
             _test.title,
-            style: const TextStyle(fontSize: 16, overflow: TextOverflow.ellipsis),
+            style: AppTextStyles.labelLarge.copyWith(overflow: TextOverflow.ellipsis),
           ),
           actions: [
             Container(
-              margin: const EdgeInsets.symmetric(vertical: 10, horizontal: 16),
-              padding: const EdgeInsets.symmetric(horizontal: 10),
+              margin: EdgeInsets.symmetric(vertical: AppSpacing.sm, horizontal: AppSpacing.lg),
+              padding: EdgeInsets.symmetric(horizontal: AppSpacing.md),
               decoration: BoxDecoration(
                 color: timerColor.withAlpha((0.1 * 255).round()),
-                borderRadius: BorderRadius.circular(20),
+                borderRadius: BorderRadius.circular(AppRadius.xl),
                 border: Border.all(color: timerColor.withAlpha((0.3 * 255).round())),
               ),
               child: Row(
                 children: [
                   Icon(Icons.timer_outlined, size: 16, color: timerColor),
-                  const SizedBox(width: 6),
+                  SizedBox(width: AppSpacing.xs),
                   Text(
                     _formatTime(_secondsLeft),
-                    style: TextStyle(color: timerColor, fontWeight: FontWeight.bold, fontFamily: 'monospace'),
+                    style: AppTextStyles.labelMedium.copyWith(color: timerColor, fontFamily: 'monospace'),
                   ),
                 ],
               ),
@@ -280,7 +280,7 @@ class _TestAttemptScreenState extends State<TestAttemptScreen> {
             // PROGRESS SECTION
             Container(
               color: AppColors.background,
-              padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 12),
+              padding: EdgeInsets.symmetric(horizontal: AppSpacing.xl, vertical: AppSpacing.md),
               child: Column(
                 children: [
                   Row(
@@ -296,12 +296,12 @@ class _TestAttemptScreenState extends State<TestAttemptScreen> {
                       ),
                     ],
                   ),
-                  const SizedBox(height: 8),
+                  SizedBox(height: AppSpacing.sm),
                   ClipRRect(
-                    borderRadius: BorderRadius.circular(4),
+                    borderRadius: BorderRadius.circular(AppRadius.xs),
                     child: LinearProgressIndicator(
                       value: totalCount > 0 ? (_currentIndex + 1) / totalCount : 0,
-                      backgroundColor: Colors.grey[300],
+                      backgroundColor: AppColors.navyBlueSurface,
                       color: AppColors.navyBlueBase,
                       minHeight: 5,
                     ),
@@ -340,12 +340,12 @@ class _TestAttemptScreenState extends State<TestAttemptScreen> {
 
             // NAVIGATION ROW
             Container(
-              padding: const EdgeInsets.all(20),
+              padding: EdgeInsets.all(AppSpacing.xl),
               decoration: BoxDecoration(
                 color: Colors.white,
                 boxShadow: [
                   BoxShadow(
-                    color: Colors.black.withAlpha((0.05 * 255).round()),
+                    color: AppColors.textPrimary.withAlpha((0.05 * 255).round()),
                     blurRadius: 10,
                     offset: const Offset(0, -5),
                   ),
@@ -363,7 +363,7 @@ class _TestAttemptScreenState extends State<TestAttemptScreen> {
                         },
                       ),
                     ),
-                  if (_currentIndex > 0) const SizedBox(width: 16),
+                  if (_currentIndex > 0) SizedBox(width: AppSpacing.lg),
                   Expanded(
                     child: (totalCount > 0 && _currentIndex == totalCount - 1)
                         ? CustomButton(
@@ -409,27 +409,27 @@ class _QuestionPage extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return SingleChildScrollView(
-      padding: const EdgeInsets.all(20),
+      padding: EdgeInsets.all(AppSpacing.xl),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           Container(
-            padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
+            padding: EdgeInsets.symmetric(horizontal: AppSpacing.md, vertical: AppSpacing.xs),
             decoration: BoxDecoration(
               color: AppColors.navyBlueSurface,
-              borderRadius: BorderRadius.circular(8),
+              borderRadius: BorderRadius.circular(AppRadius.sm),
             ),
             child: Text(
               question.subject,
               style: AppTextStyles.labelSmall.copyWith(color: AppColors.navyBlueBase),
             ),
           ),
-          const SizedBox(height: 16),
+          SizedBox(height: AppSpacing.lg),
           Text(
             "QN. ${question.questionText}",
             style: AppTextStyles.headingSmall.copyWith(height: 1.5, fontSize: 18),
           ),
-          const SizedBox(height: 24),
+          SizedBox(height: AppSpacing.xxl),
           ...List.generate(question.options.length, (index) {
             final isSelected = selectedOption == index;
             final optionLabel = String.fromCharCode(65 + index); // A, B, C, D
@@ -438,11 +438,11 @@ class _QuestionPage extends StatelessWidget {
                 onTap: () => onOptionSelected(index),
               child: AnimatedContainer(
                 duration: const Duration(milliseconds: 180),
-                margin: const EdgeInsets.only(bottom: 12),
-                padding: const EdgeInsets.all(16),
+                margin: EdgeInsets.only(bottom: AppSpacing.md),
+                padding: EdgeInsets.all(AppSpacing.lg),
                 decoration: BoxDecoration(
                   color: isSelected ? AppColors.navyBlueSurface : AppColors.background,
-                  borderRadius: BorderRadius.circular(12),
+                  borderRadius: BorderRadius.circular(AppRadius.md),
                   border: Border.all(
                     color: isSelected ? AppColors.navyBlueBase : AppColors.navyBlueSurface,
                     width: isSelected ? 2 : 1,
@@ -461,17 +461,16 @@ class _QuestionPage extends StatelessWidget {
                       alignment: Alignment.center,
                       child: Text(
                         optionLabel,
-                        style: TextStyle(
+                        style: AppTextStyles.labelLarge.copyWith(
                           color: isSelected ? Colors.white : AppColors.navyBlueBase,
-                          fontWeight: FontWeight.bold,
                         ),
                       ),
                     ),
-                    const SizedBox(width: 16),
+                    SizedBox(width: AppSpacing.lg),
                     Expanded(
                       child: Text(
                         question.options[index],
-                        style: TextStyle(
+                        style: AppTextStyles.bodyMedium.copyWith(
                           color: isSelected ? AppColors.navyBlueBase : AppColors.textPrimary,
                           fontWeight: isSelected ? FontWeight.w600 : FontWeight.normal,
                         ),
@@ -499,8 +498,8 @@ class _LegendItem extends StatelessWidget {
     return Row(
       children: [
         Container(width: 12, height: 12, decoration: BoxDecoration(color: color, shape: BoxShape.circle)),
-        const SizedBox(width: 6),
-        Text(label, style: const TextStyle(fontSize: 11)),
+        SizedBox(width: AppSpacing.xs),
+        Text(label, style: AppTextStyles.caption.copyWith(fontSize: 11)),
       ],
     );
   }

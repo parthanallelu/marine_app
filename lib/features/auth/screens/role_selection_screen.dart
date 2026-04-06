@@ -20,7 +20,7 @@ class RoleSelectionScreen extends StatelessWidget {
           Expanded(
             flex: 2,
             child: Padding(
-              padding: const EdgeInsets.symmetric(horizontal: 28),
+              padding: EdgeInsets.symmetric(horizontal: AppSpacing.xxl),
               child: Column(
                 mainAxisAlignment: MainAxisAlignment.center,
                 children: [
@@ -29,23 +29,18 @@ class RoleSelectionScreen extends StatelessWidget {
                     height: 80,
                     decoration: BoxDecoration(
                       color: AppColors.gold,
-                      borderRadius: BorderRadius.circular(20),
+                      borderRadius: BorderRadius.circular(AppRadius.lg),
                       boxShadow: AppShadows.goldGlow,
                     ),
                     child: const Icon(Icons.anchor_rounded, color: AppColors.navyBlueDark, size: 44),
                   ),
-                  const SizedBox(height: 20),
+                  SizedBox(height: AppSpacing.lg),
                   const Text(
                     AppConstants.appName,
-                    style: TextStyle(
-                      color: Colors.white,
-                      fontSize: 20,
-                      fontWeight: FontWeight.w700,
-                      fontFamily: 'Poppins',
-                    ),
+                    style: AppTextStyles.headingLarge,
                     textAlign: TextAlign.center,
                   ),
-                  const SizedBox(height: 6),
+                  SizedBox(height: AppSpacing.xs),
                   Text(
                     AppConstants.appTagline,
                     style: AppTextStyles.bodyMedium.copyWith(
@@ -67,43 +62,43 @@ class RoleSelectionScreen extends StatelessWidget {
             child: Container(
               width: double.infinity,
               decoration: const BoxDecoration(
-                color: Colors.white,
+                color: AppColors.background,
                 borderRadius: BorderRadius.only(
-                  topLeft: Radius.circular(32),
-                  topRight: Radius.circular(32),
+                  topLeft: Radius.circular(AppRadius.xxl),
+                  topRight: Radius.circular(AppRadius.xxl),
                 ),
               ),
               child: Padding(
-                padding: const EdgeInsets.fromLTRB(24, 32, 24, 24),
+                padding: EdgeInsets.fromLTRB(AppSpacing.xl, AppSpacing.xxl, AppSpacing.xl, AppSpacing.xl),
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
-                    Text("Who are you?", style: AppTextStyles.headingLarge),
-                    const SizedBox(height: 4),
-                    Text("Select your role to continue", style: AppTextStyles.bodyMedium),
-                    const SizedBox(height: 28),
+                    Text(AppConstants.whoAreYou, style: AppTextStyles.headingLarge),
+                    SizedBox(height: AppSpacing.xs),
+                    Text(AppConstants.selectRoleToContinue, style: AppTextStyles.bodyMedium),
+                    SizedBox(height: AppSpacing.xl),
                     Expanded(
                       child: Column(
                         children: [
                           _RoleCard(
-                            roleName: 'Student',
-                            subtitle: 'Access materials, tests & attendance',
+                            roleName: AppConstants.roleStudent,
+                            subtitle: AppConstants.studentRoleDesc,
                             icon: Icons.school_rounded,
                             color: AppColors.navyBlueBase,
                             onTap: () => _selectRoleAndNavigate(context, AppConstants.roleStudent),
                           ),
-                          const SizedBox(height: 14),
+                          SizedBox(height: AppSpacing.md),
                           _RoleCard(
-                            roleName: 'Professor',
-                            subtitle: 'Manage batches & mark attendance',
+                            roleName: AppConstants.roleProfessor,
+                            subtitle: AppConstants.professorRoleDesc,
                             icon: Icons.person_search_rounded,
                             color: AppColors.oceanBlue,
                             onTap: () => _selectRoleAndNavigate(context, AppConstants.roleProfessor),
                           ),
-                          const SizedBox(height: 14),
+                          SizedBox(height: AppSpacing.md),
                           _RoleCard(
-                            roleName: 'Administrator',
-                            subtitle: 'Academy management & reports',
+                            roleName: AppConstants.roleAdmin,
+                            subtitle: AppConstants.adminRoleDesc,
                             icon: Icons.admin_panel_settings_rounded,
                             color: AppColors.gold,
                             textColor: AppColors.navyBlueDark,
@@ -152,10 +147,10 @@ class _RoleCard extends StatelessWidget {
     return GestureDetector(
       onTap: onTap,
       child: Container(
-        padding: const EdgeInsets.all(18),
+        padding: EdgeInsets.all(AppSpacing.lg),
         decoration: BoxDecoration(
           color: color,
-          borderRadius: BorderRadius.circular(16),
+          borderRadius: BorderRadius.circular(AppRadius.lg),
           boxShadow: [
             BoxShadow(
               color: color.withAlpha((0.30 * 255).round()),
@@ -171,20 +166,20 @@ class _RoleCard extends StatelessWidget {
               height: 48,
               decoration: BoxDecoration(
                 color: Colors.white.withAlpha((0.15 * 255).round()),
-                borderRadius: BorderRadius.circular(12),
+                borderRadius: BorderRadius.circular(AppRadius.md),
               ),
               child: Icon(icon, color: effectiveTextColor, size: 28),
             ),
-            const SizedBox(width: 16),
+            SizedBox(width: AppSpacing.lg),
             Expanded(
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
                   Text(
                     roleName,
-                    style: AppTextStyles.labelLarge.copyWith(color: effectiveTextColor, fontSize: 16),
+                    style: AppTextStyles.labelLarge.copyWith(color: effectiveTextColor),
                   ),
-                  const SizedBox(height: 2),
+                  SizedBox(height: AppSpacing.xxs),
                   Text(
                     subtitle,
                     style: AppTextStyles.bodySmall.copyWith(

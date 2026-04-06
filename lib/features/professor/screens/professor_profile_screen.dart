@@ -56,7 +56,7 @@ class _ProfessorProfileScreenState extends State<ProfessorProfileScreen> {
     // Role security check
     if (!authProvider.isProfessor) {
       WidgetsBinding.instance.addPostFrameCallback((_) {
-        context.go(AppRoutes.roleSelection);
+        context.goNamed(AppRoutes.roleSelectionName);
       });
       return const Scaffold(body: Center(child: CircularProgressIndicator()));
     }
@@ -94,7 +94,7 @@ class _ProfessorProfileScreenState extends State<ProfessorProfileScreen> {
               child: SafeArea(
                 bottom: false,
                 child: Padding(
-                  padding: const EdgeInsets.fromLTRB(20, 16, 20, 28),
+                  padding: EdgeInsets.fromLTRB(AppSpacing.xl, AppSpacing.lg, AppSpacing.xl, AppSpacing.xxl),
                   child: Column(
                     children: [
                       CircleAvatar(
@@ -105,23 +105,23 @@ class _ProfessorProfileScreenState extends State<ProfessorProfileScreen> {
                           style: AppTextStyles.headingLarge.copyWith(color: AppColors.gold, fontSize: 36),
                         ),
                       ),
-                      const SizedBox(height: 16),
+                      SizedBox(height: AppSpacing.lg),
                       Text(
                         prof.name,
                         style: AppTextStyles.headingMedium.copyWith(color: Colors.white),
                         textAlign: TextAlign.center,
                       ),
-                      const SizedBox(height: 4),
+                      SizedBox(height: AppSpacing.xs),
                       Text(
                         prof.qualification,
                         style: AppTextStyles.bodyMedium.copyWith(color: Colors.white70),
                       ),
-                      const SizedBox(height: 12),
+                      SizedBox(height: AppSpacing.md),
                       Row(
                         mainAxisAlignment: MainAxisAlignment.center,
                         children: [
                           _buildHeaderChip(Icons.work_history_rounded, '${prof.experienceYears} Years Exp'),
-                          const SizedBox(width: 8),
+                          SizedBox(width: AppSpacing.sm),
                           BranchBadge(branch: prof.branch),
                         ],
                       ),
@@ -137,9 +137,9 @@ class _ProfessorProfileScreenState extends State<ProfessorProfileScreen> {
             child: Transform.translate(
               offset: const Offset(0, -16),
               child: Padding(
-                padding: const EdgeInsets.symmetric(horizontal: 20),
+                padding: EdgeInsets.symmetric(horizontal: AppSpacing.xl),
                 child: Container(
-                  padding: const EdgeInsets.all(16),
+                  padding: EdgeInsets.all(AppSpacing.lg),
                   decoration: BoxDecoration(
                     color: Colors.white,
                     borderRadius: AppRadius.cardRadius,
@@ -149,10 +149,10 @@ class _ProfessorProfileScreenState extends State<ProfessorProfileScreen> {
                     child: Row(
                       mainAxisAlignment: MainAxisAlignment.spaceEvenly,
                       children: [
-                        _summaryItem("Batches", _myBatches.length.toString(), Icons.groups_rounded, Colors.blue),
-                        const VerticalDivider(width: 24),
-                        _summaryItem("Subjects", prof.subjects.length.toString(), Icons.book_rounded, Colors.teal),
-                        const VerticalDivider(width: 24),
+                        _summaryItem("Batches", _myBatches.length.toString(), Icons.groups_rounded, AppColors.oceanBlue),
+                        VerticalDivider(width: AppSpacing.xxl),
+                        _summaryItem("Subjects", prof.subjects.length.toString(), Icons.book_rounded, AppColors.success),
+                        VerticalDivider(width: AppSpacing.xxl),
                         _summaryItem("Specialty", "Expert", Icons.grade_rounded, AppColors.gold),
                       ],
                     ),
@@ -165,7 +165,7 @@ class _ProfessorProfileScreenState extends State<ProfessorProfileScreen> {
           // Contact & Professional Info
           SliverToBoxAdapter(
             child: Padding(
-              padding: const EdgeInsets.symmetric(horizontal: 20),
+              padding: EdgeInsets.symmetric(horizontal: AppSpacing.xl),
               child: DashboardCard(
                 title: "Professional Information",
                 child: Column(
@@ -183,31 +183,31 @@ class _ProfessorProfileScreenState extends State<ProfessorProfileScreen> {
             ),
           ),
 
-          const SizedBox(height: 20).toSliver,
+          SizedBox(height: AppSpacing.xl).toSliver,
 
           // Subjects Section
           SliverToBoxAdapter(
             child: Padding(
-              padding: const EdgeInsets.symmetric(horizontal: 20),
+              padding: EdgeInsets.symmetric(horizontal: AppSpacing.xl),
               child: _buildSubjects(prof),
             ),
           ),
 
-          const SizedBox(height: 20).toSliver,
+          SizedBox(height: AppSpacing.xl).toSliver,
 
           // My Batches Section
           SliverPadding(
-            padding: const EdgeInsets.symmetric(horizontal: 20),
+            padding: EdgeInsets.symmetric(horizontal: AppSpacing.xl),
             sliver: SliverToBoxAdapter(
               child: Text("My Assigned Batches", style: AppTextStyles.headingSmall),
             ),
           ),
-          const SizedBox(height: 12).toSliver,
+          SizedBox(height: AppSpacing.md).toSliver,
           
           if (_myBatches.isEmpty)
             const SliverToBoxAdapter(
               child: Padding(
-                padding: EdgeInsets.all(20),
+                padding: EdgeInsets.all(AppSpacing.xl),
                 child: EmptyState(
                   icon: Icons.class_outlined,
                   title: "No Batches",
@@ -217,7 +217,7 @@ class _ProfessorProfileScreenState extends State<ProfessorProfileScreen> {
             )
           else
             SliverPadding(
-              padding: const EdgeInsets.symmetric(horizontal: 20),
+              padding: EdgeInsets.symmetric(horizontal: AppSpacing.xl),
               sliver: SliverList(
                 delegate: SliverChildBuilderDelegate(
                   (context, index) {
@@ -239,7 +239,7 @@ class _ProfessorProfileScreenState extends State<ProfessorProfileScreen> {
           // Logout Button
           SliverToBoxAdapter(
             child: Padding(
-              padding: const EdgeInsets.fromLTRB(20, 32, 20, 60),
+              padding: EdgeInsets.fromLTRB(AppSpacing.xl, AppSpacing.xxl, AppSpacing.xl, 60),
               child: CustomButton(
                 label: "Logout",
                 isOutlined: true,
@@ -259,13 +259,13 @@ class _ProfessorProfileScreenState extends State<ProfessorProfileScreen> {
       title: "Teaching Subjects",
       icon: Icons.book_rounded,
       child: Wrap(
-        spacing: 8,
-        runSpacing: 8,
+        spacing: AppSpacing.sm,
+        runSpacing: AppSpacing.sm,
         children: prof.subjects.map((subject) => Chip(
           label: Text(subject, style: AppTextStyles.labelSmall),
           backgroundColor: AppColors.navyBlueSurface,
           side: BorderSide.none,
-          shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),
+          shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(AppRadius.sm)),
         )).toList(),
       ),
     );
@@ -273,17 +273,17 @@ class _ProfessorProfileScreenState extends State<ProfessorProfileScreen> {
 
   Widget _buildHeaderChip(IconData icon, String label) {
     return Container(
-      padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 6),
+      padding: EdgeInsets.symmetric(horizontal: AppSpacing.md, vertical: AppSpacing.xs),
       decoration: BoxDecoration(
         color: Colors.white.withAlpha((0.15 * 255).round()),
-        borderRadius: BorderRadius.circular(20),
+        borderRadius: BorderRadius.circular(AppRadius.xl),
       ),
       child: Row(
         mainAxisSize: MainAxisSize.min,
         children: [
           Icon(icon, color: Colors.white, size: 14),
-          const SizedBox(width: 6),
-          Text(label, style: const TextStyle(color: Colors.white, fontSize: 12, fontWeight: FontWeight.w500)),
+          SizedBox(width: AppSpacing.sm),
+          Text(label, style: AppTextStyles.labelSmall.copyWith(color: Colors.white, fontWeight: FontWeight.w500)),
         ],
       ),
     );
@@ -293,8 +293,8 @@ class _ProfessorProfileScreenState extends State<ProfessorProfileScreen> {
     return Column(
       children: [
         Icon(icon, color: color, size: 20),
-        const SizedBox(height: 4),
-        Text(value, style: AppTextStyles.headingMedium.copyWith(color: color, fontSize: 18)),
+        SizedBox(height: AppSpacing.xxs),
+        Text(value, style: AppTextStyles.headingSmall.copyWith(color: color, fontSize: 18)),
         Text(label, style: AppTextStyles.caption.copyWith(fontSize: 10)),
       ],
     );
@@ -307,13 +307,13 @@ class _ProfessorProfileScreenState extends State<ProfessorProfileScreen> {
         title: const Text("Logout"),
         content: const Text("Are you sure you want to log out?"),
         actions: [
-          TextButton(onPressed: () => Navigator.pop(context), child: const Text("CANCEL")),
+          TextButton(onPressed: () => Navigator.pop(context), child: Text("CANCEL", style: AppTextStyles.labelLarge)),
           TextButton(
             onPressed: () {
               Navigator.pop(context);
               context.read<AuthProvider>().logout();
             },
-            child: const Text("LOGOUT", style: TextStyle(color: AppColors.error)),
+            child: Text("LOGOUT", style: AppTextStyles.labelLarge.copyWith(color: AppColors.error)),
           ),
         ],
       ),

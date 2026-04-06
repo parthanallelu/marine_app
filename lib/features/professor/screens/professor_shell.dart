@@ -43,6 +43,11 @@ class ProfessorShell extends StatelessWidget {
                 label: 'Attendance',
               ),
               NavigationDestination(
+                icon: Icon(Icons.assignment_outlined),
+                selectedIcon: Icon(Icons.assignment_rounded),
+                label: 'Tests',
+              ),
+              NavigationDestination(
                 icon: Icon(Icons.menu_book_outlined),
                 selectedIcon: Icon(Icons.menu_book_rounded),
                 label: 'Materials',

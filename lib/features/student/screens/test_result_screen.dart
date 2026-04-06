@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 import 'package:provider/provider.dart';
 import '../../../core/theme/app_theme.dart';
+import '../../../core/constants/app_constants.dart';
 import '../../../core/common_widgets/common_widgets.dart';
 import '../../../models/app_models.dart';
 import '../../../models/dummy_data.dart';
@@ -23,7 +24,7 @@ class TestResultScreen extends StatelessWidget {
     final auth = context.watch<AuthProvider>();
     if (!auth.isStudent) {
       WidgetsBinding.instance.addPostFrameCallback((_) {
-        context.goNamed('role_selection');
+        context.goNamed(AppRoutes.roleSelectionName);
       });
       return const Scaffold(body: Center(child: CircularProgressIndicator()));
     }
@@ -37,7 +38,7 @@ class TestResultScreen extends StatelessWidget {
     );
 
     final hasPassed = testResult.isPassed;
-    final primaryColor = hasPassed ? const Color(0xFF1B5E20) : const Color(0xFF7F0000);
+    final primaryColor = hasPassed ? AppColors.testPassed : AppColors.testFailed;
     final accentColor = hasPassed ? AppColors.success : AppColors.error;
 
     return Scaffold(
@@ -57,7 +58,7 @@ class TestResultScreen extends StatelessWidget {
               ),
               child: SafeArea(
                 child: Padding(
-                  padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 32),
+                  padding: EdgeInsets.symmetric(horizontal: AppSpacing.xxl, vertical: AppSpacing.xxxl),
                   child: Column(
                     children: [
                       Container(
@@ -70,26 +71,21 @@ class TestResultScreen extends StatelessWidget {
                         alignment: Alignment.center,
                         child: Text(
                           testResult.grade,
-                          style: const TextStyle(
-                            fontSize: 48,
-                            fontWeight: FontWeight.bold,
-                            color: Colors.white,
-                            fontFamily: 'Poppins',
-                          ),
+                          style: AppTextStyles.gradeLarge,
                         ),
                       ),
-                      const SizedBox(height: 16),
+                      SizedBox(height: AppSpacing.lg),
                       Text(
                         hasPassed ? "Congratulations!" : "Keep Trying!",
                         style: AppTextStyles.headingLarge.copyWith(color: Colors.white),
                       ),
-                      const SizedBox(height: 4),
+                      SizedBox(height: AppSpacing.xs),
                       Text(
                         testResult.testTitle,
                         style: AppTextStyles.bodyMedium.copyWith(color: Colors.white.withAlpha((0.8 * 255).round())),
                         textAlign: TextAlign.center,
                       ),
-                      const SizedBox(height: 24),
+                      SizedBox(height: AppSpacing.xxl),
                       Row(
                         mainAxisAlignment: MainAxisAlignment.spaceEvenly,
                         children: [
@@ -116,7 +112,7 @@ class TestResultScreen extends StatelessWidget {
 
           // SLIVER 2 — Actions
           SliverPadding(
-            padding: const EdgeInsets.all(20),
+            padding: EdgeInsets.all(AppSpacing.lg),
             sliver: SliverToBoxAdapter(
               child: Column(
                 children: [
@@ -125,15 +121,15 @@ class TestResultScreen extends StatelessWidget {
                     width: double.infinity,
                     icon: Icons.quiz_rounded,
                     // NAVIGATION SAFETY: Using goNamed
-                    onPressed: () => context.goNamed('student_tests'),
+                    onPressed: () => context.goNamed(AppRoutes.studentTestsName),
                   ),
-                  const SizedBox(height: 12),
+                  SizedBox(height: AppSpacing.md),
                   CustomButton(
                     label: "Dashboard",
                     width: double.infinity,
                     isOutlined: true,
                     // NAVIGATION SAFETY: Using goNamed
-                    onPressed: () => context.goNamed('student_home'),
+                    onPressed: () => context.goNamed(AppRoutes.studentHomeName),
                   ),
                 ],
               ),
@@ -156,9 +152,9 @@ class _ResultStat extends StatelessWidget {
       children: [
         Text(
           value,
-          style: AppTextStyles.headingMedium.copyWith(color: Colors.white, fontSize: 18),
+          style: AppTextStyles.headingMedium.copyWith(color: Colors.white),
         ),
-        const SizedBox(height: 4),
+        SizedBox(height: AppSpacing.xs),
         Text(
           label,
           style: AppTextStyles.caption.copyWith(color: Colors.white.withAlpha((0.7 * 255).round())),

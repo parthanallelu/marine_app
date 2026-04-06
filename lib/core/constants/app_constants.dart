@@ -48,10 +48,17 @@ class AppConstants {
   static const double attendanceWarning = 75.0;
   static const double attendanceCritical = 60.0;
   
-  // SharedPreferences keys
   static const String keyUserRole = 'user_role';
   static const String keyUserId = 'user_id';
   static const String keyIsLoggedIn = 'is_logged_in';
+
+  static const String whoAreYou = "Who are you?";
+  static const String selectRoleToContinue = "Select your role to continue";
+  static const String studentRoleDesc = "Access materials, tests & attendance";
+  static const String professorRoleDesc = "Manage batches & mark attendance";
+  static const String adminRoleDesc = "Academy management & reports";
+
+  static String get defaultBranch => branches[0];
 }
 
 class AppRoutes {
@@ -72,6 +79,7 @@ class AppRoutes {
   static const String professorHome = '/professor/home';
   static const String professorAttendance = '/professor/attendance';
   static const String markAttendance = '/professor/attendance/mark';
+  static const String professorTests = '/professor/tests';
   static const String professorMaterials = '/professor/materials';
   static const String professorProfile = '/professor/profile';
   
@@ -81,4 +89,27 @@ class AppRoutes {
   static const String adminBatches = '/admin/batches';
   static const String adminFees = '/admin/fees';
   static const String adminAnnouncements = '/admin/announcements';
+
+  // Route Names for goNamed
+  static const String roleSelectionName = 'role_selection';
+  static const String loginName = 'login';
+  static const String studentHomeName = 'student_home';
+  static const String studentAttendanceName = 'student_attendance';
+  static const String studentTestsName = 'student_tests';
+  static const String testAttemptName = 'test_attempt';
+  static const String testResultName = 'test_result';
+  static const String studentMaterialsName = 'student_materials';
+  static const String studentProfileName = 'student_profile';
+  static const String studentFeesName = 'student_fees';
+  static const String studentAnnouncementsName = 'student_announcements';
+  static const String professorHomeName = 'professor_home';
+  static const String professorAttendanceName = 'professor_attendance';
+  static const String professorTestsName = 'professor_tests';
+  static const String professorMaterialsName = 'professor_materials';
+  static const String professorProfileName = 'professor_profile';
+  static const String adminHomeName = 'admin_home';
+  static const String adminStudentsName = 'admin_students';
+  static const String adminBatchesName = 'admin_batches';
+  static const String adminFeesName = 'admin_fees';
+  static const String adminAnnouncementsName = 'admin_announcements';
 }

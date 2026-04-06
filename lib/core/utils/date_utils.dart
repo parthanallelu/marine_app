@@ -1,10 +1,10 @@
 import 'package:intl/intl.dart';
 
 class AppDateUtils {
-  static final DateFormat _fullDateFormatter = DateFormat('dd MMM yyyy');
-  static final DateFormat _shortDateFormatter = DateFormat('dd/MM/yyyy');
-  static final DateFormat _timeFormatter = DateFormat('hh:mm a');
-  static final DateFormat _monthYearFormatter = DateFormat('MMMM yyyy');
+  static final _fullDateFormatter = DateFormat('dd MMM yyyy');
+  static final _shortDateFormatter = DateFormat('dd/MM/yyyy');
+  static final _timeFormatter = DateFormat('hh:mm a');
+  static final _monthYearFormatter = DateFormat('MMMM yyyy');
 
   static String formatFullDate(DateTime date) => _fullDateFormatter.format(date);
   static String formatShortDate(DateTime date) => _shortDateFormatter.format(date);

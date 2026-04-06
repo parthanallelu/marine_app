@@ -16,6 +16,7 @@ class AdminBatchesScreen extends StatefulWidget {
 
 class _AdminBatchesScreenState extends State<AdminBatchesScreen> {
   late List<BatchModel> _allBatches;
+  String _searchQuery = "";
 
   @override
   void initState() {
@@ -23,8 +24,43 @@ class _AdminBatchesScreenState extends State<AdminBatchesScreen> {
     _allBatches = List.from(DummyData.batches);
   }
 
+  List<BatchModel> get _filteredBatches {
+    if (_searchQuery.isEmpty) return _allBatches;
+    final q = _searchQuery.toLowerCase();
+    return _allBatches.where((b) {
+      return b.name.toLowerCase().contains(q) ||
+          b.professorName.toLowerCase().contains(q) ||
+          b.branch.toLowerCase().contains(q) ||
+          b.courseType.toLowerCase().contains(q);
+    }).toList();
+  }
+
+  void _showSuccessSnackbar(String message) {
+    ScaffoldMessenger.of(context).showSnackBar(
+      SnackBar(
+        content: Row(
+          children: [
+            const Icon(Icons.check_circle_rounded, color: Colors.white, size: 20),
+            SizedBox(width: AppSpacing.md),
+            Expanded(child: Text(message)),
+          ],
+        ),
+        backgroundColor: AppColors.success,
+        behavior: SnackBarBehavior.floating,
+        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(AppRadius.md)),
+        margin: EdgeInsets.all(AppSpacing.lg),
+      ),
+    );
+  }
+
   @override
   Widget build(BuildContext context) {
+    final batches = _filteredBatches;
+    final groupedByBranch = <String, List<BatchModel>>{};
+    for (final batch in batches) {
+      groupedByBranch.putIfAbsent(batch.branch, () => []).add(batch);
+    }
+
     return Scaffold(
       backgroundColor: AppColors.background,
       appBar: AppBar(
@@ -33,69 +69,92 @@ class _AdminBatchesScreenState extends State<AdminBatchesScreen> {
         elevation: 0,
         foregroundColor: AppColors.navyBlueBase,
       ),
-      body: ListView.builder(
-        padding: const EdgeInsets.fromLTRB(16, 16, 16, 80),
-        itemCount: AppConstants.branches.length,
-        itemBuilder: (context, index) {
-          final branch = AppConstants.branches[index];
-          final batchesInBranch = _allBatches.where((b) => b.branch == branch).toList();
-          
-          if (batchesInBranch.isEmpty) return const SizedBox.shrink();
-
-          return Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              Padding(
-                padding: const EdgeInsets.symmetric(horizontal: 4, vertical: 12),
-                child: Row(
-                  children: [
-                    const Icon(Icons.location_on_rounded, color: AppColors.navyBlueBase, size: 20),
-                    const SizedBox(width: 8),
-                    Text(
-                      "$branch Branch",
-                      style: AppTextStyles.headingSmall.copyWith(color: AppColors.navyBlueBase),
-                    ),
-                    const Spacer(),
-                    Container(
-                      padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 2),
-                      decoration: BoxDecoration(
-                        color: AppColors.navyBlueSurface,
-                        borderRadius: BorderRadius.circular(12),
-                      ),
-                      child: Text(
-                        "${batchesInBranch.length} Active",
-                        style: AppTextStyles.labelSmall.copyWith(color: AppColors.navyBlueBase, fontWeight: FontWeight.bold),
-                      ),
-                    ),
-                  ],
-                ),
-              ),
-              ...batchesInBranch.map((batch) => _AdminBatchCard(
-                    batch: batch,
-                    onManageStudents: () {
-                      Navigator.push(
-                        context,
-                        MaterialPageRoute(builder: (_) => BatchStudentsScreen(batch: batch)),
-                      ).then((_) {
-                        if (context.mounted) {
-                          setState(() {});
-                        }
-                      });
-                    },
-                  )),
-              const SizedBox(height: 12),
-            ],
-          );
-        },
+      body: Column(
+        children: [
+          // SEARCH BAR
+          Container(
+            padding: EdgeInsets.fromLTRB(AppSpacing.lg, AppSpacing.sm, AppSpacing.lg, AppSpacing.lg),
+            color: Colors.white,
+            child: CustomTextField(
+              hintText: "Search by batch, professor, branch...",
+              prefixIcon: Icons.search_rounded,
+              onChanged: (val) => setState(() => _searchQuery = val),
+            ),
+          ),
+          // BATCH LIST
+          Expanded(
+            child: batches.isEmpty
+                ? const EmptyState(
+                    icon: Icons.class_outlined,
+                    title: "No Batches Created",
+                    subtitle: "Create a batch to get started.",
+                  )
+                : ListView(
+                    padding: EdgeInsets.fromLTRB(AppSpacing.lg, AppSpacing.sm, AppSpacing.lg, 80),
+                    children: groupedByBranch.entries.map((entry) {
+                      final branch = entry.key;
+                      final batchesInBranch = entry.value;
+                      return Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          Padding(
+                            padding: EdgeInsets.symmetric(horizontal: AppSpacing.xs, vertical: AppSpacing.md),
+                            child: Row(
+                              children: [
+                                const Icon(Icons.location_on_rounded, color: AppColors.navyBlueBase, size: 20),
+                                SizedBox(width: AppSpacing.sm),
+                                Text(
+                                  "$branch Branch",
+                                  style: AppTextStyles.headingSmall.copyWith(color: AppColors.navyBlueBase),
+                                ),
+                                const Spacer(),
+                                Container(
+                                  padding: EdgeInsets.symmetric(horizontal: AppSpacing.sm, vertical: 2),
+                                  decoration: BoxDecoration(
+                                    color: AppColors.navyBlueSurface,
+                                    borderRadius: BorderRadius.circular(AppRadius.md),
+                                  ),
+                                  child: Text(
+                                    "${batchesInBranch.length} Active",
+                                    style: AppTextStyles.labelSmall.copyWith(color: AppColors.navyBlueBase, fontWeight: FontWeight.bold),
+                                  ),
+                                ),
+                              ],
+                            ),
+                          ),
+                          ...batchesInBranch.map((batch) => _AdminBatchCard(
+                                batch: batch,
+                                onManageStudents: () {
+                                  Navigator.push(
+                                    context,
+                                    MaterialPageRoute(builder: (_) => BatchStudentsScreen(batch: batch)),
+                                  ).then((_) {
+                                    if (context.mounted) setState(() {});
+                                  });
+                                },
+                                onEdit: () => _showEditBatchSheet(batch),
+                                onDelete: () => _confirmDeleteBatch(batch),
+                              )),
+                          const SizedBox(height: 12),
+                        ],
+                      );
+                    }).toList(),
+                  ),
+          ),
+        ],
       ),
       floatingActionButton: FloatingActionButton.extended(
         onPressed: () => _showCreateBatchSheet(),
         backgroundColor: AppColors.navyBlueBase,
         icon: const Icon(Icons.add_rounded, color: Colors.white),
-        label: const Text("Create Batch", style: TextStyle(color: Colors.white, fontWeight: FontWeight.bold)),
+        label: Text("Create Batch", style: AppTextStyles.labelLarge.copyWith(color: Colors.white)),
       ),
     );
   }
+
+  // ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+  // CREATE BATCH
+  // ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 
   void _showCreateBatchSheet() {
     final formKey = GlobalKey<FormState>();
@@ -110,11 +169,160 @@ class _AdminBatchesScreenState extends State<AdminBatchesScreen> {
       context: context,
       isScrollControlled: true,
       backgroundColor: Colors.transparent,
+      builder: (context) => StatefulBuilder(
+        builder: (context, setModalState) => Container(
+          height: MediaQuery.of(context).size.height * 0.85,
+          decoration: const BoxDecoration(
+            color: Colors.white,
+            borderRadius: BorderRadius.vertical(top: Radius.circular(AppRadius.xxl)),
+          ),
+          padding: EdgeInsets.only(
+            bottom: MediaQuery.of(context).viewInsets.bottom,
+          ),
+          child: Column(
+            children: [
+              Container(
+                width: 40,
+                height: 4,
+                margin: EdgeInsets.symmetric(vertical: AppSpacing.md),
+                decoration: BoxDecoration(
+                  color: AppColors.divider,
+                  borderRadius: BorderRadius.circular(AppRadius.xs),
+                ),
+              ),
+              Expanded(
+                child: SingleChildScrollView(
+                  padding: EdgeInsets.all(AppSpacing.xl),
+                  child: Form(
+                    key: formKey,
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        Text("Create New Batch", style: AppTextStyles.headingMedium),
+                        const SizedBox(height: AppSpacing.sm),
+                        Text(
+                          "Configure a new academic batch with schedule and instructor assignment.",
+                          style: AppTextStyles.bodyMedium.copyWith(color: AppColors.textSecondary),
+                        ),
+                        const SizedBox(height: AppSpacing.xl),
+                        CustomTextField(
+                          label: "Batch Name",
+                          hintText: "e.g. Gamma Batch 2024",
+                          controller: nameController,
+                          prefixIcon: Icons.badge_outlined,
+                          validator: (v) => v == null || v.isEmpty ? "Batch name is required" : null,
+                        ),
+                        const SizedBox(height: AppSpacing.lg),
+                        DropdownButtonFormField<String>(
+                          decoration: const InputDecoration(labelText: "Course", prefixIcon: Icon(Icons.school_outlined, size: 20)),
+                          items: AppConstants.courseTypes.map((c) => DropdownMenuItem(value: c, child: Text(c))).toList(),
+                          onChanged: (val) => selectedCourse = val,
+                          validator: (v) => v == null ? "Required" : null,
+                        ),
+                        const SizedBox(height: AppSpacing.lg),
+                        DropdownButtonFormField<String>(
+                          decoration: const InputDecoration(labelText: "Branch", prefixIcon: Icon(Icons.location_on_outlined, size: 20)),
+                          items: AppConstants.branches.map((b) => DropdownMenuItem(value: b, child: Text(b))).toList(),
+                          onChanged: (val) => selectedBranch = val,
+                          validator: (v) => v == null ? "Required" : null,
+                        ),
+                        const SizedBox(height: AppSpacing.lg),
+                        DropdownButtonFormField<String>(
+                          decoration: const InputDecoration(labelText: "Assigned Professor", prefixIcon: Icon(Icons.person_pin_outlined, size: 20)),
+                          items: DummyData.professors.map((p) => DropdownMenuItem(value: p.id, child: Text(p.name))).toList(),
+                          onChanged: (val) => selectedProfessor = val,
+                          validator: (v) => v == null ? "Required" : null,
+                        ),
+                        const SizedBox(height: AppSpacing.lg),
+                        CustomTextField(
+                          label: "Class Timings",
+                          hintText: "e.g. 09:00 AM - 01:00 PM",
+                          controller: timingController,
+                          prefixIcon: Icons.schedule_outlined,
+                          validator: (v) => v == null || v.isEmpty ? "Required" : null,
+                        ),
+                        const SizedBox(height: AppSpacing.xl),
+                        ListTile(
+                          contentPadding: EdgeInsets.zero,
+                          title: Text("Start Date", style: AppTextStyles.labelLarge),
+                          subtitle: Text("${selectedDate.day}/${selectedDate.month}/${selectedDate.year}"),
+                          trailing: IconButton(
+                            icon: const Icon(Icons.calendar_today_rounded, color: AppColors.navyBlueBase),
+                            onPressed: () async {
+                              final picked = await showDatePicker(
+                                context: context,
+                                initialDate: selectedDate,
+                                firstDate: DateTime.now(),
+                                lastDate: DateTime.now().add(const Duration(days: 365)),
+                              );
+                              if (picked != null) {
+                                setModalState(() => selectedDate = picked);
+                              }
+                            },
+                          ),
+                        ),
+                        const SizedBox(height: AppSpacing.xxxl),
+                        CustomButton(
+                          label: "Initialize Batch",
+                          width: double.infinity,
+                          onPressed: () {
+                            if (formKey.currentState!.validate()) {
+                              final prof = DummyData.professors.firstWhere((p) => p.id == selectedProfessor);
+                              final newBatch = BatchModel(
+                                id: const Uuid().v4(),
+                                name: nameController.text,
+                                courseType: selectedCourse!,
+                                branch: selectedBranch!,
+                                professorId: selectedProfessor!,
+                                professorName: prof.name,
+                                timing: timingController.text,
+                                days: ['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'],
+                                startDate: selectedDate,
+                                studentIds: [],
+                              );
+                              setState(() {
+                                _allBatches.insert(0, newBatch);
+                                DummyData.batches.insert(0, newBatch);
+                              });
+                              Navigator.pop(context);
+                              _showSuccessSnackbar("Batch created successfully");
+                            }
+                          },
+                        ),
+                        const SizedBox(height: AppSpacing.lg),
+                      ],
+                    ),
+                  ),
+                ),
+              ),
+            ],
+          ),
+        ),
+      ),
+    );
+  }
+
+  // ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+  // EDIT BATCH
+  // ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+  void _showEditBatchSheet(BatchModel batch) {
+    final formKey = GlobalKey<FormState>();
+    final nameController = TextEditingController(text: batch.name);
+    final timingController = TextEditingController(text: batch.timing);
+    String selectedBranch = batch.branch;
+    String selectedCourse = batch.courseType;
+    String selectedProfessor = batch.professorId;
+
+    showModalBottomSheet(
+      context: context,
+      isScrollControlled: true,
+      backgroundColor: Colors.transparent,
       builder: (context) => Container(
         height: MediaQuery.of(context).size.height * 0.85,
         decoration: const BoxDecoration(
           color: Colors.white,
-          borderRadius: BorderRadius.vertical(top: Radius.circular(24)),
+          borderRadius: BorderRadius.vertical(top: Radius.circular(AppRadius.xxl)),
         ),
         padding: EdgeInsets.only(
           bottom: MediaQuery.of(context).viewInsets.bottom,
@@ -124,56 +332,59 @@ class _AdminBatchesScreenState extends State<AdminBatchesScreen> {
             Container(
               width: 40,
               height: 4,
-              margin: const EdgeInsets.symmetric(vertical: 12),
+              margin: EdgeInsets.symmetric(vertical: AppSpacing.md),
               decoration: BoxDecoration(
                 color: AppColors.divider,
-                borderRadius: BorderRadius.circular(2),
+                borderRadius: BorderRadius.circular(AppRadius.xs),
               ),
             ),
             Expanded(
               child: SingleChildScrollView(
-                padding: const EdgeInsets.all(24),
+                padding: EdgeInsets.all(AppSpacing.xl),
                 child: Form(
                   key: formKey,
                   child: Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
-                      Text("Create New Batch", style: AppTextStyles.headingMedium),
-                      const SizedBox(height: 8),
+                      Text("Edit Batch", style: AppTextStyles.headingMedium),
+                      const SizedBox(height: AppSpacing.sm),
                       Text(
-                        "Configure a new academic batch with schedule and instructor assignment.",
+                        "Update ${batch.name}'s configuration.",
                         style: AppTextStyles.bodyMedium.copyWith(color: AppColors.textSecondary),
                       ),
-                      const SizedBox(height: 24),
+                      const SizedBox(height: AppSpacing.xl),
                       CustomTextField(
                         label: "Batch Name",
                         hintText: "e.g. Gamma Batch 2024",
                         controller: nameController,
                         prefixIcon: Icons.badge_outlined,
-                        validator: (v) => v == null || v.isEmpty ? "Required" : null,
+                        validator: (v) => v == null || v.isEmpty ? "Batch name is required" : null,
                       ),
-                      const SizedBox(height: 16),
+                      const SizedBox(height: AppSpacing.lg),
                       DropdownButtonFormField<String>(
                         decoration: const InputDecoration(labelText: "Course", prefixIcon: Icon(Icons.school_outlined, size: 20)),
+                        initialValue: selectedCourse,
                         items: AppConstants.courseTypes.map((c) => DropdownMenuItem(value: c, child: Text(c))).toList(),
-                        onChanged: (val) => selectedCourse = val,
+                        onChanged: (val) => selectedCourse = val!,
                         validator: (v) => v == null ? "Required" : null,
                       ),
-                      const SizedBox(height: 16),
+                      const SizedBox(height: AppSpacing.lg),
                       DropdownButtonFormField<String>(
                         decoration: const InputDecoration(labelText: "Branch", prefixIcon: Icon(Icons.location_on_outlined, size: 20)),
+                        initialValue: selectedBranch,
                         items: AppConstants.branches.map((b) => DropdownMenuItem(value: b, child: Text(b))).toList(),
-                        onChanged: (val) => selectedBranch = val,
+                        onChanged: (val) => selectedBranch = val!,
                         validator: (v) => v == null ? "Required" : null,
                       ),
-                      const SizedBox(height: 16),
+                      const SizedBox(height: AppSpacing.lg),
                       DropdownButtonFormField<String>(
                         decoration: const InputDecoration(labelText: "Assigned Professor", prefixIcon: Icon(Icons.person_pin_outlined, size: 20)),
+                        initialValue: selectedProfessor,
                         items: DummyData.professors.map((p) => DropdownMenuItem(value: p.id, child: Text(p.name))).toList(),
-                        onChanged: (val) => selectedProfessor = val,
+                        onChanged: (val) => selectedProfessor = val!,
                         validator: (v) => v == null ? "Required" : null,
                       ),
-                      const SizedBox(height: 16),
+                      const SizedBox(height: AppSpacing.lg),
                       CustomTextField(
                         label: "Class Timings",
                         hintText: "e.g. 09:00 AM - 01:00 PM",
@@ -181,57 +392,31 @@ class _AdminBatchesScreenState extends State<AdminBatchesScreen> {
                         prefixIcon: Icons.schedule_outlined,
                         validator: (v) => v == null || v.isEmpty ? "Required" : null,
                       ),
-                      const SizedBox(height: 24),
-                      ListTile(
-                        contentPadding: EdgeInsets.zero,
-                        title: Text("Start Date", style: AppTextStyles.labelLarge),
-                        subtitle: Text("${selectedDate.day}/${selectedDate.month}/${selectedDate.year}"),
-                        trailing: IconButton(
-                          icon: const Icon(Icons.calendar_today_rounded, color: AppColors.navyBlueBase),
-                          onPressed: () async {
-                            final picked = await showDatePicker(
-                              context: context,
-                              initialDate: selectedDate,
-                              firstDate: DateTime.now(),
-                              lastDate: DateTime.now().add(const Duration(days: 365)),
-                            );
-                            if (picked != null) {
-                              // Small hack to rebuild bottom sheet state
-                              // In a real app we'd use a Stateful builder or proper state management
-                            }
-                          },
-                        ),
-                      ),
-                      const SizedBox(height: 32),
+                      const SizedBox(height: AppSpacing.xxxl),
                       CustomButton(
-                        label: "Initialize Batch",
+                        label: "Update Batch",
                         width: double.infinity,
                         onPressed: () {
                           if (formKey.currentState!.validate()) {
                             final prof = DummyData.professors.firstWhere((p) => p.id == selectedProfessor);
-                            final newBatch = BatchModel(
-                              id: const Uuid().v4(),
-                              name: nameController.text,
-                              courseType: selectedCourse!,
-                              branch: selectedBranch!,
-                              professorId: selectedProfessor!,
-                              professorName: prof.name,
-                              timing: timingController.text,
-                              days: ['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'],
-                              startDate: selectedDate,
-                              studentIds: [],
-                            );
                             setState(() {
-                              _allBatches.insert(0, newBatch);
+                              batch.name = nameController.text;
+                              batch.courseType = selectedCourse;
+                              batch.branch = selectedBranch;
+                              batch.professorId = selectedProfessor;
+                              batch.professorName = prof.name;
+                              batch.timing = timingController.text;
+                              // Update batchName for all students in this batch
+                              for (var student in DummyData.students.where((s) => s.batchId == batch.id)) {
+                                student.batchName = batch.name;
+                              }
                             });
                             Navigator.pop(context);
-                            ScaffoldMessenger.of(context).showSnackBar(
-                              const SnackBar(content: Text("Batch created successfully!")),
-                            );
+                            _showSuccessSnackbar("Batch updated successfully");
                           }
                         },
                       ),
-                      const SizedBox(height: 16),
+                      const SizedBox(height: AppSpacing.lg),
                     ],
                   ),
                 ),
@@ -242,21 +427,99 @@ class _AdminBatchesScreenState extends State<AdminBatchesScreen> {
       ),
     );
   }
+
+  // ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+  // DELETE BATCH
+  // ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+  void _confirmDeleteBatch(BatchModel batch) {
+    final studentCount = DummyData.students.where((s) => s.batchId == batch.id).length;
+    showDialog(
+      context: context,
+      builder: (context) => AlertDialog(
+        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(AppRadius.lg)),
+        title: const Text("Delete this batch?"),
+        content: Column(
+          mainAxisSize: MainAxisSize.min,
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            const Text("This action cannot be undone."),
+            if (studentCount > 0) ...[
+              SizedBox(height: AppSpacing.md),
+              Container(
+                padding: EdgeInsets.all(AppSpacing.md),
+                decoration: BoxDecoration(
+                  color: AppColors.warning.withAlpha((0.1 * 255).round()),
+                  borderRadius: BorderRadius.circular(AppRadius.sm),
+                ),
+                child: Row(
+                  children: [
+                    const Icon(Icons.warning_amber_rounded, color: AppColors.warning, size: 20),
+                    SizedBox(width: AppSpacing.sm),
+                    Expanded(
+                      child: Text(
+                        "$studentCount students will become unassigned.",
+                        style: AppTextStyles.bodySmall.copyWith(color: AppColors.warning),
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+            ],
+          ],
+        ),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.pop(context),
+            child: const Text("Cancel"),
+          ),
+          ElevatedButton(
+            style: ElevatedButton.styleFrom(backgroundColor: AppColors.error),
+            onPressed: () {
+              setState(() {
+                // Unassign all students from this batch
+                for (var student in DummyData.students.where((s) => s.batchId == batch.id)) {
+                  student.batchId = '';
+                  student.batchName = '';
+                }
+                _allBatches.remove(batch);
+                DummyData.batches.remove(batch);
+              });
+              Navigator.pop(context);
+              _showSuccessSnackbar("Batch deleted");
+            },
+            child: const Text("Delete", style: TextStyle(color: Colors.white)),
+          ),
+        ],
+      ),
+    );
+  }
 }
+
+// ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+// BATCH CARD
+// ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 
 class _AdminBatchCard extends StatelessWidget {
   final BatchModel batch;
   final VoidCallback onManageStudents;
-  const _AdminBatchCard({required this.batch, required this.onManageStudents});
+  final VoidCallback onEdit;
+  final VoidCallback onDelete;
+  const _AdminBatchCard({
+    required this.batch,
+    required this.onManageStudents,
+    required this.onEdit,
+    required this.onDelete,
+  });
 
   @override
   Widget build(BuildContext context) {
     return Container(
-      margin: const EdgeInsets.only(bottom: 12),
-      padding: const EdgeInsets.all(16),
+      margin: EdgeInsets.only(bottom: AppSpacing.md),
+      padding: EdgeInsets.all(AppSpacing.lg),
       decoration: BoxDecoration(
         color: Colors.white,
-        borderRadius: BorderRadius.circular(16),
+        borderRadius: BorderRadius.circular(AppRadius.lg),
         boxShadow: AppShadows.subtle,
       ),
       child: Column(
@@ -264,14 +527,14 @@ class _AdminBatchCard extends StatelessWidget {
           Row(
             children: [
               Container(
-                padding: const EdgeInsets.all(10),
+                padding: EdgeInsets.all(AppSpacing.md),
                 decoration: BoxDecoration(
                   color: AppColors.gold.withAlpha((0.1 * 255).round()),
-                  borderRadius: BorderRadius.circular(12),
+                  borderRadius: BorderRadius.circular(AppRadius.md),
                 ),
                 child: const Icon(Icons.class_outlined, color: AppColors.gold, size: 24),
               ),
-              const SizedBox(width: 16),
+              SizedBox(width: AppSpacing.lg),
               Expanded(
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
@@ -281,10 +544,57 @@ class _AdminBatchCard extends StatelessWidget {
                   ],
                 ),
               ),
-              CourseBadge(courseType: batch.courseType),
+              PopupMenuButton<String>(
+                icon: const Icon(Icons.more_vert_rounded, color: AppColors.textHint),
+                onSelected: (val) {
+                  switch (val) {
+                    case 'edit':
+                      onEdit();
+                      break;
+                    case 'manage':
+                      onManageStudents();
+                      break;
+                    case 'delete':
+                      onDelete();
+                      break;
+                  }
+                },
+                itemBuilder: (context) => [
+                  const PopupMenuItem(
+                    value: 'edit',
+                    child: Row(
+                      children: [
+                        const Icon(Icons.edit_outlined, size: 18),
+                        SizedBox(width: AppSpacing.sm),
+                        const Text("Edit Batch"),
+                      ],
+                    ),
+                  ),
+                  const PopupMenuItem(
+                    value: 'manage',
+                    child: Row(
+                      children: [
+                        const Icon(Icons.group_rounded, size: 18),
+                        SizedBox(width: AppSpacing.sm),
+                        const Text("Manage Students"),
+                      ],
+                    ),
+                  ),
+                  const PopupMenuItem(
+                    value: 'delete',
+                    child: Row(
+                      children: [
+                        const Icon(Icons.delete_outline, size: 18, color: AppColors.error),
+                        SizedBox(width: AppSpacing.sm),
+                        Text("Delete", style: AppTextStyles.labelMedium.copyWith(color: AppColors.error)),
+                      ],
+                    ),
+                  ),
+                ],
+              ),
             ],
           ),
-          const Divider(height: 24),
+          Divider(height: AppSpacing.xl),
           Row(
             children: [
               _BatchMeta(icon: Icons.person_pin_outlined, label: batch.professorName),
@@ -292,7 +602,7 @@ class _AdminBatchCard extends StatelessWidget {
               _BatchMeta(icon: Icons.access_time_rounded, label: batch.timing),
             ],
           ),
-          const SizedBox(height: 12),
+          SizedBox(height: AppSpacing.md),
           Row(
             children: [
               _BatchMeta(icon: Icons.people_alt_outlined, label: "${DummyData.students.where((s) => s.batchId == batch.id).length} Students enrolled"),
@@ -300,10 +610,10 @@ class _AdminBatchCard extends StatelessWidget {
               TextButton.icon(
                 onPressed: onManageStudents,
                 icon: const Icon(Icons.group_rounded, size: 18),
-                label: const Text("Manage Students"),
+                label: const Text("Manage"),
                 style: TextButton.styleFrom(
                   foregroundColor: AppColors.navyBlueBase,
-                  padding: const EdgeInsets.symmetric(horizontal: 12),
+                  padding: EdgeInsets.symmetric(horizontal: AppSpacing.lg),
                 ),
               ),
             ],
@@ -326,7 +636,7 @@ class _BatchMeta extends StatelessWidget {
       mainAxisSize: MainAxisSize.min,
       children: [
         Icon(icon, size: 14, color: AppColors.oceanBlue),
-        const SizedBox(width: 6),
+        SizedBox(width: AppSpacing.xs),
         Text(label, style: AppTextStyles.bodySmall.copyWith(color: AppColors.textSecondary)),
       ],
     );

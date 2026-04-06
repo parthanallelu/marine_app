@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:go_router/go_router.dart';
 import '../../../core/theme/app_theme.dart';
+import '../../../core/constants/app_constants.dart';
 import '../../../core/common_widgets/common_widgets.dart';
 import '../../../providers/auth_provider.dart';
 import '../../../models/app_models.dart';
@@ -49,7 +50,7 @@ class _AnnouncementsScreenState extends State<AnnouncementsScreen> {
     // Access Control Safety
     if (!authProvider.isStudent) {
       WidgetsBinding.instance.addPostFrameCallback((_) {
-        context.goNamed('role_selection');
+        context.goNamed(AppRoutes.roleSelectionName);
       });
       return const Scaffold(body: Center(child: CircularProgressIndicator()));
     }
@@ -76,7 +77,7 @@ class _AnnouncementsScreenState extends State<AnnouncementsScreen> {
               subtitle: "All important notices will appear here.",
             )
           : ListView.builder(
-              padding: const EdgeInsets.all(20),
+              padding: EdgeInsets.all(AppSpacing.lg),
               itemCount: _announcements.length,
               itemBuilder: (context, index) {
                 final announcement = _announcements[index];
@@ -85,8 +86,8 @@ class _AnnouncementsScreenState extends State<AnnouncementsScreen> {
                 final bgColor = isHigh ? AppColors.errorSurface : AppColors.warningSurface;
 
                 return Container(
-                  margin: const EdgeInsets.only(bottom: 16),
-                  padding: const EdgeInsets.all(16),
+                  margin: EdgeInsets.only(bottom: AppSpacing.lg),
+                  padding: EdgeInsets.all(AppSpacing.xl),
                   decoration: BoxDecoration(
                     color: Colors.white,
                     borderRadius: AppRadius.cardRadius,
@@ -98,10 +99,10 @@ class _AnnouncementsScreenState extends State<AnnouncementsScreen> {
                       Row(
                         children: [
                           Container(
-                            padding: const EdgeInsets.all(8),
+                            padding: EdgeInsets.all(AppSpacing.md),
                             decoration: BoxDecoration(
                               color: bgColor,
-                              borderRadius: BorderRadius.circular(8),
+                              borderRadius: BorderRadius.circular(AppRadius.md),
                             ),
                             child: Icon(
                               isHigh ? Icons.push_pin_rounded : Icons.announcement_rounded,
@@ -109,7 +110,7 @@ class _AnnouncementsScreenState extends State<AnnouncementsScreen> {
                               size: 20,
                             ),
                           ),
-                          const SizedBox(width: 12),
+                          const SizedBox(width: AppSpacing.md),
                           Expanded(
                             child: Column(
                               crossAxisAlignment: CrossAxisAlignment.start,
@@ -125,16 +126,16 @@ class _AnnouncementsScreenState extends State<AnnouncementsScreen> {
                           PriorityTag(priority: announcement.priority),
                         ],
                       ),
-                      const SizedBox(height: 12),
+                      const SizedBox(height: AppSpacing.md),
                       Text(
                         announcement.description,
                         style: AppTextStyles.bodyMedium.copyWith(color: AppColors.textSecondary, height: 1.5),
                       ),
-                      const SizedBox(height: 16),
+                      const SizedBox(height: AppSpacing.lg),
                       Row(
                         children: [
                           const Icon(Icons.calendar_today, size: 14, color: AppColors.textHint),
-                          const SizedBox(width: 4),
+                          const SizedBox(width: AppSpacing.xs),
                           Text(
                             announcement.createdAt.toString().split(' ')[0],
                             style: AppTextStyles.caption.copyWith(color: AppColors.textHint),
@@ -142,7 +143,7 @@ class _AnnouncementsScreenState extends State<AnnouncementsScreen> {
                           if (announcement.isPinned) ...[
                             const Spacer(),
                             const Icon(Icons.push_pin, size: 14, color: AppColors.warning),
-                            const SizedBox(width: 4),
+                            const SizedBox(width: AppSpacing.xs),
                             const Text("Pinned", style: TextStyle(color: AppColors.warning, fontSize: 10, fontWeight: FontWeight.bold)),
                           ],
                         ],
