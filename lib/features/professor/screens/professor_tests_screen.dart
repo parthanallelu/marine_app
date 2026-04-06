@@ -16,13 +16,28 @@ class ProfessorTestsScreen extends StatefulWidget {
 
 class _ProfessorTestsScreenState extends State<ProfessorTestsScreen> {
   late List<TestModel> _allTests;
+  late List<TestModel> _filteredTestsResults;
+  late Map<String, BatchModel> _testBatches;
   String _searchQuery = "";
   bool _isLoading = true;
+
+  // Controllers promoted to class members for proper disposal
+  final _titleController = TextEditingController();
+  final _marksController = TextEditingController();
+  final _durationController = TextEditingController();
 
   @override
   void initState() {
     super.initState();
     _loadTests();
+  }
+
+  @override
+  void dispose() {
+    _titleController.dispose();
+    _marksController.dispose();
+    _durationController.dispose();
+    super.dispose();
   }
 
   void _loadTests() {
@@ -32,20 +47,28 @@ class _ProfessorTestsScreenState extends State<ProfessorTestsScreen> {
 
     setState(() {
       _allTests = DummyData.tests.where((t) => t.createdByProfessorId == prof.id).toList();
+      _processTests();
       _isLoading = false;
     });
   }
 
-  List<TestModel> get _filteredTests {
-    if (_searchQuery.isEmpty) return _allTests;
+  void _processTests() {
+    // Filter and Map
+    _testBatches = {};
     final q = _searchQuery.toLowerCase();
-    return _allTests.where((t) {
+    
+    _filteredTestsResults = _allTests.where((t) {
       final batch = DummyData.batches.firstWhere((b) => b.id == t.batchId, orElse: () => DummyData.batches[0]);
+      _testBatches[t.id] = batch;
+      
+      if (q.isEmpty) return true;
+      
       return t.title.toLowerCase().contains(q) ||
           t.subject.toLowerCase().contains(q) ||
           batch.name.toLowerCase().contains(q);
     }).toList();
   }
+
 
   void _showSuccessSnackbar(String message) {
     ScaffoldMessenger.of(context).showSnackBar(
@@ -54,7 +77,7 @@ class _ProfessorTestsScreenState extends State<ProfessorTestsScreen> {
           children: [
             const Icon(Icons.check_circle_rounded, color: Colors.white, size: 20),
             SizedBox(width: AppSpacing.md),
-            Expanded(child: const Text("Test successfully updated")),
+            Expanded(child: Text("Test successfully updated")),
           ],
         ),
         backgroundColor: AppColors.success,
@@ -70,8 +93,6 @@ class _ProfessorTestsScreenState extends State<ProfessorTestsScreen> {
     if (_isLoading) {
       return const Scaffold(body: Center(child: CircularProgressIndicator()));
     }
-
-    final tests = _filteredTests;
 
     return Scaffold(
       backgroundColor: AppColors.background,
@@ -90,13 +111,16 @@ class _ProfessorTestsScreenState extends State<ProfessorTestsScreen> {
             child: CustomTextField(
               hintText: "Search by title, subject, or batch...",
               prefixIcon: Icons.search_rounded,
-              onChanged: (val) => setState(() => _searchQuery = val),
+              onChanged: (val) => setState(() {
+                _searchQuery = val;
+                _processTests();
+              }),
             ),
           ),
 
           // TEST LIST
           Expanded(
-            child: tests.isEmpty
+            child: _filteredTestsResults.isEmpty
                 ? const EmptyState(
                     icon: Icons.assignment_outlined,
                     title: "No Tests Found",
@@ -104,11 +128,12 @@ class _ProfessorTestsScreenState extends State<ProfessorTestsScreen> {
                   )
                 : ListView.builder(
                     padding: EdgeInsets.fromLTRB(AppSpacing.lg, AppSpacing.md, AppSpacing.lg, 80),
-                    itemCount: tests.length,
+                    itemCount: _filteredTestsResults.length,
                     itemBuilder: (context, index) {
-                      final test = tests[index];
+                      final test = _filteredTestsResults[index];
                       return _ProfessorTestCard(
                         test: test,
+                        batch: _testBatches[test.id],
                         onDelete: () => _confirmDeleteTest(test),
                       );
                     },
@@ -143,6 +168,7 @@ class _ProfessorTestsScreenState extends State<ProfessorTestsScreen> {
               setState(() {
                 _allTests.remove(test);
                 DummyData.tests.remove(test);
+                _processTests();
               });
               Navigator.pop(context);
               _showSuccessSnackbar("Test deleted successfully");
@@ -159,9 +185,9 @@ class _ProfessorTestsScreenState extends State<ProfessorTestsScreen> {
     if (prof == null) return;
 
     final formKey = GlobalKey<FormState>();
-    final titleController = TextEditingController();
-    final marksController = TextEditingController();
-    final durationController = TextEditingController();
+    _titleController.clear();
+    _marksController.clear();
+    _durationController.clear();
     String? selectedBatch;
     String? selectedSubject = prof.subjects.isNotEmpty ? prof.subjects.first : null;
     DateTime selectedDate = DateTime.now().add(const Duration(days: 1));
@@ -209,7 +235,7 @@ class _ProfessorTestsScreenState extends State<ProfessorTestsScreen> {
                         CustomTextField(
                           label: "Test Title",
                           hintText: "e.g. Navigation Unit Mock 1",
-                          controller: titleController,
+                          controller: _titleController,
                           prefixIcon: Icons.assignment_outlined,
                           validator: (v) => v == null || v.isEmpty ? "Required" : null,
                         ),
@@ -231,25 +257,25 @@ class _ProfessorTestsScreenState extends State<ProfessorTestsScreen> {
                         Row(
                           children: [
                             Expanded(
-                              child: CustomTextField(
-                                label: "Total Marks",
-                                hintText: "e.g. 50",
-                                controller: marksController,
-                                keyboardType: TextInputType.number,
-                                prefixIcon: Icons.score_outlined,
-                                validator: (v) => v == null || int.tryParse(v) == null ? "Invalid" : null,
-                              ),
+                                child: CustomTextField(
+                                  label: "Total Marks",
+                                  hintText: "e.g. 50",
+                                  controller: _marksController,
+                                  keyboardType: TextInputType.number,
+                                  prefixIcon: Icons.score_outlined,
+                                  validator: (v) => v == null || int.tryParse(v) == null ? "Invalid" : null,
+                                ),
                             ),
                             SizedBox(width: AppSpacing.lg),
                             Expanded(
-                              child: CustomTextField(
-                                label: "Duration (Mins)",
-                                hintText: "e.g. 60",
-                                controller: durationController,
-                                keyboardType: TextInputType.number,
-                                prefixIcon: Icons.timer_outlined,
-                                validator: (v) => v == null || int.tryParse(v) == null ? "Invalid" : null,
-                              ),
+                                child: CustomTextField(
+                                  label: "Duration (Mins)",
+                                  hintText: "e.g. 60",
+                                  controller: _durationController,
+                                  keyboardType: TextInputType.number,
+                                  prefixIcon: Icons.timer_outlined,
+                                  validator: (v) => v == null || int.tryParse(v) == null ? "Invalid" : null,
+                                ),
                             ),
                           ],
                         ),
@@ -281,20 +307,21 @@ class _ProfessorTestsScreenState extends State<ProfessorTestsScreen> {
                             if (formKey.currentState!.validate()) {
                               final newTest = TestModel(
                                 id: const Uuid().v4(),
-                                title: titleController.text,
+                                title: _titleController.text,
                                 type: "Academic",
                                 subject: selectedSubject!,
                                 batchId: selectedBatch!,
                                 questions: [],
-                                durationMinutes: int.parse(durationController.text),
+                                durationMinutes: int.parse(_durationController.text),
                                 scheduledDate: selectedDate,
                                 createdByProfessorId: prof.id,
-                                totalMarks: double.tryParse(marksController.text) ?? 0.0,
-                                passingMarks: (double.tryParse(marksController.text) ?? 0.0) * 0.4,
+                                totalMarks: double.tryParse(_marksController.text) ?? 0.0,
+                                passingMarks: (double.tryParse(_marksController.text) ?? 0.0) * 0.4,
                               );
                               setState(() {
                                 _allTests.insert(0, newTest);
                                 DummyData.tests.insert(0, newTest);
+                                _processTests();
                               });
                               Navigator.pop(context);
                               _showSuccessSnackbar("Test scheduled successfully");
@@ -317,13 +344,14 @@ class _ProfessorTestsScreenState extends State<ProfessorTestsScreen> {
 
 class _ProfessorTestCard extends StatelessWidget {
   final TestModel test;
+  final BatchModel? batch;
   final VoidCallback onDelete;
 
-  const _ProfessorTestCard({required this.test, required this.onDelete});
+  const _ProfessorTestCard({required this.test, this.batch, required this.onDelete});
 
   @override
   Widget build(BuildContext context) {
-    final batch = DummyData.batches.firstWhere((b) => b.id == test.batchId, orElse: () => DummyData.batches[0]);
+    final batch = this.batch ?? DummyData.batches[0];
     final isUpcoming = test.scheduledDate.isAfter(DateTime.now());
 
     return Container(

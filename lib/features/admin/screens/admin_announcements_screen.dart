@@ -158,7 +158,7 @@ class _AdminAnnouncementsScreenState extends State<AdminAnnouncementsScreen> {
                           children: [
                             Expanded(
                               child: DropdownButtonFormField<String>(
-                                value: selectedPriority,
+                                initialValue: selectedPriority,
                                 decoration: const InputDecoration(labelText: "Priority", prefixIcon: Icon(Icons.priority_high_rounded, size: 20)),
                                 items: ["Low", "Medium", "High"].map((p) => DropdownMenuItem(value: p, child: Text(p))).toList(),
                                 onChanged: (val) => setModalState(() => selectedPriority = val!),
@@ -338,7 +338,7 @@ class _BranchChip extends StatelessWidget {
 class _AdminAnnouncementCard extends StatelessWidget {
   final AnnouncementModel announcement;
   final VoidCallback onDelete;
-  _AdminAnnouncementCard({required this.announcement, required this.onDelete});
+  const _AdminAnnouncementCard({required this.announcement, required this.onDelete});
 
   @override
   Widget build(BuildContext context) {

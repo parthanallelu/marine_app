@@ -588,7 +588,7 @@ class NavyHeader extends StatelessWidget {
             children: [
               Row(
                 children: [
-                  if (leadingWidget != null) leadingWidget,
+                  ?leadingWidget,
                   const Spacer(),
                   ...?actionsList,
                 ],

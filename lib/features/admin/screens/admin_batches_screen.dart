@@ -16,24 +16,56 @@ class AdminBatchesScreen extends StatefulWidget {
 
 class _AdminBatchesScreenState extends State<AdminBatchesScreen> {
   late List<BatchModel> _allBatches;
+  late List<BatchModel> _filteredBatches;
+  late Map<String, List<BatchModel>> _groupedByBranch;
+  late Map<String, int> _batchStudentCounts;
   String _searchQuery = "";
+
+  // Controllers promoted to class members for proper disposal
+  final _nameController = TextEditingController();
+  final _timingController = TextEditingController();
 
   @override
   void initState() {
     super.initState();
     _allBatches = List.from(DummyData.batches);
+    _processBatches();
   }
 
-  List<BatchModel> get _filteredBatches {
-    if (_searchQuery.isEmpty) return _allBatches;
-    final q = _searchQuery.toLowerCase();
-    return _allBatches.where((b) {
-      return b.name.toLowerCase().contains(q) ||
-          b.professorName.toLowerCase().contains(q) ||
-          b.branch.toLowerCase().contains(q) ||
-          b.courseType.toLowerCase().contains(q);
-    }).toList();
+  @override
+  void dispose() {
+    _nameController.dispose();
+    _timingController.dispose();
+    super.dispose();
   }
+
+  void _processBatches() {
+    // Filter
+    if (_searchQuery.isEmpty) {
+      _filteredBatches = List.from(_allBatches);
+    } else {
+      final q = _searchQuery.toLowerCase();
+      _filteredBatches = _allBatches.where((b) {
+        return b.name.toLowerCase().contains(q) ||
+            b.professorName.toLowerCase().contains(q) ||
+            b.branch.toLowerCase().contains(q) ||
+            b.courseType.toLowerCase().contains(q);
+      }).toList();
+    }
+
+    // Group
+    _groupedByBranch = {};
+    for (final batch in _filteredBatches) {
+      _groupedByBranch.putIfAbsent(batch.branch, () => []).add(batch);
+    }
+
+    // Pre-calculate student counts to avoid O(N*M) in build
+    _batchStudentCounts = {};
+    for (final batch in _filteredBatches) {
+      _batchStudentCounts[batch.id] = DummyData.students.where((s) => s.batchId == batch.id).length;
+    }
+  }
+
 
   void _showSuccessSnackbar(String message) {
     ScaffoldMessenger.of(context).showSnackBar(
@@ -55,11 +87,6 @@ class _AdminBatchesScreenState extends State<AdminBatchesScreen> {
 
   @override
   Widget build(BuildContext context) {
-    final batches = _filteredBatches;
-    final groupedByBranch = <String, List<BatchModel>>{};
-    for (final batch in batches) {
-      groupedByBranch.putIfAbsent(batch.branch, () => []).add(batch);
-    }
 
     return Scaffold(
       backgroundColor: AppColors.background,
@@ -78,12 +105,15 @@ class _AdminBatchesScreenState extends State<AdminBatchesScreen> {
             child: CustomTextField(
               hintText: "Search by batch, professor, branch...",
               prefixIcon: Icons.search_rounded,
-              onChanged: (val) => setState(() => _searchQuery = val),
+              onChanged: (val) => setState(() {
+                _searchQuery = val;
+                _processBatches();
+              }),
             ),
           ),
           // BATCH LIST
           Expanded(
-            child: batches.isEmpty
+            child: _filteredBatches.isEmpty
                 ? const EmptyState(
                     icon: Icons.class_outlined,
                     title: "No Batches Created",
@@ -91,7 +121,7 @@ class _AdminBatchesScreenState extends State<AdminBatchesScreen> {
                   )
                 : ListView(
                     padding: EdgeInsets.fromLTRB(AppSpacing.lg, AppSpacing.sm, AppSpacing.lg, 80),
-                    children: groupedByBranch.entries.map((entry) {
+                    children: _groupedByBranch.entries.map((entry) {
                       final branch = entry.key;
                       final batchesInBranch = entry.value;
                       return Column(
@@ -124,12 +154,17 @@ class _AdminBatchesScreenState extends State<AdminBatchesScreen> {
                           ),
                           ...batchesInBranch.map((batch) => _AdminBatchCard(
                                 batch: batch,
+                                studentCount: _batchStudentCounts[batch.id] ?? 0,
                                 onManageStudents: () {
                                   Navigator.push(
                                     context,
                                     MaterialPageRoute(builder: (_) => BatchStudentsScreen(batch: batch)),
                                   ).then((_) {
-                                    if (context.mounted) setState(() {});
+                                    if (context.mounted) {
+                                      setState(() {
+                                        _processBatches();
+                                      });
+                                    }
                                   });
                                 },
                                 onEdit: () => _showEditBatchSheet(batch),
@@ -158,8 +193,8 @@ class _AdminBatchesScreenState extends State<AdminBatchesScreen> {
 
   void _showCreateBatchSheet() {
     final formKey = GlobalKey<FormState>();
-    final nameController = TextEditingController();
-    final timingController = TextEditingController();
+    _nameController.clear();
+    _timingController.clear();
     String? selectedBranch;
     String? selectedCourse;
     String? selectedProfessor;
@@ -208,7 +243,7 @@ class _AdminBatchesScreenState extends State<AdminBatchesScreen> {
                         CustomTextField(
                           label: "Batch Name",
                           hintText: "e.g. Gamma Batch 2024",
-                          controller: nameController,
+                          controller: _nameController,
                           prefixIcon: Icons.badge_outlined,
                           validator: (v) => v == null || v.isEmpty ? "Batch name is required" : null,
                         ),
@@ -237,7 +272,7 @@ class _AdminBatchesScreenState extends State<AdminBatchesScreen> {
                         CustomTextField(
                           label: "Class Timings",
                           hintText: "e.g. 09:00 AM - 01:00 PM",
-                          controller: timingController,
+                          controller: _timingController,
                           prefixIcon: Icons.schedule_outlined,
                           validator: (v) => v == null || v.isEmpty ? "Required" : null,
                         ),
@@ -255,7 +290,7 @@ class _AdminBatchesScreenState extends State<AdminBatchesScreen> {
                                 firstDate: DateTime.now(),
                                 lastDate: DateTime.now().add(const Duration(days: 365)),
                               );
-                              if (picked != null) {
+                              if (picked != null && context.mounted) {
                                 setModalState(() => selectedDate = picked);
                               }
                             },
@@ -270,20 +305,21 @@ class _AdminBatchesScreenState extends State<AdminBatchesScreen> {
                               final prof = DummyData.professors.firstWhere((p) => p.id == selectedProfessor);
                               final newBatch = BatchModel(
                                 id: const Uuid().v4(),
-                                name: nameController.text,
+                                name: _nameController.text,
                                 courseType: selectedCourse!,
                                 branch: selectedBranch!,
                                 professorId: selectedProfessor!,
                                 professorName: prof.name,
-                                timing: timingController.text,
+                                timing: _timingController.text,
                                 days: ['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'],
                                 startDate: selectedDate,
                                 studentIds: [],
                               );
-                              setState(() {
-                                _allBatches.insert(0, newBatch);
-                                DummyData.batches.insert(0, newBatch);
-                              });
+                            setState(() {
+                              _allBatches.insert(0, newBatch);
+                              DummyData.batches.insert(0, newBatch);
+                              _processBatches();
+                            });
                               Navigator.pop(context);
                               _showSuccessSnackbar("Batch created successfully");
                             }
@@ -308,8 +344,8 @@ class _AdminBatchesScreenState extends State<AdminBatchesScreen> {
 
   void _showEditBatchSheet(BatchModel batch) {
     final formKey = GlobalKey<FormState>();
-    final nameController = TextEditingController(text: batch.name);
-    final timingController = TextEditingController(text: batch.timing);
+    _nameController.text = batch.name;
+    _timingController.text = batch.timing;
     String selectedBranch = batch.branch;
     String selectedCourse = batch.courseType;
     String selectedProfessor = batch.professorId;
@@ -356,7 +392,7 @@ class _AdminBatchesScreenState extends State<AdminBatchesScreen> {
                       CustomTextField(
                         label: "Batch Name",
                         hintText: "e.g. Gamma Batch 2024",
-                        controller: nameController,
+                        controller: _nameController,
                         prefixIcon: Icons.badge_outlined,
                         validator: (v) => v == null || v.isEmpty ? "Batch name is required" : null,
                       ),
@@ -388,7 +424,7 @@ class _AdminBatchesScreenState extends State<AdminBatchesScreen> {
                       CustomTextField(
                         label: "Class Timings",
                         hintText: "e.g. 09:00 AM - 01:00 PM",
-                        controller: timingController,
+                        controller: _timingController,
                         prefixIcon: Icons.schedule_outlined,
                         validator: (v) => v == null || v.isEmpty ? "Required" : null,
                       ),
@@ -400,16 +436,17 @@ class _AdminBatchesScreenState extends State<AdminBatchesScreen> {
                           if (formKey.currentState!.validate()) {
                             final prof = DummyData.professors.firstWhere((p) => p.id == selectedProfessor);
                             setState(() {
-                              batch.name = nameController.text;
+                              batch.name = _nameController.text;
                               batch.courseType = selectedCourse;
                               batch.branch = selectedBranch;
                               batch.professorId = selectedProfessor;
                               batch.professorName = prof.name;
-                              batch.timing = timingController.text;
+                              batch.timing = _timingController.text;
                               // Update batchName for all students in this batch
                               for (var student in DummyData.students.where((s) => s.batchId == batch.id)) {
                                 student.batchName = batch.name;
                               }
+                              _processBatches();
                             });
                             Navigator.pop(context);
                             _showSuccessSnackbar("Batch updated successfully");
@@ -484,6 +521,7 @@ class _AdminBatchesScreenState extends State<AdminBatchesScreen> {
                 }
                 _allBatches.remove(batch);
                 DummyData.batches.remove(batch);
+                _processBatches();
               });
               Navigator.pop(context);
               _showSuccessSnackbar("Batch deleted");
@@ -502,11 +540,13 @@ class _AdminBatchesScreenState extends State<AdminBatchesScreen> {
 
 class _AdminBatchCard extends StatelessWidget {
   final BatchModel batch;
+  final int studentCount;
   final VoidCallback onManageStudents;
   final VoidCallback onEdit;
   final VoidCallback onDelete;
   const _AdminBatchCard({
     required this.batch,
+    required this.studentCount,
     required this.onManageStudents,
     required this.onEdit,
     required this.onDelete,
@@ -564,9 +604,9 @@ class _AdminBatchCard extends StatelessWidget {
                     value: 'edit',
                     child: Row(
                       children: [
-                        const Icon(Icons.edit_outlined, size: 18),
+                        Icon(Icons.edit_outlined, size: 18),
                         SizedBox(width: AppSpacing.sm),
-                        const Text("Edit Batch"),
+                        Text("Edit Batch"),
                       ],
                     ),
                   ),
@@ -574,9 +614,9 @@ class _AdminBatchCard extends StatelessWidget {
                     value: 'manage',
                     child: Row(
                       children: [
-                        const Icon(Icons.group_rounded, size: 18),
+                        Icon(Icons.group_rounded, size: 18),
                         SizedBox(width: AppSpacing.sm),
-                        const Text("Manage Students"),
+                        Text("Manage Students"),
                       ],
                     ),
                   ),
@@ -584,7 +624,7 @@ class _AdminBatchCard extends StatelessWidget {
                     value: 'delete',
                     child: Row(
                       children: [
-                        const Icon(Icons.delete_outline, size: 18, color: AppColors.error),
+                        Icon(Icons.delete_outline, size: 18, color: AppColors.error),
                         SizedBox(width: AppSpacing.sm),
                         Text("Delete", style: AppTextStyles.labelMedium.copyWith(color: AppColors.error)),
                       ],
@@ -605,7 +645,7 @@ class _AdminBatchCard extends StatelessWidget {
           SizedBox(height: AppSpacing.md),
           Row(
             children: [
-              _BatchMeta(icon: Icons.people_alt_outlined, label: "${DummyData.students.where((s) => s.batchId == batch.id).length} Students enrolled"),
+              _BatchMeta(icon: Icons.people_alt_outlined, label: "$studentCount Students enrolled"),
               const Spacer(),
               TextButton.icon(
                 onPressed: onManageStudents,

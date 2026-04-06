@@ -15,18 +15,39 @@ class AdminStudentsScreen extends StatefulWidget {
 
 class _AdminStudentsScreenState extends State<AdminStudentsScreen> {
   late List<StudentModel> _allStudents;
+  late List<StudentModel> _filteredStudents;
   String _searchQuery = "";
   String _selectedBranch = "All";
   String _selectedCourse = "All";
+
+  // Controllers promoted to class members for proper disposal
+  final _nameController = TextEditingController();
+  final _emailController = TextEditingController();
+  final _phoneController = TextEditingController();
+  final _rollController = TextEditingController();
+  final _parentPhoneController = TextEditingController();
+  final _targetCompanyController = TextEditingController();
 
   @override
   void initState() {
     super.initState();
     _allStudents = List.from(DummyData.students);
+    _applyFilters();
   }
 
-  List<StudentModel> get _filteredStudents {
-    return _allStudents.where((s) {
+  @override
+  void dispose() {
+    _nameController.dispose();
+    _emailController.dispose();
+    _phoneController.dispose();
+    _rollController.dispose();
+    _parentPhoneController.dispose();
+    _targetCompanyController.dispose();
+    super.dispose();
+  }
+
+  void _applyFilters() {
+    _filteredStudents = _allStudents.where((s) {
       final q = _searchQuery.toLowerCase();
       final matchesSearch = s.name.toLowerCase().contains(q) ||
           s.rollNumber.toLowerCase().contains(q) ||
@@ -38,6 +59,7 @@ class _AdminStudentsScreenState extends State<AdminStudentsScreen> {
       return matchesSearch && matchesBranch && matchesCourse;
     }).toList();
   }
+
 
   void _showSuccessSnackbar(String message) {
     ScaffoldMessenger.of(context).showSnackBar(
@@ -59,7 +81,6 @@ class _AdminStudentsScreenState extends State<AdminStudentsScreen> {
 
   @override
   Widget build(BuildContext context) {
-    final students = _filteredStudents;
 
     return Scaffold(
       backgroundColor: AppColors.background,
@@ -80,7 +101,10 @@ class _AdminStudentsScreenState extends State<AdminStudentsScreen> {
                 CustomTextField(
                   hintText: "Search by name, roll no, email, batch...",
                   prefixIcon: Icons.search_rounded,
-                  onChanged: (val) => setState(() => _searchQuery = val),
+                  onChanged: (val) => setState(() {
+                    _searchQuery = val;
+                    _applyFilters();
+                  }),
                 ),
                 SizedBox(height: AppSpacing.md),
                 Row(
@@ -113,7 +137,7 @@ class _AdminStudentsScreenState extends State<AdminStudentsScreen> {
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
               children: [
                 Text(
-                  "Found ${students.length} Students",
+                  "Found ${_filteredStudents.length} Students",
                   style: AppTextStyles.labelLarge.copyWith(color: AppColors.textSecondary),
                 ),
                 if (_selectedBranch != "All" || _selectedCourse != "All" || _searchQuery.isNotEmpty)
@@ -122,6 +146,7 @@ class _AdminStudentsScreenState extends State<AdminStudentsScreen> {
                       _selectedBranch = "All";
                       _selectedCourse = "All";
                       _searchQuery = "";
+                      _applyFilters();
                     }),
                     child: const Text("Clear All"),
                   ),
@@ -131,7 +156,7 @@ class _AdminStudentsScreenState extends State<AdminStudentsScreen> {
 
           // STUDENT LIST
           Expanded(
-            child: students.isEmpty
+            child: _filteredStudents.isEmpty
                 ? const EmptyState(
                     icon: Icons.school_outlined,
                     title: "No Students Found",
@@ -139,14 +164,16 @@ class _AdminStudentsScreenState extends State<AdminStudentsScreen> {
                   )
                 : ListView.builder(
                     padding: EdgeInsets.fromLTRB(AppSpacing.lg, 0, AppSpacing.lg, 80),
-                    itemCount: students.length,
+                    itemCount: _filteredStudents.length,
                     itemBuilder: (context, index) {
-                      final student = students[index];
+                      final student = _filteredStudents[index];
                       return _AdminStudentTile(
                         student: student,
                         onEdit: () => _showEditStudentSheet(student),
                         onDelete: () => _confirmDeleteStudent(student),
-                        onBatchChanged: () => setState(() {}),
+                        onBatchChanged: () => setState(() {
+                          _applyFilters();
+                        }),
                       );
                     },
                   ),
@@ -168,12 +195,15 @@ class _AdminStudentsScreenState extends State<AdminStudentsScreen> {
 
   void _showAddStudentSheet() {
     final formKey = GlobalKey<FormState>();
-    final nameController = TextEditingController();
-    final emailController = TextEditingController();
-    final phoneController = TextEditingController();
-    final rollController = TextEditingController();
-    final parentPhoneController = TextEditingController();
-    final targetCompanyController = TextEditingController();
+    
+    // Reset controllers for new entry
+    _nameController.clear();
+    _emailController.clear();
+    _phoneController.clear();
+    _rollController.clear();
+    _parentPhoneController.clear();
+    _targetCompanyController.clear();
+
     String? selectedBranch;
     String? selectedCourse;
 
@@ -234,7 +264,7 @@ class _AdminStudentsScreenState extends State<AdminStudentsScreen> {
                       CustomTextField(
                         label: "Full Name",
                         hintText: "Enter student's full name",
-                        controller: nameController,
+                        controller: _nameController,
                         prefixIcon: Icons.person_outline_rounded,
                         validator: (v) => v == null || v.isEmpty ? "Name is required" : null,
                       ),
@@ -242,7 +272,7 @@ class _AdminStudentsScreenState extends State<AdminStudentsScreen> {
                       CustomTextField(
                         label: "Email Address",
                         hintText: "example@academy.com",
-                        controller: emailController,
+                        controller: _emailController,
                         keyboardType: TextInputType.emailAddress,
                         prefixIcon: Icons.email_outlined,
                         validator: (v) => v == null || !v.contains('@') ? "Enter a valid email" : null,
@@ -254,7 +284,7 @@ class _AdminStudentsScreenState extends State<AdminStudentsScreen> {
                             child: CustomTextField(
                               label: "Phone",
                               hintText: "10-digit number",
-                              controller: phoneController,
+                              controller: _phoneController,
                               keyboardType: TextInputType.phone,
                               prefixIcon: Icons.phone_outlined,
                               validator: (v) => v == null || v.length < 10 ? "Min 10 digits" : null,
@@ -265,7 +295,7 @@ class _AdminStudentsScreenState extends State<AdminStudentsScreen> {
                             child: CustomTextField(
                               label: "Roll Number",
                               hintText: "MA-2024-XXX",
-                              controller: rollController,
+                              controller: _rollController,
                               prefixIcon: Icons.badge_outlined,
                               validator: (v) => v == null || v.isEmpty ? "Required" : null,
                             ),
@@ -276,7 +306,7 @@ class _AdminStudentsScreenState extends State<AdminStudentsScreen> {
                       CustomTextField(
                         label: "Parent Phone",
                         hintText: "Parent's 10-digit number",
-                        controller: parentPhoneController,
+                        controller: _parentPhoneController,
                         keyboardType: TextInputType.phone,
                         prefixIcon: Icons.family_restroom_outlined,
                         validator: (v) => v == null || v.length < 10 ? "Min 10 digits" : null,
@@ -285,7 +315,7 @@ class _AdminStudentsScreenState extends State<AdminStudentsScreen> {
                       CustomTextField(
                         label: "Target Company (Optional)",
                         hintText: "e.g. Synergy, Anglo Eastern",
-                        controller: targetCompanyController,
+                        controller: _targetCompanyController,
                         prefixIcon: Icons.business_outlined,
                       ),
                       const SizedBox(height: AppSpacing.lg),
@@ -310,22 +340,23 @@ class _AdminStudentsScreenState extends State<AdminStudentsScreen> {
                           if (formKey.currentState!.validate()) {
                               final newStudent = StudentModel(
                                 id: const Uuid().v4(),
-                                name: nameController.text,
-                                email: emailController.text,
-                                phone: phoneController.text,
-                                parentPhone: parentPhoneController.text,
+                                name: _nameController.text,
+                                email: _emailController.text,
+                                phone: _phoneController.text,
+                                parentPhone: _parentPhoneController.text,
                                 role: AppConstants.roleStudent,
                                 branch: selectedBranch!,
                                 courseType: selectedCourse!,
-                                rollNumber: rollController.text,
+                                rollNumber: _rollController.text,
                                 batchId: "",
                                 batchName: "",
                                 createdAt: DateTime.now(),
                                 joiningDate: DateTime.now(),
-                                targetCompany: targetCompanyController.text,
+                                targetCompany: _targetCompanyController.text,
                               );
                             setState(() {
                               _allStudents.insert(0, newStudent);
+                              _applyFilters();
                             });
                             Navigator.pop(context);
                             _showSuccessSnackbar("Student enrolled successfully");
@@ -350,12 +381,15 @@ class _AdminStudentsScreenState extends State<AdminStudentsScreen> {
 
   void _showEditStudentSheet(StudentModel student) {
     final formKey = GlobalKey<FormState>();
-    final nameController = TextEditingController(text: student.name);
-    final emailController = TextEditingController(text: student.email);
-    final phoneController = TextEditingController(text: student.phone);
-    final rollController = TextEditingController(text: student.rollNumber);
-    final parentPhoneController = TextEditingController(text: student.parentPhone);
-    final targetCompanyController = TextEditingController(text: student.targetCompany);
+    
+    // Initialize class controllers with current student values
+    _nameController.text = student.name;
+    _emailController.text = student.email;
+    _phoneController.text = student.phone;
+    _rollController.text = student.rollNumber;
+    _parentPhoneController.text = student.parentPhone;
+    _targetCompanyController.text = student.targetCompany;
+
     String selectedBranch = student.branch;
     String selectedCourse = student.courseType;
 
@@ -401,7 +435,7 @@ class _AdminStudentsScreenState extends State<AdminStudentsScreen> {
                       CustomTextField(
                         label: "Full Name",
                         hintText: "Enter student's full name",
-                        controller: nameController,
+                        controller: _nameController,
                         prefixIcon: Icons.person_outline_rounded,
                         validator: (v) => v == null || v.isEmpty ? "Name is required" : null,
                       ),
@@ -409,7 +443,7 @@ class _AdminStudentsScreenState extends State<AdminStudentsScreen> {
                       CustomTextField(
                         label: "Email Address",
                         hintText: "example@academy.com",
-                        controller: emailController,
+                        controller: _emailController,
                         keyboardType: TextInputType.emailAddress,
                         prefixIcon: Icons.email_outlined,
                         validator: (v) => v == null || !v.contains('@') ? "Enter a valid email" : null,
@@ -421,7 +455,7 @@ class _AdminStudentsScreenState extends State<AdminStudentsScreen> {
                             child: CustomTextField(
                               label: "Phone",
                               hintText: "10-digit number",
-                              controller: phoneController,
+                              controller: _phoneController,
                               keyboardType: TextInputType.phone,
                               prefixIcon: Icons.phone_outlined,
                               validator: (v) => v == null || v.length < 10 ? "Min 10 digits" : null,
@@ -432,7 +466,7 @@ class _AdminStudentsScreenState extends State<AdminStudentsScreen> {
                             child: CustomTextField(
                               label: "Roll Number",
                               hintText: "MA-2024-XXX",
-                              controller: rollController,
+                              controller: _rollController,
                               prefixIcon: Icons.badge_outlined,
                               validator: (v) => v == null || v.isEmpty ? "Required" : null,
                             ),
@@ -443,7 +477,7 @@ class _AdminStudentsScreenState extends State<AdminStudentsScreen> {
                       CustomTextField(
                         label: "Parent Phone",
                         hintText: "Parent's 10-digit number",
-                        controller: parentPhoneController,
+                        controller: _parentPhoneController,
                         keyboardType: TextInputType.phone,
                         prefixIcon: Icons.family_restroom_outlined,
                         validator: (v) => v == null || v.length < 10 ? "Min 10 digits" : null,
@@ -452,7 +486,7 @@ class _AdminStudentsScreenState extends State<AdminStudentsScreen> {
                       CustomTextField(
                         label: "Target Company (Optional)",
                         hintText: "e.g. Synergy, Anglo Eastern",
-                        controller: targetCompanyController,
+                        controller: _targetCompanyController,
                         prefixIcon: Icons.business_outlined,
                       ),
                       const SizedBox(height: AppSpacing.lg),
@@ -478,14 +512,15 @@ class _AdminStudentsScreenState extends State<AdminStudentsScreen> {
                         onPressed: () {
                           if (formKey.currentState!.validate()) {
                             setState(() {
-                              student.name = nameController.text;
-                              student.email = emailController.text;
-                              student.phone = phoneController.text;
-                              student.rollNumber = rollController.text;
+                              student.name = _nameController.text;
+                              student.email = _emailController.text;
+                              student.phone = _phoneController.text;
+                              student.rollNumber = _rollController.text;
                               student.courseType = selectedCourse;
                               student.branch = selectedBranch;
-                              student.parentPhone = parentPhoneController.text;
-                              student.targetCompany = targetCompanyController.text;
+                              student.parentPhone = _parentPhoneController.text;
+                              student.targetCompany = _targetCompanyController.text;
+                              _applyFilters();
                             });
                             Navigator.pop(context);
                             _showSuccessSnackbar("Student updated successfully");
@@ -528,6 +563,7 @@ class _AdminStudentsScreenState extends State<AdminStudentsScreen> {
               setState(() {
                 _allStudents.remove(student);
                 DummyData.students.remove(student);
+                _applyFilters();
               });
               Navigator.pop(context);
               _showSuccessSnackbar("Student deleted");
@@ -561,12 +597,18 @@ class _AdminStudentsScreenState extends State<AdminStudentsScreen> {
                   value: branch,
                   groupValue: _selectedBranch,
                   onChanged: (val) {
-                    setState(() => _selectedBranch = val!);
+                    setState(() {
+                      _selectedBranch = val!;
+                      _applyFilters();
+                    });
                     Navigator.pop(context);
                   },
                 ),
                 onTap: () {
-                  setState(() => _selectedBranch = branch);
+                  setState(() {
+                    _selectedBranch = branch;
+                    _applyFilters();
+                  });
                   Navigator.pop(context);
                 },
               )),
@@ -593,12 +635,18 @@ class _AdminStudentsScreenState extends State<AdminStudentsScreen> {
                   value: course,
                   groupValue: _selectedCourse,
                   onChanged: (val) {
-                    setState(() => _selectedCourse = val!);
+                    setState(() {
+                      _selectedCourse = val!;
+                      _applyFilters();
+                    });
                     Navigator.pop(context);
                   },
                 ),
                 onTap: () {
-                  setState(() => _selectedCourse = course);
+                  setState(() {
+                    _selectedCourse = course;
+                    _applyFilters();
+                  });
                   Navigator.pop(context);
                 },
               )),

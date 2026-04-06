@@ -22,6 +22,7 @@ class _ProfessorHomeScreenState extends State<ProfessorHomeScreen> {
   late List<BatchModel> _assignedBatches;
   late List<BatchModel> _todaysClasses;
   late int _totalStudents;
+  late Map<String, int> _batchStudentCounts;
   bool _isLoading = true;
 
   @override
@@ -60,7 +61,15 @@ class _ProfessorHomeScreenState extends State<ProfessorHomeScreen> {
         .toList();
 
     // Calculate total students across all assigned batches
-    _totalStudents = _assignedBatches.fold(0, (sum, b) => sum + b.studentIds.length);
+    _totalStudents = 0;
+    _batchStudentCounts = {};
+    
+    // Efficiently count students for assigned batches
+    for (var batch in _assignedBatches) {
+      final count = DummyData.students.where((s) => s.batchId == batch.id).length;
+      _batchStudentCounts[batch.id] = count;
+      _totalStudents += count;
+    }
 
     // Filter today's classes
     final today = DateFormat('EEEE').format(DateTime.now()); // e.g., "Monday"
@@ -218,7 +227,7 @@ class _ProfessorHomeScreenState extends State<ProfessorHomeScreen> {
                   courseType: batch.courseType,
                   timing: batch.timing,
                   branch: batch.branch,
-                  studentCount: DummyData.students.where((s) => s.batchId == batch.id).length,
+                  studentCount: _batchStudentCounts[batch.id] ?? 0,
                   actionLabel: 'Mark Attendance',
                   onAction: () => context.push(AppRoutes.markAttendance),
                 ),
@@ -253,7 +262,7 @@ class _ProfessorHomeScreenState extends State<ProfessorHomeScreen> {
                   courseType: batch.courseType,
                   timing: batch.timing,
                   branch: batch.branch,
-                  studentCount: DummyData.students.where((s) => s.batchId == batch.id).length,
+                  studentCount: _batchStudentCounts[batch.id] ?? 0,
                   onTap: () {
                     // Future: Batch details screen
                   },

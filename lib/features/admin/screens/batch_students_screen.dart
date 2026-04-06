@@ -197,13 +197,28 @@ class _AddStudentsSheet extends StatefulWidget {
 
 class _AddStudentsSheetState extends State<_AddStudentsSheet> {
   final Set<String> _selectedStudents = {};
+  late List<StudentModel> _filteredStudents;
   String _searchQuery = "";
 
   @override
+  void initState() {
+    super.initState();
+    _filterStudents();
+  }
+
+  void _filterStudents() {
+    if (_searchQuery.isEmpty) {
+      _filteredStudents = List.from(widget.availableStudents);
+    } else {
+      final q = _searchQuery.toLowerCase();
+      _filteredStudents = widget.availableStudents.where((s) {
+        return s.name.toLowerCase().contains(q);
+      }).toList();
+    }
+  }
+
+  @override
   Widget build(BuildContext context) {
-    final filteredStudents = widget.availableStudents.where((s) {
-      return s.name.toLowerCase().contains(_searchQuery.toLowerCase());
-    }).toList();
 
     return DraggableScrollableSheet(
       initialChildSize: 0.8,
@@ -247,6 +262,7 @@ class _AddStudentsSheetState extends State<_AddStudentsSheet> {
                   onChanged: (val) {
                     setState(() {
                       _searchQuery = val;
+                      _filterStudents();
                     });
                   },
                 ),
@@ -256,9 +272,9 @@ class _AddStudentsSheetState extends State<_AddStudentsSheet> {
                 child: ListView.builder(
                   controller: scrollController,
                   padding: EdgeInsets.symmetric(horizontal: AppSpacing.lg),
-                  itemCount: filteredStudents.length,
+                  itemCount: _filteredStudents.length,
                   itemBuilder: (context, index) {
-                    final student = filteredStudents[index];
+                    final student = _filteredStudents[index];
                     return CheckboxListTile(
                       value: _selectedStudents.contains(student.id),
                       onChanged: (val) {
