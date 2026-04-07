@@ -180,13 +180,13 @@ class _ProfessorHomeScreenState extends State<ProfessorHomeScreen> {
               label: 'Attendance',
               icon: Icons.how_to_reg_rounded,
               color: AppColors.navyBlueBase,
-              onTap: () => context.push(AppRoutes.professorAttendance),
+              onTap: () => context.pushNamed(AppRoutes.professorAttendanceName),
             ),
             QuickActionTile(
               label: 'Upload',
               icon: Icons.upload_file_rounded,
               color: AppColors.oceanBlue,
-              onTap: () => context.push(AppRoutes.professorMaterials),
+              onTap: () => context.pushNamed(AppRoutes.professorMaterialsName),
             ),
             QuickActionTile(
               label: 'Students',
@@ -226,14 +226,13 @@ class _ProfessorHomeScreenState extends State<ProfessorHomeScreen> {
           ..._todaysClasses.map((batch) => Padding(
                 padding: const EdgeInsets.only(bottom: AppSpacing.md),
                 child: BatchCard(
-
                   name: batch.name,
                   courseType: batch.courseType,
                   timing: batch.timing,
                   branch: batch.branch,
                   studentCount: _batchStudentCounts[batch.id] ?? 0,
                   actionLabel: 'Mark Attendance',
-                  onAction: () => context.push(AppRoutes.professorAttendance),
+                  onAction: () => context.pushNamed(AppRoutes.professorAttendanceName),
                 ),
               )),
       ],

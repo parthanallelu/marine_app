@@ -26,6 +26,12 @@ class _TestAttemptScreenState extends State<TestAttemptScreen> {
   
   Timer? _timer;
   int _secondsLeft = 0;
+  bool _isSubmitting = false;
+
+  void _setSubmitting(bool value) {
+    if (mounted) setState(() => _isSubmitting = value);
+  }
+
 
   @override
   void initState() {
@@ -72,10 +78,19 @@ class _TestAttemptScreenState extends State<TestAttemptScreen> {
     return AppColors.success;
   }
 
-  void _submitTest() {
+  Future<void> _submitTest() async {
     _timer?.cancel();
+    _setSubmitting(true);
     
-    // TODO: Replace with backend calculation for anti-cheat
+    // Simulate submission delay
+    await Future.delayed(const Duration(milliseconds: 1500));
+    
+    if (!mounted) {
+      _setSubmitting(false);
+      return;
+    }
+
+    // Calculation for results
     int correctCount = 0;
     for (var q in _test.questions) {
       if (_answers[q.id] == q.correctOptionIndex) {
@@ -100,13 +115,10 @@ class _TestAttemptScreenState extends State<TestAttemptScreen> {
       isPassed: (totalScore >= _test.passingMarks),
     );
 
-    // TODO: Save result to Firestore:
-    // await studentRepository.saveTestResult(result);
-
-    if (mounted) {
-      context.pushReplacementNamed(AppRoutes.testResultName, pathParameters: {'resultId': result.id}, extra: result);
-    }
+    _setSubmitting(false);
+    context.pushReplacementNamed(AppRoutes.testResultName, pathParameters: {'resultId': result.id}, extra: result);
   }
+
 
   Future<void> _showSubmitDialog() async {
     final answeredCount = _answers.length;
@@ -136,13 +148,16 @@ class _TestAttemptScreenState extends State<TestAttemptScreen> {
         actions: [
           TextButton(onPressed: () => Navigator.pop(context), child: const Text("CANCEL")),
           ElevatedButton(
-            onPressed: () {
+            onPressed: _isSubmitting ? null : () {
               Navigator.pop(context);
               _submitTest();
             },
             style: ElevatedButton.styleFrom(backgroundColor: AppColors.success, foregroundColor: Colors.white),
-            child: const Text("SUBMIT"),
+            child: _isSubmitting 
+              ? const SizedBox(width: 16, height: 16, child: CircularProgressIndicator(strokeWidth: 2, color: Colors.white))
+              : const Text("SUBMIT"),
           ),
+
         ],
       ),
     );
@@ -279,35 +294,49 @@ class _TestAttemptScreenState extends State<TestAttemptScreen> {
           children: [
             _buildProgressHeader(totalCount, answeredCount),
 
-            // PAGE VIEW
-            Expanded(
-              child: totalCount > 0 
-                ? PageView.builder(
-                    controller: _pageController,
-                    physics: const NeverScrollableScrollPhysics(),
-                    onPageChanged: (idx) {
-                      if (mounted) setState(() => _currentIndex = idx);
-                    },
-                    itemCount: totalCount,
-                    itemBuilder: (context, index) {
-                      final question = _test.questions[index];
-                      return _QuestionPage(
-                        question: question,
-                        selectedOption: _answers[question.id],
-                        onOptionSelected: (optIdx) {
-                          if (mounted) setState(() => _answers[question.id] = optIdx);
-                        },
-                      );
-                    },
-                  )
-                : const EmptyState(
-                    icon: Icons.quiz_rounded,
-                    title: "No Questions",
-                    subtitle: "This test does not contain any questions.",
+            if (_isSubmitting)
+              const Expanded(
+                child: Center(
+                  child: Column(
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    children: [
+                      CircularProgressIndicator(),
+                      SizedBox(height: AppSpacing.lg),
+                      Text("Submitting your answers...", style: AppTextStyles.labelLarge),
+                    ],
                   ),
-            ),
+                ),
+              )
+            else
+              Expanded(
+                child: totalCount > 0 
+                  ? PageView.builder(
+                      controller: _pageController,
+                      physics: const NeverScrollableScrollPhysics(),
+                      onPageChanged: (idx) {
+                        if (mounted) setState(() => _currentIndex = idx);
+                      },
+                      itemCount: totalCount,
+                      itemBuilder: (context, index) {
+                        final question = _test.questions[index];
+                        return _QuestionPage(
+                          question: question,
+                          selectedOption: _answers[question.id],
+                          onOptionSelected: (optIdx) {
+                            if (mounted && !_isSubmitting) setState(() => _answers[question.id] = optIdx);
+                          },
+                        );
+                      },
+                    )
+                  : const EmptyState(
+                      icon: Icons.quiz_rounded,
+                      title: "No Questions",
+                      subtitle: "This test does not contain any questions.",
+                    ),
+              ),
 
-            _buildNavigationFooter(totalCount),
+            if (!_isSubmitting) _buildNavigationFooter(totalCount),
+
           ],
         ),
 

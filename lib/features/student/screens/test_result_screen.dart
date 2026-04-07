@@ -57,60 +57,59 @@ class TestResultScreen extends StatelessWidget {
                 ),
               ),
               child: SafeArea(
-        child: SafeArea(
-          child: Padding(
-            padding: const EdgeInsets.symmetric(horizontal: AppSpacing.xxl, vertical: AppSpacing.xxxl),
-            child: Column(
-              children: [
-                Container(
-                  width: 100,
-                  height: 100,
-                  decoration: BoxDecoration(
-                    color: Colors.white.withAlpha((0.15 * 255).round()),
-                    shape: BoxShape.circle,
+                child: Padding(
+                  padding: const EdgeInsets.symmetric(horizontal: AppSpacing.xxl, vertical: AppSpacing.xxxl),
+                  child: Column(
+                    children: [
+                      Container(
+                        width: 100,
+                        height: 100,
+                        decoration: BoxDecoration(
+                          color: Colors.white.withAlpha((0.15 * 255).round()),
+                          shape: BoxShape.circle,
+                        ),
+                        alignment: Alignment.center,
+                        child: Text(
+                          testResult.grade,
+                          style: AppTextStyles.gradeLarge,
+                        ),
+                      ),
+                      const SizedBox(height: AppSpacing.lg),
+                      Text(
+                        hasPassed ? "Congratulations!" : "Keep Trying!",
+                        style: AppTextStyles.headingLarge.copyWith(color: Colors.white),
+                      ),
+                      const SizedBox(height: AppSpacing.xs),
+                      Text(
+                        testResult.testTitle,
+                        style: AppTextStyles.bodyMedium.copyWith(color: Colors.white.withAlpha((0.8 * 255).round())),
+                        textAlign: TextAlign.center,
+                      ),
+                      const SizedBox(height: AppSpacing.xxl),
+                      Row(
+                        mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                        children: [
+                          _ResultStat(
+                            label: "Score",
+                            value: "${testResult.score.toInt()} / ${testResult.totalMarks.toInt()}",
+                          ),
+                          _ResultStat(
+                            label: "Percentage",
+                            value: "${testResult.percentage.toStringAsFixed(1)}%",
+                          ),
+                          _ResultStat(
+                            label: "Time taken",
+                            value: "${testResult.timeTakenSeconds ~/ 60}m ${testResult.timeTakenSeconds % 60}s",
+                          ),
+                        ],
+                      ),
+                    ],
                   ),
-                  alignment: Alignment.center,
-                  child: Text(
-                    testResult.grade,
-                    style: AppTextStyles.gradeLarge,
-                  ),
                 ),
-                const SizedBox(height: AppSpacing.lg),
-                Text(
-                  hasPassed ? "Congratulations!" : "Keep Trying!",
-                  style: AppTextStyles.headingLarge.copyWith(color: Colors.white),
-                ),
-                const SizedBox(height: AppSpacing.xs),
-                Text(
-                  testResult.testTitle,
-                  style: AppTextStyles.bodyMedium.copyWith(color: Colors.white.withAlpha((0.8 * 255).round())),
-                  textAlign: TextAlign.center,
-                ),
-                const SizedBox(height: AppSpacing.xxl),
-                Row(
-                  mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-                  children: [
-                    _ResultStat(
-                      label: "Score",
-                      value: "${testResult.score.toInt()} / ${testResult.totalMarks.toInt()}",
-                    ),
-                    _ResultStat(
-                      label: "Percentage",
-                      value: "${testResult.percentage.toStringAsFixed(1)}%",
-                    ),
-                    _ResultStat(
-                      label: "Time taken",
-                      value: "${testResult.timeTakenSeconds ~/ 60}m ${testResult.timeTakenSeconds % 60}s",
-                    ),
-                  ],
-                ),
-              ],
+              ),
             ),
           ),
-        ),
-      ),
-    ),
-  ),
+
 
   // SLIVER 2 — Actions
   SliverPadding(

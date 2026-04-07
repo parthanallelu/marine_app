@@ -23,6 +23,13 @@ class _MarkAttendanceScreenState extends State<MarkAttendanceScreen> {
   final Map<String, AttendanceStatus> _attendance = {};
   List<StudentModel> _students = [];
   bool _isLoading = false;
+  bool _isSubmitting = false;
+
+  void _setSubmitting(bool value) {
+    if (mounted) setState(() => _isSubmitting = value);
+  }
+
+
 
   void _onBatchChanged(String? batchId) {
     if (batchId == null || batchId == _selectedBatch) return;
@@ -258,7 +265,8 @@ class _MarkAttendanceScreenState extends State<MarkAttendanceScreen> {
       child: SafeArea(
         child: CustomButton(
           label: 'Submit Attendance',
-          onPressed: _saveAttendance,
+          isLoading: _isSubmitting,
+          onPressed: _isSubmitting ? null : _saveAttendance,
           width: double.infinity,
         ),
       ),
@@ -303,24 +311,26 @@ class _MarkAttendanceScreenState extends State<MarkAttendanceScreen> {
     });
   }
 
-  void _saveAttendance() {
+  Future<void> _saveAttendance() async {
     // Final date validation check
     if (_selectedDate.isAfter(DateTime.now())) {
-       ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(
-          content: Text('Cannot mark attendance for future dates.'),
-          backgroundColor: AppColors.error,
-        ),
-      );
+      AppSnackBar.showError(context, 'Cannot mark attendance for future dates.');
       return;
     }
 
-    ScaffoldMessenger.of(context).showSnackBar(
-      const SnackBar(
-        content: Text('Attendance submitted successfully!'),
-        backgroundColor: AppColors.success,
-      ),
-    );
+    _setSubmitting(true);
+    
+    // Simulate network delay
+    await Future.delayed(const Duration(milliseconds: 1200));
+    
+    if (!mounted) {
+      _setSubmitting(false);
+      return;
+    }
+
+    _setSubmitting(false);
+    AppSnackBar.showSuccess(context, 'Attendance recorded successfully!');
     context.pop();
   }
+
 }

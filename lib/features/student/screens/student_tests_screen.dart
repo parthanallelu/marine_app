@@ -251,35 +251,36 @@ class _TestCard extends StatelessWidget {
                 const SizedBox(height: AppSpacing.lg),
                 Row(
                   children: [
-                    _MetaChip(icon: Icons.help_outline, label: "${test.questions.length} Qns"),
+                    _MetaChip(icon: Icons.help_outline_rounded, label: "${test.questions.length} Qns"),
                     const SizedBox(width: AppSpacing.sm),
                     _MetaChip(icon: Icons.timer_outlined, label: "${test.durationMinutes}m"),
                     const SizedBox(width: AppSpacing.sm),
                     _MetaChip(icon: Icons.stars_rounded, label: "${test.totalMarks.toInt()} Marks"),
+
                   ],
                 ),
                 const SizedBox(height: AppSpacing.lg),
 
-                Row(
-                  children: [
-                    const Icon(Icons.event_note, size: 16, color: AppColors.textHint),
-                    const SizedBox(width: AppSpacing.xs),
-
-                    Text(
-                      test.scheduledDate.toString().split(' ')[0],
-                      style: AppTextStyles.caption.copyWith(color: AppColors.textSecondary),
+                    Row(
+                      children: [
+                        const Icon(Icons.calendar_today_outlined, size: 14, color: AppColors.textHint),
+                        const SizedBox(width: AppSpacing.xs),
+                        Text(
+                          test.scheduledDate.toString().split(' ')[0],
+                          style: AppTextStyles.caption.copyWith(color: AppColors.textSecondary),
+                        ),
+                      ],
                     ),
                     const Spacer(),
                     if (isUpcoming)
                       CustomButton(
-                        label: "Start Test",
-                        height: 40,
+                        label: "Start Assessment",
+                        height: 44,
+                        width: 140,
                         color: typeColor,
-                        // NAVIGATION SAFETY: Using goNamed
                         onPressed: () => context.pushNamed(AppRoutes.testAttemptName, pathParameters: {'testId': test.id}),
                       ),
-                  ],
-                ),
+
                ],
             ),
           ),

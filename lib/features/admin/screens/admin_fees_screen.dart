@@ -17,6 +17,13 @@ class _AdminFeesScreenState extends State<AdminFeesScreen> {
   late List<FeeRecord> _allFeeRecords;
   String _selectedBranch = "All";
   String _searchQuery = "";
+  bool _isSubmitting = false;
+
+  void _setSubmitting(bool value) {
+    if (mounted) setState(() => _isSubmitting = value);
+  }
+
+
 
   @override
   void initState() {
@@ -269,7 +276,17 @@ class _AdminFeesScreenState extends State<AdminFeesScreen> {
                                   backgroundColor: AppColors.navyBlueSurface,
                                   padding: EdgeInsets.symmetric(horizontal: AppSpacing.lg),
                                 ),
-                                onPressed: () {
+                                onPressed: _isSubmitting ? null : () async {
+                                  _setSubmitting(true);
+                                  
+                                  // Simulate payment processing
+                                  await Future.delayed(const Duration(milliseconds: 1200));
+                                  
+                                  if (!mounted) {
+                                    _setSubmitting(false);
+                                    return;
+                                  }
+
                                   setState(() {
                                     final listIndex = record.installments.indexWhere((i) => i.id == inst.id);
                                     if (listIndex != -1) {
@@ -288,9 +305,14 @@ class _AdminFeesScreenState extends State<AdminFeesScreen> {
                                       }
                                     }
                                   });
+                                  
+                                  _setSubmitting(false);
                                   setModalState(() {});
+                                  AppSnackBar.showSuccess(context, "Payment of ₹${inst.amount.toInt()} recorded");
                                 },
-                                child: Text("Pay Now", style: AppTextStyles.labelSmall.copyWith(color: AppColors.navyBlueBase, fontWeight: FontWeight.bold)),
+                                child: _isSubmitting 
+                                  ? const SizedBox(width: 16, height: 16, child: CircularProgressIndicator(strokeWidth: 2, color: AppColors.navyBlueBase))
+                                  : Text("Pay Now", style: AppTextStyles.labelSmall.copyWith(color: AppColors.navyBlueBase, fontWeight: FontWeight.bold)),
                               ),
                           ],
                         ),

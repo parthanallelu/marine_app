@@ -20,10 +20,13 @@ class _AdminBatchesScreenState extends State<AdminBatchesScreen> {
   late Map<String, List<BatchModel>> _groupedByBranch;
   late Map<String, int> _batchStudentCounts;
   String _searchQuery = "";
+  bool _isSubmitting = false;
 
   // Controllers promoted to class members for proper disposal
   final _nameController = TextEditingController();
   final _timingController = TextEditingController();
+
+
 
   @override
   void initState() {
@@ -67,23 +70,10 @@ class _AdminBatchesScreenState extends State<AdminBatchesScreen> {
   }
 
 
-  void _showSuccessSnackbar(String message) {
-    ScaffoldMessenger.of(context).showSnackBar(
-      SnackBar(
-        content: Row(
-          children: [
-            const Icon(Icons.check_circle_rounded, color: Colors.white, size: 20),
-            SizedBox(width: AppSpacing.md),
-            Expanded(child: Text(message)),
-          ],
-        ),
-        backgroundColor: AppColors.success,
-        behavior: SnackBarBehavior.floating,
-        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(AppRadius.md)),
-        margin: EdgeInsets.all(AppSpacing.lg),
-      ),
-    );
+  void _setSubmitting(bool value) {
+    if (mounted) setState(() => _isSubmitting = value);
   }
+
 
   @override
   Widget build(BuildContext context) {
@@ -300,8 +290,16 @@ class _AdminBatchesScreenState extends State<AdminBatchesScreen> {
                         CustomButton(
                           label: "Initialize Batch",
                           width: double.infinity,
-                          onPressed: () {
+                          isLoading: _isSubmitting,
+                          onPressed: _isSubmitting ? null : () async {
                             if (formKey.currentState!.validate()) {
+                              _setSubmitting(true);
+                              
+                              // Simulate network delay
+                              await Future.delayed(const Duration(milliseconds: 800));
+                              
+                              if (!mounted) return;
+
                               final prof = DummyData.professors.firstWhere((p) => p.id == selectedProfessor);
                               final newBatch = BatchModel(
                                 id: const Uuid().v4(),
@@ -315,16 +313,22 @@ class _AdminBatchesScreenState extends State<AdminBatchesScreen> {
                                 startDate: selectedDate,
                                 studentIds: [],
                               );
-                            setState(() {
-                              _allBatches.insert(0, newBatch);
-                              DummyData.batches.insert(0, newBatch);
-                              _processBatches();
-                            });
+                              
+                              setState(() {
+                                _allBatches.insert(0, newBatch);
+                                DummyData.batches.insert(0, newBatch);
+                                _processBatches();
+                              });
+                              
+                              _setSubmitting(false);
                               Navigator.pop(context);
-                              _showSuccessSnackbar("Batch created successfully");
+                              AppSnackBar.showSuccess(context, "Batch created successfully");
+                            } else {
+                              AppSnackBar.showError(context, "Please fix the errors in the form");
                             }
                           },
                         ),
+
                         const SizedBox(height: AppSpacing.lg),
                       ],
                     ),
@@ -430,10 +434,18 @@ class _AdminBatchesScreenState extends State<AdminBatchesScreen> {
                       ),
                       const SizedBox(height: AppSpacing.xxxl),
                       CustomButton(
-                        label: "Update Batch",
+                        label: "Update Batch Configuration",
                         width: double.infinity,
-                        onPressed: () {
+                        isLoading: _isSubmitting,
+                        onPressed: _isSubmitting ? null : () async {
                           if (formKey.currentState!.validate()) {
+                            _setSubmitting(true);
+                            
+                            // Simulate network delay
+                            await Future.delayed(const Duration(milliseconds: 800));
+                            
+                            if (!mounted) return;
+
                             final prof = DummyData.professors.firstWhere((p) => p.id == selectedProfessor);
                             setState(() {
                               batch.name = _nameController.text;
@@ -448,11 +460,16 @@ class _AdminBatchesScreenState extends State<AdminBatchesScreen> {
                               }
                               _processBatches();
                             });
+                            
+                            _setSubmitting(false);
                             Navigator.pop(context);
-                            _showSuccessSnackbar("Batch updated successfully");
+                            AppSnackBar.showSuccess(context, "Batch details updated");
+                          } else {
+                            AppSnackBar.showError(context, "Please fix the errors in the form");
                           }
                         },
                       ),
+
                       const SizedBox(height: AppSpacing.lg),
                     ],
                   ),
@@ -519,15 +536,14 @@ class _AdminBatchesScreenState extends State<AdminBatchesScreen> {
                   student.batchId = '';
                   student.batchName = '';
                 }
-                _allBatches.remove(batch);
-                DummyData.batches.remove(batch);
                 _processBatches();
               });
               Navigator.pop(context);
-              _showSuccessSnackbar("Batch deleted");
+              AppSnackBar.showSuccess(context, "Batch deleted successfully");
             },
             child: const Text("Delete", style: TextStyle(color: Colors.white)),
           ),
+
         ],
       ),
     );

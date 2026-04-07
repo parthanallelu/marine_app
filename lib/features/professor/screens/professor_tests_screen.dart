@@ -20,6 +20,12 @@ class _ProfessorTestsScreenState extends State<ProfessorTestsScreen> {
   late Map<String, BatchModel> _testBatches;
   String _searchQuery = "";
   bool _isLoading = true;
+  bool _isSubmitting = false;
+
+  void _setSubmitting(bool value) {
+    if (mounted) setState(() => _isSubmitting = value);
+  }
+
 
   // Controllers promoted to class members for proper disposal
   final _titleController = TextEditingController();
@@ -70,23 +76,7 @@ class _ProfessorTestsScreenState extends State<ProfessorTestsScreen> {
   }
 
 
-  void _showSuccessSnackbar(String message) {
-    ScaffoldMessenger.of(context).showSnackBar(
-      SnackBar(
-        content: Row(
-          children: [
-            const Icon(Icons.check_circle_rounded, color: Colors.white, size: 20),
-            SizedBox(width: AppSpacing.md),
-            Expanded(child: Text("Test successfully updated")),
-          ],
-        ),
-        backgroundColor: AppColors.success,
-        behavior: SnackBarBehavior.floating,
-        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(AppRadius.md)),
-        margin: EdgeInsets.all(AppSpacing.lg),
-      ),
-    );
-  }
+
 
   @override
   Widget build(BuildContext context) {
@@ -171,10 +161,11 @@ class _ProfessorTestsScreenState extends State<ProfessorTestsScreen> {
                 _processTests();
               });
               Navigator.pop(context);
-              _showSuccessSnackbar("Test deleted successfully");
+              AppSnackBar.showSuccess(context, "Assessment deleted successfully");
             },
             child: Text("Delete", style: AppTextStyles.labelLarge.copyWith(color: Colors.white)),
           ),
+
         ],
       ),
     );
@@ -303,8 +294,16 @@ class _ProfessorTestsScreenState extends State<ProfessorTestsScreen> {
                         CustomButton(
                           label: "Publish Assessment",
                           width: double.infinity,
-                          onPressed: () {
+                          isLoading: _isSubmitting,
+                          onPressed: _isSubmitting ? null : () async {
                             if (formKey.currentState!.validate()) {
+                              _setSubmitting(true);
+                              
+                              // Simulate network delay
+                              await Future.delayed(const Duration(milliseconds: 1000));
+                              
+                              if (!mounted) return;
+
                               final newTest = TestModel(
                                 id: const Uuid().v4(),
                                 title: _titleController.text,
@@ -318,16 +317,22 @@ class _ProfessorTestsScreenState extends State<ProfessorTestsScreen> {
                                 totalMarks: double.tryParse(_marksController.text) ?? 0.0,
                                 passingMarks: (double.tryParse(_marksController.text) ?? 0.0) * 0.4,
                               );
+                              
                               setState(() {
                                 _allTests.insert(0, newTest);
                                 DummyData.tests.insert(0, newTest);
                                 _processTests();
                               });
+                              
+                              _setSubmitting(false);
                               Navigator.pop(context);
-                              _showSuccessSnackbar("Test scheduled successfully");
+                              AppSnackBar.showSuccess(context, "Test scheduled successfully");
+                            } else {
+                              AppSnackBar.showError(context, "Please fix the errors in the form");
                             }
                           },
                         ),
+
                         SizedBox(height: AppSpacing.lg),
                       ],
                     ),

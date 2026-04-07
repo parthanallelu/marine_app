@@ -213,14 +213,9 @@ class _StudentHomeScreenState extends State<StudentHomeScreen> {
                   color: AppColors.course12th,
                   onTap: () => context.pushNamed(AppRoutes.studentFeesName),
                 ),
-                QuickActionTile(
-                  label: "Schedule",
-                  icon: Icons.schedule_rounded,
-                  color: AppColors.oceanBlue,
-                  onTap: () => ScaffoldMessenger.of(context).showSnackBar(
-                    const SnackBar(content: Text("Schedule feature coming soon!")),
-                  ),
+                  onTap: () => AppSnackBar.showInfo(context, "Schedule feature coming soon!"),
                 ),
+
                 QuickActionTile(
                   label: "Notice Board",
                   icon: Icons.announcement_rounded,
@@ -458,6 +453,4 @@ class _StudentHeader extends StatelessWidget {
       ),
     );
   }
-}
-
 }

@@ -294,14 +294,16 @@ class CustomButton extends StatelessWidget {
           )
         : Row(
             mainAxisSize: MainAxisSize.min,
+            mainAxisAlignment: MainAxisAlignment.center,
             children: [
               if (icon != null) ...[
                 Icon(icon, size: 20),
-                const SizedBox(width: 8),
+                const SizedBox(width: AppSpacing.sm),
               ],
-              Text(label),
+              Text(label, style: const TextStyle(fontWeight: FontWeight.w600)),
             ],
           );
+
 
     return SizedBox(
       width: width,
@@ -648,6 +650,84 @@ class PriorityTag extends StatelessWidget {
 }
 
 // ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+// AppSnackBar
+// ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+class AppSnackBar {
+  static void showSuccess(BuildContext context, String message) {
+    ScaffoldMessenger.of(context).showSnackBar(
+      SnackBar(
+        content: Row(
+          children: [
+            const Icon(Icons.check_circle_rounded, color: Colors.white, size: 20),
+            const SizedBox(width: AppSpacing.md),
+            Expanded(
+              child: Text(
+                message,
+                style: AppTextStyles.labelMedium.copyWith(color: Colors.white),
+              ),
+            ),
+          ],
+        ),
+        backgroundColor: AppColors.success,
+        behavior: SnackBarBehavior.floating,
+        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(AppRadius.md)),
+        margin: const EdgeInsets.all(AppSpacing.lg),
+        duration: const Duration(seconds: 3),
+      ),
+    );
+  }
+
+  static void showError(BuildContext context, String message) {
+    ScaffoldMessenger.of(context).showSnackBar(
+      SnackBar(
+        content: Row(
+          children: [
+            const Icon(Icons.error_outline_rounded, color: Colors.white, size: 20),
+            const SizedBox(width: AppSpacing.md),
+            Expanded(
+              child: Text(
+                message,
+                style: AppTextStyles.labelMedium.copyWith(color: Colors.white),
+              ),
+            ),
+          ],
+        ),
+        backgroundColor: AppColors.error,
+        behavior: SnackBarBehavior.floating,
+        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(AppRadius.md)),
+        margin: const EdgeInsets.all(AppSpacing.lg),
+        duration: const Duration(seconds: 4),
+      ),
+    );
+  }
+
+  static void showInfo(BuildContext context, String message) {
+    ScaffoldMessenger.of(context).showSnackBar(
+      SnackBar(
+        content: Row(
+          children: [
+            const Icon(Icons.info_outline_rounded, color: Colors.white, size: 20),
+            const SizedBox(width: AppSpacing.md),
+            Expanded(
+              child: Text(
+                message,
+                style: AppTextStyles.labelMedium.copyWith(color: Colors.white),
+              ),
+            ),
+          ],
+        ),
+        backgroundColor: AppColors.navyBlueBase,
+        behavior: SnackBarBehavior.floating,
+        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(AppRadius.md)),
+        margin: const EdgeInsets.all(AppSpacing.lg),
+      ),
+    );
+  }
+}
+
+
+// ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 // CustomTextField
 // ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 
@@ -659,9 +739,12 @@ class CustomTextField extends StatelessWidget {
   final IconData? prefixIcon;
   final Widget? suffixIcon;
   final TextInputType keyboardType;
+  final TextInputAction textInputAction;
   final String? Function(String?)? validator;
   final Function(String)? onChanged;
+  final Function(String)? onFieldSubmitted;
   final int maxLines;
+  final FocusNode? focusNode;
 
   const CustomTextField({
     super.key,
@@ -672,10 +755,14 @@ class CustomTextField extends StatelessWidget {
     this.prefixIcon,
     this.suffixIcon,
     this.keyboardType = TextInputType.text,
+    this.textInputAction = TextInputAction.next,
     this.validator,
     this.onChanged,
+    this.onFieldSubmitted,
     this.maxLines = 1,
+    this.focusNode,
   });
+
 
   @override
   Widget build(BuildContext context) {
@@ -690,15 +777,22 @@ class CustomTextField extends StatelessWidget {
           controller: controller,
           obscureText: isPassword,
           keyboardType: keyboardType,
+          textInputAction: textInputAction,
           validator: validator,
           onChanged: onChanged,
+          onFieldSubmitted: onFieldSubmitted,
           maxLines: maxLines,
+          focusNode: focusNode,
+          style: AppTextStyles.bodyLarge,
           decoration: InputDecoration(
             hintText: hintText,
+            hintStyle: AppTextStyles.bodyMedium.copyWith(color: AppColors.textHint),
             prefixIcon: prefixIcon != null ? Icon(prefixIcon, color: AppColors.textHint, size: 20) : null,
             suffixIcon: suffixIcon,
+            contentPadding: const EdgeInsets.symmetric(horizontal: AppSpacing.lg, vertical: AppSpacing.md),
           ),
         ),
+
       ],
     );
   }

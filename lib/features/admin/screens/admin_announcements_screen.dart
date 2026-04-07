@@ -16,6 +16,13 @@ class AdminAnnouncementsScreen extends StatefulWidget {
 class _AdminAnnouncementsScreenState extends State<AdminAnnouncementsScreen> {
   late List<AnnouncementModel> _allAnnouncements;
   String _selectedBranch = "All";
+  bool _isSubmitting = false;
+
+  void _setSubmitting(bool value) {
+    if (mounted) setState(() => _isSubmitting = value);
+  }
+
+
 
   @override
   void initState() {
@@ -208,8 +215,16 @@ class _AdminAnnouncementsScreenState extends State<AdminAnnouncementsScreen> {
                         CustomButton(
                           label: "PUBLISH BROADCAST",
                           width: double.infinity,
-                          onPressed: () {
+                          isLoading: _isSubmitting,
+                          onPressed: _isSubmitting ? null : () async {
                             if (formKey.currentState!.validate()) {
+                              _setSubmitting(true);
+                              
+                              // Simulate network delay
+                              await Future.delayed(const Duration(milliseconds: 800));
+                              
+                              if (!mounted) return;
+
                               final newNotice = AnnouncementModel(
                                 id: const Uuid().v4(),
                                 title: titleController.text,
@@ -222,28 +237,21 @@ class _AdminAnnouncementsScreenState extends State<AdminAnnouncementsScreen> {
                                 priority: selectedPriority,
                                 isPinned: isPinned,
                               );
+                              
                               setState(() {
                                 _allAnnouncements.insert(0, newNotice);
+                                DummyData.announcements.insert(0, newNotice);
                               });
+                              
+                              _setSubmitting(false);
                               Navigator.pop(context);
-                              ScaffoldMessenger.of(context).showSnackBar(
-                                SnackBar(
-                                  content: Row(
-                                    children: [
-                                      const Icon(Icons.check_circle_rounded, color: Colors.white, size: 20),
-                                      SizedBox(width: AppSpacing.md),
-                                      const Text("Notice published successfully"),
-                                    ],
-                                  ),
-                                  backgroundColor: AppColors.success,
-                                  behavior: SnackBarBehavior.floating,
-                                  shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(AppRadius.md)),
-                                  margin: EdgeInsets.all(AppSpacing.lg),
-                                ),
-                              );
+                              AppSnackBar.showSuccess(context, "Notice published successfully");
+                            } else {
+                              AppSnackBar.showError(context, "Please fix the errors in the form");
                             }
                           },
                         ),
+
                         SizedBox(height: AppSpacing.lg),
                       ],
                     ),
@@ -273,28 +281,14 @@ class _AdminAnnouncementsScreenState extends State<AdminAnnouncementsScreen> {
             style: ElevatedButton.styleFrom(backgroundColor: AppColors.error),
             onPressed: () {
               setState(() {
-                _allAnnouncements.remove(announcement);
-                DummyData.announcements.remove(announcement);
+              DummyData.announcements.remove(announcement);
               });
               Navigator.pop(context);
-              ScaffoldMessenger.of(context).showSnackBar(
-                SnackBar(
-                  content: const Row(
-                    children: [
-                      Icon(Icons.check_circle_rounded, color: Colors.white, size: 20),
-                      SizedBox(width: AppSpacing.md),
-                      Text("Announcement deleted"),
-                    ],
-                  ),
-                  backgroundColor: AppColors.success,
-                  behavior: SnackBarBehavior.floating,
-                  shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(AppRadius.md)),
-                  margin: EdgeInsets.all(AppSpacing.lg),
-                ),
-              );
+              AppSnackBar.showSuccess(context, "Announcement deleted successfully");
             },
             child: const Text("Delete", style: TextStyle(color: Colors.white)),
           ),
+
         ],
       ),
     );

@@ -16,9 +16,9 @@ class AdminStudentsScreen extends StatefulWidget {
 class _AdminStudentsScreenState extends State<AdminStudentsScreen> {
   late List<StudentModel> _allStudents;
   late List<StudentModel> _filteredStudents;
-  String _searchQuery = "";
-  String _selectedBranch = "All";
   String _selectedCourse = "All";
+  bool _isSubmitting = false;
+
 
   // Controllers promoted to class members for proper disposal
   final _nameController = TextEditingController();
@@ -61,24 +61,34 @@ class _AdminStudentsScreenState extends State<AdminStudentsScreen> {
   }
 
 
-  void _showSuccessSnackbar(String message) {
-    ScaffoldMessenger.of(context).showSnackBar(
-      SnackBar(
-        content: Row(
-          children: [
-            const Icon(Icons.check_circle_rounded, color: Colors.white, size: 20),
-            const SizedBox(width: AppSpacing.md),
-            Expanded(child: Text(message)),
-          ],
+  void _setSubmitting(bool value) {
+    if (mounted) setState(() => _isSubmitting = value);
+  }
 
-        ),
-        backgroundColor: AppColors.success,
-        behavior: SnackBarBehavior.floating,
-        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(AppRadius.md)),
-        margin: EdgeInsets.all(AppSpacing.lg),
+  void _confirmDeleteStudent(StudentModel student) {
+    showDialog(
+      context: context,
+      builder: (context) => AlertDialog(
+        title: const Text("Delete Student"),
+        content: Text("Are you sure you want to delete ${student.name}?"),
+        actions: [
+          TextButton(onPressed: () => Navigator.pop(context), child: const Text("Cancel")),
+          TextButton(
+            onPressed: () {
+              setState(() {
+                _allStudents.removeWhere((s) => s.id == student.id);
+                _applyFilters();
+              });
+              Navigator.pop(context);
+              AppSnackBar.show(context, "Student deleted successfully", isError: false);
+            },
+            child: const Text("Delete", style: TextStyle(color: Colors.red)),
+          ),
+        ],
       ),
     );
   }
+
 
   @override
   Widget build(BuildContext context) {
@@ -329,33 +339,47 @@ class _AdminStudentsScreenState extends State<AdminStudentsScreen> {
                       CustomButton(
                         label: "Add Student to Records",
                         width: double.infinity,
-                        onPressed: () {
+                        isLoading: _isSubmitting,
+                        onPressed: _isSubmitting ? null : () async {
                           if (formKey.currentState!.validate()) {
-                              final newStudent = StudentModel(
-                                id: const Uuid().v4(),
-                                name: _nameController.text,
-                                email: _emailController.text,
-                                phone: _phoneController.text,
-                                parentPhone: _parentPhoneController.text,
-                                role: AppConstants.roleStudent,
-                                branch: selectedBranch!,
-                                courseType: selectedCourse!,
-                                rollNumber: _rollController.text,
-                                batchId: "",
-                                batchName: "",
-                                createdAt: DateTime.now(),
-                                joiningDate: DateTime.now(),
-                                targetCompany: _targetCompanyController.text,
-                              );
+                            _setSubmitting(true);
+                            
+                            // Simulate network delay for demo feel
+                            await Future.delayed(const Duration(milliseconds: 800));
+                            
+                            if (!mounted) return;
+
+                            final newStudent = StudentModel(
+                              id: const Uuid().v4(),
+                              name: _nameController.text,
+                              email: _emailController.text,
+                              phone: _phoneController.text,
+                              parentPhone: _parentPhoneController.text,
+                              role: AppConstants.roleStudent,
+                              branch: selectedBranch!,
+                              courseType: selectedCourse!,
+                              rollNumber: _rollController.text,
+                              batchId: "",
+                              batchName: "",
+                              createdAt: DateTime.now(),
+                              joiningDate: DateTime.now(),
+                              targetCompany: _targetCompanyController.text,
+                            );
+                            
                             setState(() {
                               _allStudents.insert(0, newStudent);
                               _applyFilters();
                             });
+                            
+                            _setSubmitting(false);
                             Navigator.pop(context);
-                            _showSuccessSnackbar("Student enrolled successfully");
+                            AppSnackBar.showSuccess(context, "Student enrolled successfully");
+                          } else {
+                            AppSnackBar.showError(context, "Please fix the errors in the form");
                           }
                         },
                       ),
+
                       const SizedBox(height: AppSpacing.lg),
                     ],
                   ),
@@ -494,33 +518,46 @@ class _AdminStudentsScreenState extends State<AdminStudentsScreen> {
                       const SizedBox(height: AppSpacing.lg),
                       DropdownButtonFormField<String>(
                         decoration: const InputDecoration(labelText: "Course Type", prefixIcon: Icon(Icons.school_outlined, size: 20)),
-                        initialValue: selectedCourse,
+                        value: selectedCourse,
                         items: AppConstants.courseTypes.map((c) => DropdownMenuItem(value: c, child: Text(c))).toList(),
                         onChanged: (val) => selectedCourse = val!,
                         validator: (v) => v == null ? "Required" : null,
                       ),
                       const SizedBox(height: AppSpacing.xxxl),
                       CustomButton(
-                        label: "Save Changes",
+                        label: "Update Student Information",
                         width: double.infinity,
-                        onPressed: () {
+                        isLoading: _isSubmitting,
+                        onPressed: _isSubmitting ? null : () async {
                           if (formKey.currentState!.validate()) {
+                            _setSubmitting(true);
+                            
+                            // Simulate network delay
+                            await Future.delayed(const Duration(milliseconds: 800));
+                            
+                            if (!mounted) return;
+
                             setState(() {
                               student.name = _nameController.text;
                               student.email = _emailController.text;
                               student.phone = _phoneController.text;
                               student.rollNumber = _rollController.text;
-                              student.courseType = selectedCourse;
-                              student.branch = selectedBranch;
                               student.parentPhone = _parentPhoneController.text;
                               student.targetCompany = _targetCompanyController.text;
+                              student.branch = selectedBranch;
+                              student.courseType = selectedCourse;
                               _applyFilters();
                             });
+                            
+                            _setSubmitting(false);
                             Navigator.pop(context);
-                            _showSuccessSnackbar("Student updated successfully");
+                            AppSnackBar.showSuccess(context, "Student records updated");
+                          } else {
+                            AppSnackBar.showError(context, "Please fix the errors before saving");
                           }
                         },
                       ),
+
                       const SizedBox(height: AppSpacing.lg),
                     ],
                   ),
@@ -560,10 +597,11 @@ class _AdminStudentsScreenState extends State<AdminStudentsScreen> {
                 _applyFilters();
               });
               Navigator.pop(context);
-              _showSuccessSnackbar("Student deleted");
+              AppSnackBar.showSuccess(context, "Student deleted");
             },
             child: Text("Delete", style: AppTextStyles.labelLarge.copyWith(color: Colors.white)),
           ),
+
         ],
       ),
     );
