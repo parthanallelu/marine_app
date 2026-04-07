@@ -110,22 +110,23 @@ class _ProfessorHomeScreenState extends State<ProfessorHomeScreen> {
           ),
           SliverToBoxAdapter(
             child: Padding(
-              padding: EdgeInsets.all(AppSpacing.lg),
+              padding: const EdgeInsets.all(AppSpacing.lg),
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
                   _buildStatsGrid(professor),
-                  SizedBox(height: AppSpacing.xxl),
+                  const SizedBox(height: AppSpacing.xxl),
                   _buildQuickActions(context),
-                  SizedBox(height: AppSpacing.xxl),
+                  const SizedBox(height: AppSpacing.xxl),
                   _buildTodaySchedule(context),
-                  SizedBox(height: AppSpacing.xxl),
+                  const SizedBox(height: AppSpacing.xxl),
                   _buildMyBatches(),
-                  SizedBox(height: AppSpacing.xxxl),
+                  const SizedBox(height: AppSpacing.xxxl),
                 ],
               ),
             ),
           ),
+
         ],
       ),
     );
@@ -166,7 +167,8 @@ class _ProfessorHomeScreenState extends State<ProfessorHomeScreen> {
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
         const SectionHeader(title: 'Quick Actions'),
-        SizedBox(height: AppSpacing.md),
+        const SizedBox(height: AppSpacing.md),
+
         GridView.count(
           crossAxisCount: 3,
           shrinkWrap: true,
@@ -212,7 +214,8 @@ class _ProfessorHomeScreenState extends State<ProfessorHomeScreen> {
             ),
           ],
         ),
-        SizedBox(height: AppSpacing.md),
+        const SizedBox(height: AppSpacing.md),
+
         if (_todaysClasses.isEmpty)
           const EmptyState(
             icon: Icons.calendar_today_outlined,
@@ -221,8 +224,9 @@ class _ProfessorHomeScreenState extends State<ProfessorHomeScreen> {
           )
         else
           ..._todaysClasses.map((batch) => Padding(
-                padding: EdgeInsets.only(bottom: AppSpacing.md),
+                padding: const EdgeInsets.only(bottom: AppSpacing.md),
                 child: BatchCard(
+
                   name: batch.name,
                   courseType: batch.courseType,
                   timing: batch.timing,
@@ -241,7 +245,8 @@ class _ProfessorHomeScreenState extends State<ProfessorHomeScreen> {
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
         const SectionHeader(title: 'My Batches'),
-        SizedBox(height: AppSpacing.md),
+        const SizedBox(height: AppSpacing.md),
+
         if (_assignedBatches.isEmpty)
           const EmptyState(
             icon: Icons.class_outlined,
@@ -256,7 +261,7 @@ class _ProfessorHomeScreenState extends State<ProfessorHomeScreen> {
             itemBuilder: (context, index) {
               final batch = _assignedBatches[index];
               return Padding(
-                padding: EdgeInsets.only(bottom: AppSpacing.md),
+                padding: const EdgeInsets.only(bottom: AppSpacing.md),
                 child: BatchCard(
                   name: batch.name,
                   courseType: batch.courseType,
@@ -269,6 +274,7 @@ class _ProfessorHomeScreenState extends State<ProfessorHomeScreen> {
                 ),
               );
             },
+
           ),
       ],
     );
@@ -289,17 +295,18 @@ class _ProfessorHomeScreenState extends State<ProfessorHomeScreen> {
         expand: false,
         builder: (context, scrollController) => Column(
           children: [
-            SizedBox(height: AppSpacing.md),
+            const SizedBox(height: AppSpacing.md),
             Container(width: 40, height: 4, decoration: BoxDecoration(color: AppColors.navyBlueSurface, borderRadius: BorderRadius.circular(AppRadius.xs))),
-            SizedBox(height: AppSpacing.lg),
+            const SizedBox(height: AppSpacing.lg),
             Padding(
-              padding: EdgeInsets.symmetric(horizontal: AppSpacing.xl),
-              child: Text('Assigned Students', style: AppTextStyles.headingSmall),
+              padding: const EdgeInsets.symmetric(horizontal: AppSpacing.xl),
+              child: const Text('Assigned Students', style: AppTextStyles.headingSmall),
             ),
-            SizedBox(height: AppSpacing.xl),
+            const SizedBox(height: AppSpacing.xl),
             if (students.isEmpty)
               const Expanded(
                 child: EmptyState(
+
                   icon: Icons.person_off_rounded,
                   title: 'No Students Found',
                   subtitle: 'You are not connected to any students yet.',
@@ -309,9 +316,10 @@ class _ProfessorHomeScreenState extends State<ProfessorHomeScreen> {
               Expanded(
                 child: ListView.builder(
                   controller: scrollController,
-                  padding: EdgeInsets.symmetric(horizontal: AppSpacing.xl),
+                  padding: const EdgeInsets.symmetric(horizontal: AppSpacing.xl),
                   itemCount: students.length,
                   itemBuilder: (context, index) {
+
                     final student = students[index];
                     return StudentTile(
                       name: student.name,

@@ -112,14 +112,16 @@ class _BatchStudentsScreenState extends State<BatchStudentsScreen> {
                     subtitle: "Assign students to this batch",
                   )
                 : ListView.builder(
-                    padding: EdgeInsets.all(AppSpacing.lg),
+                    padding: const EdgeInsets.all(AppSpacing.lg),
                     itemCount: _batchStudents.length,
                     itemBuilder: (context, index) {
+
                       final student = _batchStudents[index];
                       return Container(
-                        margin: EdgeInsets.only(bottom: AppSpacing.sm),
-                        padding: EdgeInsets.all(AppSpacing.md),
+                        margin: const EdgeInsets.only(bottom: AppSpacing.sm),
+                        padding: const EdgeInsets.all(AppSpacing.md),
                         decoration: BoxDecoration(
+
                           color: Colors.white,
                           borderRadius: BorderRadius.circular(AppRadius.md),
                           boxShadow: AppShadows.subtle,
@@ -133,21 +135,23 @@ class _BatchStudentsScreenState extends State<BatchStudentsScreen> {
                                 style: const TextStyle(fontWeight: FontWeight.bold, color: AppColors.navyBlueBase),
                               ),
                              ),
-                            SizedBox(width: AppSpacing.lg),
+                            const SizedBox(width: AppSpacing.lg),
                             Expanded(
+
                               child: Column(
                                 crossAxisAlignment: CrossAxisAlignment.start,
                                 children: [
                                   Text(student.name, style: AppTextStyles.labelLarge),
                                   Text(student.rollNumber.isEmpty ? 'No roll number' : student.rollNumber, style: AppTextStyles.caption),
-                                  SizedBox(height: AppSpacing.xs),
+                                  const SizedBox(height: AppSpacing.xs),
                                   Row(
                                     children: [
                                       CourseBadge(courseType: student.courseType),
-                                      SizedBox(width: AppSpacing.sm),
+                                      const SizedBox(width: AppSpacing.sm),
                                       BranchBadge(branch: student.branch),
                                     ],
                                   ),
+
                                 ],
                               ),
                             ),
@@ -162,9 +166,10 @@ class _BatchStudentsScreenState extends State<BatchStudentsScreen> {
                   ),
           ),
           Container(
-            padding: EdgeInsets.all(AppSpacing.lg),
+            padding: const EdgeInsets.all(AppSpacing.lg),
             decoration: const BoxDecoration(
               color: Colors.white,
+
               boxShadow: [BoxShadow(color: Colors.black12, blurRadius: 10, offset: Offset(0, -2))],
             ),
             child: CustomButton(
@@ -235,18 +240,19 @@ class _AddStudentsSheetState extends State<_AddStudentsSheet> {
               Container(
                 width: 40,
                 height: 4,
-                margin: EdgeInsets.symmetric(vertical: AppSpacing.md),
+                margin: const EdgeInsets.symmetric(vertical: AppSpacing.md),
                 decoration: BoxDecoration(
+
                   color: AppColors.divider,
                   borderRadius: BorderRadius.circular(AppRadius.xs),
                 ),
               ),
               Padding(
-                padding: EdgeInsets.symmetric(horizontal: AppSpacing.xl, vertical: AppSpacing.sm),
+                padding: const EdgeInsets.symmetric(horizontal: AppSpacing.xl, vertical: AppSpacing.sm),
                 child: Row(
                   mainAxisAlignment: MainAxisAlignment.spaceBetween,
                   children: [
-                    Text("Assign Students", style: AppTextStyles.headingMedium),
+                    const Text("Assign Students", style: AppTextStyles.headingMedium),
                     IconButton(
                       icon: const Icon(Icons.close),
                       onPressed: () => Navigator.pop(context),
@@ -254,8 +260,9 @@ class _AddStudentsSheetState extends State<_AddStudentsSheet> {
                   ],
                 ),
               ),
+
               Padding(
-                padding: EdgeInsets.symmetric(horizontal: AppSpacing.xl),
+                padding: const EdgeInsets.symmetric(horizontal: AppSpacing.xl),
                 child: CustomTextField(
                   hintText: "Search studens...",
                   prefixIcon: Icons.search,
@@ -267,12 +274,14 @@ class _AddStudentsSheetState extends State<_AddStudentsSheet> {
                   },
                 ),
               ),
-              SizedBox(height: AppSpacing.lg),
+
+              const SizedBox(height: AppSpacing.lg),
               Expanded(
                 child: ListView.builder(
                   controller: scrollController,
-                  padding: EdgeInsets.symmetric(horizontal: AppSpacing.lg),
+                  padding: const EdgeInsets.symmetric(horizontal: AppSpacing.lg),
                   itemCount: _filteredStudents.length,
+
                   itemBuilder: (context, index) {
                     final student = _filteredStudents[index];
                     return CheckboxListTile(
@@ -306,11 +315,12 @@ class _AddStudentsSheetState extends State<_AddStudentsSheet> {
                 ),
               ),
               Container(
-                padding: EdgeInsets.all(AppSpacing.xl),
+                padding: const EdgeInsets.all(AppSpacing.xl),
                 decoration: const BoxDecoration(
                   color: Colors.white,
                   boxShadow: [BoxShadow(color: Colors.black12, blurRadius: 10, offset: Offset(0, -2))],
                 ),
+
                 child: CustomButton(
                   label: "Assign Selected (${_selectedStudents.length})",
                   width: double.infinity,

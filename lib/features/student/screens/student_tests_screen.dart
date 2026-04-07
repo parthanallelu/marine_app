@@ -89,7 +89,7 @@ class _StudentTestsScreenState extends State<StudentTestsScreen> with SingleTick
               child: Column(
                 children: [
                   Padding(
-                    padding: EdgeInsets.fromLTRB(AppSpacing.lg, AppSpacing.md, AppSpacing.lg, AppSpacing.sm),
+                    padding: const EdgeInsets.fromLTRB(AppSpacing.lg, AppSpacing.md, AppSpacing.lg, AppSpacing.sm),
                     child: Row(
                       children: [
                         Text(
@@ -99,6 +99,7 @@ class _StudentTestsScreenState extends State<StudentTestsScreen> with SingleTick
                       ],
                     ),
                   ),
+
                   TabBar(
                     controller: _tabController,
                     indicatorColor: AppColors.gold,
@@ -149,13 +150,14 @@ class _TestList extends StatelessWidget {
 
     // LIST PERFORMANCE: Using ListView.builder for dynamic lists
     return ListView.builder(
-      padding: EdgeInsets.all(AppSpacing.lg),
+      padding: const EdgeInsets.all(AppSpacing.lg),
       itemCount: tests.length,
       itemBuilder: (context, index) {
         final test = tests[index];
         return _TestCard(test: test, isUpcoming: isUpcoming);
       },
     );
+
   }
 }
 
@@ -191,12 +193,13 @@ class _TestCard extends StatelessWidget {
     }
 
     return Container(
-      margin: EdgeInsets.only(bottom: AppSpacing.lg),
+      margin: const EdgeInsets.only(bottom: AppSpacing.lg),
       decoration: BoxDecoration(
         color: Colors.white,
         borderRadius: AppRadius.cardRadius,
         boxShadow: AppShadows.card,
       ),
+
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
@@ -208,10 +211,11 @@ class _TestCard extends StatelessWidget {
             ),
           ),
           Padding(
-            padding: EdgeInsets.all(AppSpacing.lg),
+            padding: const EdgeInsets.all(AppSpacing.lg),
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
+
                 Row(
                   children: [
                     Container(
@@ -242,23 +246,25 @@ class _TestCard extends StatelessWidget {
                     ],
                   ],
                 ),
-                SizedBox(height: AppSpacing.md),
+                const SizedBox(height: AppSpacing.md),
                 Text(test.title, style: AppTextStyles.headingSmall),
-                SizedBox(height: AppSpacing.lg),
+                const SizedBox(height: AppSpacing.lg),
                 Row(
                   children: [
                     _MetaChip(icon: Icons.help_outline, label: "${test.questions.length} Qns"),
-                    SizedBox(width: AppSpacing.sm),
+                    const SizedBox(width: AppSpacing.sm),
                     _MetaChip(icon: Icons.timer_outlined, label: "${test.durationMinutes}m"),
-                    SizedBox(width: AppSpacing.sm),
+                    const SizedBox(width: AppSpacing.sm),
                     _MetaChip(icon: Icons.stars_rounded, label: "${test.totalMarks.toInt()} Marks"),
                   ],
                 ),
-                SizedBox(height: AppSpacing.lg),
+                const SizedBox(height: AppSpacing.lg),
+
                 Row(
                   children: [
                     const Icon(Icons.event_note, size: 16, color: AppColors.textHint),
-                    SizedBox(width: AppSpacing.xs),
+                    const SizedBox(width: AppSpacing.xs),
+
                     Text(
                       test.scheduledDate.toString().split(' ')[0],
                       style: AppTextStyles.caption.copyWith(color: AppColors.textSecondary),
@@ -291,7 +297,7 @@ class _MetaChip extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Container(
-        padding: EdgeInsets.symmetric(horizontal: AppSpacing.sm, vertical: AppSpacing.xs),
+        padding: const EdgeInsets.symmetric(horizontal: AppSpacing.sm, vertical: AppSpacing.xs),
         decoration: BoxDecoration(
           color: AppColors.background,
           borderRadius: BorderRadius.circular(AppRadius.sm),
@@ -322,13 +328,14 @@ class _ResultList extends StatelessWidget {
     }
 
     return ListView.builder(
-      padding: EdgeInsets.all(AppSpacing.lg),
+      padding: const EdgeInsets.all(AppSpacing.lg),
       itemCount: results.length,
       itemBuilder: (context, index) {
         final result = results[index];
         return _ResultCard(result: result);
       },
     );
+
   }
 }
 
@@ -345,13 +352,14 @@ class _ResultCard extends StatelessWidget {
     return GestureDetector(
       onTap: () => context.pushNamed(AppRoutes.testResultName, pathParameters: {'resultId': result.id}),
       child: Container(
-        margin: EdgeInsets.only(bottom: AppSpacing.lg),
-        padding: EdgeInsets.all(AppSpacing.lg),
+        margin: const EdgeInsets.only(bottom: AppSpacing.lg),
+        padding: const EdgeInsets.all(AppSpacing.lg),
         decoration: BoxDecoration(
           color: Colors.white,
           borderRadius: AppRadius.cardRadius,
           boxShadow: AppShadows.card,
         ),
+
         child: Row(
           children: [
             Container(
@@ -367,7 +375,8 @@ class _ResultCard extends StatelessWidget {
                 style: AppTextStyles.headingMedium.copyWith(color: color, fontWeight: FontWeight.bold),
               ),
             ),
-            SizedBox(width: AppSpacing.lg),
+            const SizedBox(width: AppSpacing.lg),
+
             Expanded(
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
@@ -386,11 +395,12 @@ class _ResultCard extends StatelessWidget {
               ),
             ),
             Container(
-              padding: EdgeInsets.symmetric(horizontal: AppSpacing.sm, vertical: AppSpacing.xs),
+              padding: const EdgeInsets.symmetric(horizontal: AppSpacing.sm, vertical: AppSpacing.xs),
               decoration: BoxDecoration(
                 color: bgColor,
                 borderRadius: BorderRadius.circular(AppRadius.xxl),
               ),
+
               child: Text(
                 hasPassed ? "PASSED" : "FAILED",
                 style: AppTextStyles.labelSmall.copyWith(color: color, fontWeight: FontWeight.bold, fontSize: 10),

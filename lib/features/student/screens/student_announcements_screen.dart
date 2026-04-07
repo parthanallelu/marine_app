@@ -65,11 +65,12 @@ class _AnnouncementsScreenState extends State<AnnouncementsScreen> {
     return Scaffold(
       backgroundColor: AppColors.background,
       appBar: AppBar(
-        title: Text("Notice Board", style: AppTextStyles.headingMedium),
+        title: const Text("Notice Board", style: AppTextStyles.headingMedium),
         backgroundColor: Colors.white,
         elevation: 0,
         foregroundColor: AppColors.navyBlueBase,
       ),
+
       body: _announcements.isEmpty
           ? const EmptyState(
               icon: Icons.campaign_rounded,
@@ -77,29 +78,31 @@ class _AnnouncementsScreenState extends State<AnnouncementsScreen> {
               subtitle: "All important notices will appear here.",
             )
           : ListView.builder(
-              padding: EdgeInsets.all(AppSpacing.lg),
+              padding: const EdgeInsets.all(AppSpacing.lg),
               itemCount: _announcements.length,
               itemBuilder: (context, index) {
                 final announcement = _announcements[index];
+
                 final isHigh = announcement.priority.toLowerCase() == 'high';
                 final color = isHigh ? AppColors.error : AppColors.warning;
                 final bgColor = isHigh ? AppColors.errorSurface : AppColors.warningSurface;
 
                 return Container(
-                  margin: EdgeInsets.only(bottom: AppSpacing.lg),
-                  padding: EdgeInsets.all(AppSpacing.xl),
+                  margin: const EdgeInsets.only(bottom: AppSpacing.lg),
+                  padding: const EdgeInsets.all(AppSpacing.xl),
                   decoration: BoxDecoration(
                     color: Colors.white,
                     borderRadius: AppRadius.cardRadius,
                     boxShadow: AppShadows.card,
                   ),
+
                   child: Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
                       Row(
                         children: [
                           Container(
-                            padding: EdgeInsets.all(AppSpacing.md),
+                            padding: const EdgeInsets.all(AppSpacing.md),
                             decoration: BoxDecoration(
                               color: bgColor,
                               borderRadius: BorderRadius.circular(AppRadius.md),
@@ -110,6 +113,7 @@ class _AnnouncementsScreenState extends State<AnnouncementsScreen> {
                               size: 20,
                             ),
                           ),
+
                           const SizedBox(width: AppSpacing.md),
                           Expanded(
                             child: Column(

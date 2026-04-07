@@ -76,205 +76,215 @@ class _StudentProfileScreenState extends State<StudentProfileScreen> {
       backgroundColor: AppColors.background,
       body: CustomScrollView(
         slivers: [
-          // SLIVER 1 — Profile header
-          SliverToBoxAdapter(
-            child: Container(
-              width: double.infinity,
-              decoration: const BoxDecoration(
-                gradient: LinearGradient(
-                  colors: [AppColors.navyBlueDark, AppColors.navyBlueBase],
-                  begin: Alignment.topLeft,
-                  end: Alignment.bottomRight,
-                ),
-              ),
-              child: SafeArea(
-                child: Padding(
-                  padding: EdgeInsets.fromLTRB(AppSpacing.xl, AppSpacing.lg, AppSpacing.xl, AppSpacing.xxl),
-                  child: Column(
-                    children: [
-                      CircleAvatar(
-                        radius: 40,
-                        backgroundColor: AppColors.gold.withAlpha((0.25 * 255).round()),
-                        child: Text(
-                          student.name[0],
-                          style: AppTextStyles.headingLarge.copyWith(color: AppColors.gold, fontSize: 32),
-                        ),
-                      ),
-                      SizedBox(height: AppSpacing.md),
-                      Text(
-                        student.name,
-                        style: AppTextStyles.headingMedium.copyWith(color: Colors.white),
-                        textAlign: TextAlign.center,
-                      ),
-                      Text(
-                        "Roll No: ${student.rollNumber}",
-                        style: AppTextStyles.bodySmall.copyWith(color: Colors.white54),
-                      ),
-                      SizedBox(height: AppSpacing.md),
-                      Row(
-                        mainAxisAlignment: MainAxisAlignment.center,
-                        children: [
-                          CourseBadge(courseType: student.courseType),
-                          SizedBox(width: AppSpacing.sm),
-                          BranchBadge(branch: student.branch),
-                        ],
-                      ),
-                    ],
-                  ),
-                ),
-              ),
-            ),
-          ),
-
-          // SLIVER 2 — Floating stats card
-          SliverToBoxAdapter(
-            child: Transform.translate(
-              offset: const Offset(0, -16),
-              child: Padding(
-                padding: EdgeInsets.symmetric(horizontal: AppSpacing.xl),
-                child: Container(
-                  padding: EdgeInsets.all(AppSpacing.lg),
-                  decoration: BoxDecoration(
-                    color: Colors.white,
-                    borderRadius: AppRadius.cardRadius,
-                    boxShadow: AppShadows.elevated,
-                  ),
-                  child: IntrinsicHeight(
-                    child: Row(
-                      children: [
-                        _ProfileStat(
-                          label: "Attendance",
-                          value: _attendance.percentageLabel,
-                          icon: Icons.calendar_today,
-                          color: AppColors.success,
-                        ),
-                        VerticalDivider(width: AppSpacing.xxxl),
-                        _ProfileStat(
-                          label: "Test Avg",
-                          value: "${_avgScore.toStringAsFixed(0)}%",
-                          icon: Icons.quiz_rounded,
-                          color: AppColors.oceanBlue,
-                        ),
-                        VerticalDivider(width: AppSpacing.xxxl),
-                        _ProfileStat(
-                          label: "Fees Paid",
-                          value: "${_feeRecord.percentagePaid.toStringAsFixed(0)}%",
-                          icon: Icons.receipt_rounded,
-                          color: _feeRecord.pendingAmount > 0 ? AppColors.warning : AppColors.success,
-                        ),
-                      ],
-                    ),
-                  ),
-                ),
-              ),
-            ),
-          ),
-
-          // SLIVER 3 — Personal Info
-          SliverToBoxAdapter(
-            child: Padding(
-              padding: EdgeInsets.fromLTRB(AppSpacing.xl, 0, AppSpacing.xl, AppSpacing.xxl),
-              child: DashboardCard(
-                title: "Personal Information",
-                child: Column(
-                  children: [
-                    InfoRow(icon: Icons.email_outlined, label: "Email", value: student.email),
-                    const Divider(height: 1),
-                    InfoRow(icon: Icons.phone_outlined, label: "Phone", value: student.phone),
-                    const Divider(height: 1),
-                    InfoRow(icon: Icons.family_restroom_outlined, label: "Parent Phone", value: student.parentPhone),
-                    const Divider(height: 1),
-                    InfoRow(icon: Icons.history_outlined, label: "Joined Date", value: student.createdAt.toString().split(' ')[0]),
-                    const Divider(height: 1),
-                    InfoRow(icon: Icons.group_outlined, label: "Batch", value: student.batchName),
-                    if (student.targetCompany.isNotEmpty) ...[
-                      const Divider(height: 1),
-                      InfoRow(
-                        icon: Icons.stars_rounded, 
-                        label: "Target", 
-                        value: student.targetCompany,
-                        iconColor: AppColors.gold,
-                      ),
-                    ],
-                  ],
-                ),
-              ),
-            ),
-          ),
-
-          // SLIVER 4 — Quick Links
-          SliverToBoxAdapter(
-            child: Padding(
-              padding: EdgeInsets.fromLTRB(AppSpacing.xl, 0, AppSpacing.xl, AppSpacing.xxl),
-              child: DashboardCard(
-                title: "Quick Links",
-                padding: EdgeInsets.zero,
-                child: Column(
-                  children: [
-                    ListTile(
-                      leading: Container(
-                        padding: EdgeInsets.all(AppSpacing.sm),
-                        decoration: BoxDecoration(color: AppColors.gold.withAlpha((0.1 * 255).round()), borderRadius: BorderRadius.circular(AppRadius.sm)),
-                        child: const Icon(Icons.receipt_long_rounded, color: AppColors.gold, size: 20),
-                      ),
-                      title: Text("Fee Details", style: AppTextStyles.labelLarge),
-                      trailing: const Icon(Icons.chevron_right_rounded),
-                      // NAVIGATION SAFETY: Using goNamed
-                      onTap: () => context.pushNamed(AppRoutes.studentFeesName),
-                    ),
-                    const Divider(height: 1, indent: 52),
-                    ListTile(
-                      leading: Container(
-                        padding: EdgeInsets.all(AppSpacing.sm),
-                        decoration: BoxDecoration(color: AppColors.warning.withAlpha((0.1 * 255).round()), borderRadius: BorderRadius.circular(AppRadius.sm)),
-                        child: const Icon(Icons.campaign_rounded, color: AppColors.warning, size: 20),
-                      ),
-                      title: Text("Announcements", style: AppTextStyles.labelLarge),
-                      trailing: const Icon(Icons.chevron_right_rounded),
-                      // NAVIGATION SAFETY: Using goNamed
-                      onTap: () => context.pushNamed(AppRoutes.studentAnnouncementsName),
-                    ),
-                  ],
-                ),
-              ),
-            ),
-          ),
-
-          // SLIVER 5 — Logout button
-          SliverToBoxAdapter(
-            child: Padding(
-              padding: EdgeInsets.fromLTRB(AppSpacing.xl, 0, AppSpacing.xl, AppSpacing.xxxl),
-              child: CustomButton(
-                label: "Logout",
-                isOutlined: true,
-                color: AppColors.error,
-                icon: Icons.logout_rounded,
-                onPressed: () {
-                  showDialog(
-                    context: context,
-                    builder: (context) => AlertDialog(
-                      title: const Text("Logout"),
-                      content: const Text("Are you sure you want to log out?"),
-                      actions: [
-                        TextButton(onPressed: () => Navigator.pop(context), child: const Text("CANCEL")),
-                        TextButton(
-                          onPressed: () {
-                            Navigator.pop(context);
-                            authProvider.logout();
-                          },
-                          child: Text("LOGOUT", style: AppTextStyles.labelLarge.copyWith(color: AppColors.error)),
-                        ),
-                      ],
-                    ),
-                  );
-                },
-              ),
-            ),
-          ),
+          _buildProfileHeader(student),
+          _buildStatsCard(),
+          _buildPersonalInfo(student),
+          _buildQuickLinks(context),
+          _buildLogoutButton(context, authProvider),
         ],
       ),
     );
   }
+
+  Widget _buildProfileHeader(StudentModel student) {
+    return SliverToBoxAdapter(
+      child: Container(
+        width: double.infinity,
+        decoration: const BoxDecoration(
+          gradient: LinearGradient(
+            colors: [AppColors.navyBlueDark, AppColors.navyBlueBase],
+            begin: Alignment.topLeft,
+            end: Alignment.bottomRight,
+          ),
+        ),
+        child: SafeArea(
+          child: Padding(
+            padding: const EdgeInsets.fromLTRB(AppSpacing.xl, AppSpacing.lg, AppSpacing.xl, AppSpacing.xxl),
+            child: Column(
+              children: [
+                CircleAvatar(
+                  radius: 40,
+                  backgroundColor: AppColors.gold.withAlpha((0.25 * 255).round()),
+                  child: Text(
+                    student.name[0],
+                    style: AppTextStyles.headingLarge.copyWith(color: AppColors.gold, fontSize: 32),
+                  ),
+                ),
+                const SizedBox(height: AppSpacing.md),
+                Text(
+                  student.name,
+                  style: AppTextStyles.headingMedium.copyWith(color: Colors.white),
+                  textAlign: TextAlign.center,
+                ),
+                Text(
+                  "Roll No: ${student.rollNumber}",
+                  style: AppTextStyles.bodySmall.copyWith(color: Colors.white54),
+                ),
+                const SizedBox(height: AppSpacing.md),
+                Row(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  children: [
+                    CourseBadge(courseType: student.courseType),
+                    const SizedBox(width: AppSpacing.sm),
+                    BranchBadge(branch: student.branch),
+                  ],
+                ),
+              ],
+            ),
+          ),
+        ),
+      ),
+    );
+  }
+
+  Widget _buildStatsCard() {
+    return SliverToBoxAdapter(
+      child: Transform.translate(
+        offset: const Offset(0, -16),
+        child: Padding(
+          padding: const EdgeInsets.symmetric(horizontal: AppSpacing.xl),
+          child: Container(
+            padding: const EdgeInsets.all(AppSpacing.lg),
+            decoration: BoxDecoration(
+              color: Colors.white,
+              borderRadius: AppRadius.cardRadius,
+              boxShadow: AppShadows.elevated,
+            ),
+            child: IntrinsicHeight(
+              child: Row(
+                children: [
+                  _ProfileStat(
+                    label: "Attendance",
+                    value: _attendance.percentageLabel,
+                    icon: Icons.calendar_today,
+                    color: AppColors.success,
+                  ),
+                  const VerticalDivider(width: AppSpacing.xxxl),
+                  _ProfileStat(
+                    label: "Test Avg",
+                    value: "${_avgScore.toStringAsFixed(0)}%",
+                    icon: Icons.quiz_rounded,
+                    color: AppColors.oceanBlue,
+                  ),
+                  const VerticalDivider(width: AppSpacing.xxxl),
+                  _ProfileStat(
+                    label: "Fees Paid",
+                    value: "${_feeRecord.percentagePaid.toStringAsFixed(0)}%",
+                    icon: Icons.receipt_rounded,
+                    color: _feeRecord.pendingAmount > 0 ? AppColors.warning : AppColors.success,
+                  ),
+                ],
+              ),
+            ),
+          ),
+        ),
+      ),
+    );
+  }
+
+  Widget _buildPersonalInfo(StudentModel student) {
+    return SliverToBoxAdapter(
+      child: Padding(
+        padding: const EdgeInsets.fromLTRB(AppSpacing.xl, 0, AppSpacing.xl, AppSpacing.xxl),
+        child: DashboardCard(
+          title: "Personal Information",
+          child: Column(
+            children: [
+              InfoRow(icon: Icons.email_outlined, label: "Email", value: student.email),
+              const Divider(height: 1),
+              InfoRow(icon: Icons.phone_outlined, label: "Phone", value: student.phone),
+              const Divider(height: 1),
+              InfoRow(icon: Icons.family_restroom_outlined, label: "Parent Phone", value: student.parentPhone),
+              const Divider(height: 1),
+              InfoRow(icon: Icons.history_outlined, label: "Joined Date", value: student.createdAt.toString().split(' ')[0]),
+              const Divider(height: 1),
+              InfoRow(icon: Icons.group_outlined, label: "Batch", value: student.batchName),
+              if (student.targetCompany.isNotEmpty) ...[
+                const Divider(height: 1),
+                InfoRow(
+                  icon: Icons.stars_rounded, 
+                  label: "Target", 
+                  value: student.targetCompany,
+                  iconColor: AppColors.gold,
+                ),
+              ],
+            ],
+          ),
+        ),
+      ),
+    );
+  }
+
+  Widget _buildQuickLinks(BuildContext context) {
+    return SliverToBoxAdapter(
+      child: Padding(
+        padding: const EdgeInsets.fromLTRB(AppSpacing.xl, 0, AppSpacing.xl, AppSpacing.xxl),
+        child: DashboardCard(
+          title: "Quick Links",
+          padding: EdgeInsets.zero,
+          child: Column(
+            children: [
+              ListTile(
+                leading: Container(
+                  padding: const EdgeInsets.all(AppSpacing.sm),
+                  decoration: BoxDecoration(color: AppColors.gold.withAlpha((0.1 * 255).round()), borderRadius: BorderRadius.circular(AppRadius.sm)),
+                  child: const Icon(Icons.receipt_long_rounded, color: AppColors.gold, size: 20),
+                ),
+                title: const Text("Fee Details", style: AppTextStyles.labelLarge),
+                trailing: const Icon(Icons.chevron_right_rounded),
+                onTap: () => context.pushNamed(AppRoutes.studentFeesName),
+              ),
+              const Divider(height: 1, indent: 52),
+              ListTile(
+                leading: Container(
+                  padding: const EdgeInsets.all(AppSpacing.sm),
+                  decoration: BoxDecoration(color: AppColors.warning.withAlpha((0.1 * 255).round()), borderRadius: BorderRadius.circular(AppRadius.sm)),
+                  child: const Icon(Icons.campaign_rounded, color: AppColors.warning, size: 20),
+                ),
+                title: const Text("Announcements", style: AppTextStyles.labelLarge),
+                trailing: const Icon(Icons.chevron_right_rounded),
+                onTap: () => context.pushNamed(AppRoutes.studentAnnouncementsName),
+              ),
+            ],
+          ),
+        ),
+      ),
+    );
+  }
+
+  Widget _buildLogoutButton(BuildContext context, AuthProvider authProvider) {
+    return SliverToBoxAdapter(
+      child: Padding(
+        padding: const EdgeInsets.fromLTRB(AppSpacing.xl, 0, AppSpacing.xl, AppSpacing.xxxl),
+        child: CustomButton(
+          label: "Logout",
+          isOutlined: true,
+          color: AppColors.error,
+          icon: Icons.logout_rounded,
+          onPressed: () {
+            showDialog(
+              context: context,
+              builder: (context) => AlertDialog(
+                title: const Text("Logout"),
+                content: const Text("Are you sure you want to log out?"),
+                actions: [
+                  TextButton(onPressed: () => Navigator.pop(context), child: const Text("CANCEL")),
+                  TextButton(
+                    onPressed: () {
+                      Navigator.pop(context);
+                      authProvider.logout();
+                    },
+                    child: Text("LOGOUT", style: AppTextStyles.labelLarge.copyWith(color: AppColors.error)),
+                  ),
+                ],
+              ),
+            );
+          },
+        ),
+      ),
+    );
+  }
+
 }
 
 class _ProfileStat extends StatelessWidget {
@@ -371,75 +381,14 @@ class _StudentFeesScreenState extends State<StudentFeesScreen> {
     return Scaffold(
       backgroundColor: AppColors.background,
       appBar: AppBar(
-        title: Text("Fee Details", style: AppTextStyles.headingSmall),
+        title: const Text("Fee Details", style: AppTextStyles.headingSmall),
         backgroundColor: Colors.white,
         elevation: 0,
         foregroundColor: AppColors.navyBlueBase,
       ),
       body: CustomScrollView(
         slivers: [
-          // SLIVER 1 — Summary card
-          SliverToBoxAdapter(
-            child: Container(
-              margin: EdgeInsets.all(AppSpacing.xl),
-              padding: EdgeInsets.all(AppSpacing.xl),
-              decoration: BoxDecoration(
-                gradient: const LinearGradient(
-                  colors: [AppColors.navyBlueDark, AppColors.navyBlueBase],
-                  begin: Alignment.topLeft,
-                  end: Alignment.bottomRight,
-                ),
-                borderRadius: AppRadius.cardRadius,
-                boxShadow: AppShadows.elevated,
-              ),
-              child: Column(
-                children: [
-                  Row(
-                    children: [
-                      const Icon(Icons.receipt_rounded, color: AppColors.gold, size: 28),
-                      const SizedBox(width: AppSpacing.md),
-                      Text(
-                        "Fee Summary",
-                        style: AppTextStyles.headingSmall.copyWith(color: Colors.white),
-                      ),
-                    ],
-                  ),
-                  const SizedBox(height: AppSpacing.xl),
-                  Row(
-                    mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-                    children: [
-                      _FeeSummaryItem(label: "Total Fees", value: "₹${_feeRecord.totalFees.toInt()}"),
-                      _FeeSummaryItem(label: "Paid Amount", value: "₹${_feeRecord.paidAmount.toInt()}"),
-                      _FeeSummaryItem(
-                        label: "Pending", 
-                        value: "₹${_feeRecord.pendingAmount.toInt()}",
-                        valueColor: _feeRecord.pendingAmount > 0 ? AppColors.warning : AppColors.gold,
-                      ),
-                    ],
-                  ),
-                  const SizedBox(height: AppSpacing.lg),
-                  ClipRRect(
-                    borderRadius: BorderRadius.circular(AppRadius.sm),
-                    child: LinearProgressIndicator(
-                      value: _feeRecord.paidAmount / _feeRecord.totalFees,
-                      minHeight: 8,
-                      backgroundColor: Colors.white.withAlpha((0.2 * 255).round()),
-                      valueColor: const AlwaysStoppedAnimation<Color>(AppColors.gold),
-                    ),
-                  ),
-                  const SizedBox(height: AppSpacing.lg),
-                  SizedBox(height: AppSpacing.xxs),
-                  Align(
-                    alignment: Alignment.centerRight,
-                    child: Text(
-                      "${_feeRecord.percentagePaid.toStringAsFixed(1)}% paid",
-                      style: AppTextStyles.caption.copyWith(color: Colors.white70),
-                    ),
-                  ),
-                ],
-              ),
-            ),
-          ),
+          _buildFeeSummaryCard(),
 
           // SLIVER 2 — Installments heading
           const SliverPadding(
@@ -450,80 +399,11 @@ class _StudentFeesScreenState extends State<StudentFeesScreen> {
           ),
           
           SliverPadding(
-            padding: EdgeInsets.all(AppSpacing.xl),
+            padding: const EdgeInsets.all(AppSpacing.xl),
             sliver: SliverList(
               delegate: SliverChildBuilderDelegate(
                 (context, index) {
-                  final installment = _feeRecord.installments[index];
-                  final isPaid = installment.status == FeeStatus.paid;
-                  final color = isPaid ? AppColors.success : AppColors.warning;
-
-                  return Container(
-                    margin: EdgeInsets.only(bottom: AppSpacing.md),
-                    padding: EdgeInsets.all(AppSpacing.md),
-                    decoration: BoxDecoration(
-                      color: Colors.white,
-                      borderRadius: BorderRadius.circular(AppRadius.lg),
-                      boxShadow: AppShadows.subtle,
-                    ),
-                    child: Row(
-                      children: [
-                        Container(
-                          width: 44,
-                          height: 44,
-                          decoration: BoxDecoration(
-                            color: color.withAlpha((0.1 * 255).round()),
-                            borderRadius: BorderRadius.circular(10),
-                          ),
-                          alignment: Alignment.center,
-                          child: Icon(
-                            isPaid ? Icons.check_circle_rounded : Icons.pending_actions_rounded,
-                            color: color,
-                            size: 24,
-                          ),
-                        ),
-                        const SizedBox(width: AppSpacing.md),
-                        Expanded(
-                          child: Column(
-                            crossAxisAlignment: CrossAxisAlignment.start,
-                            children: [
-                              Text(installment.title, style: AppTextStyles.labelLarge),
-                              Text(
-                                "Due: ${installment.dueDate.toString().split(' ')[0]}",
-                                style: AppTextStyles.bodySmall.copyWith(color: AppColors.textSecondary),
-                              ),
-                              if (isPaid && installment.paidDate != null)
-                                Text(
-                                  "Paid: ${installment.paidDate!.toString().split(' ')[0]}",
-                                  style: AppTextStyles.caption.copyWith(color: AppColors.success),
-                                ),
-                            ],
-                          ),
-                        ),
-                        Column(
-                          crossAxisAlignment: CrossAxisAlignment.end,
-                          children: [
-                            Text(
-                              "₹${installment.amount.toInt()}",
-                              style: AppTextStyles.labelLarge,
-                            ),
-                            const SizedBox(height: AppSpacing.xs),
-                            Container(
-                              padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 2),
-                              decoration: BoxDecoration(
-                                color: color.withAlpha((0.1 * 255).round()),
-                                borderRadius: BorderRadius.circular(AppRadius.xxs),
-                              ),
-                              child: Text(
-                                installment.status.name.toUpperCase(),
-                                style: AppTextStyles.labelSmall.copyWith(color: color, fontSize: 10),
-                              ),
-                            ),
-                          ],
-                        ),
-                      ],
-                    ),
-                  );
+                  return _InstallmentTile(installment: _feeRecord.installments[index]);
                 },
                 childCount: _feeRecord.installments.length,
               ),
@@ -534,6 +414,151 @@ class _StudentFeesScreenState extends State<StudentFeesScreen> {
       ),
     );
   }
+
+  Widget _buildFeeSummaryCard() {
+    return SliverToBoxAdapter(
+      child: Container(
+        margin: const EdgeInsets.all(AppSpacing.xl),
+        padding: const EdgeInsets.all(AppSpacing.xl),
+        decoration: BoxDecoration(
+          gradient: const LinearGradient(
+            colors: [AppColors.navyBlueDark, AppColors.navyBlueBase],
+            begin: Alignment.topLeft,
+            end: Alignment.bottomRight,
+          ),
+          borderRadius: AppRadius.cardRadius,
+          boxShadow: AppShadows.elevated,
+        ),
+        child: Column(
+          children: [
+            Row(
+              children: [
+                const Icon(Icons.receipt_rounded, color: AppColors.gold, size: 28),
+                const SizedBox(width: AppSpacing.md),
+                Text(
+                  "Fee Summary",
+                  style: AppTextStyles.headingSmall.copyWith(color: Colors.white),
+                ),
+              ],
+            ),
+            const SizedBox(height: AppSpacing.xl),
+            Row(
+              mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+              children: [
+                _FeeSummaryItem(label: "Total Fees", value: "₹${_feeRecord.totalFees.toInt()}"),
+                _FeeSummaryItem(label: "Paid Amount", value: "₹${_feeRecord.paidAmount.toInt()}"),
+                _FeeSummaryItem(
+                  label: "Pending", 
+                  value: "₹${_feeRecord.pendingAmount.toInt()}",
+                  valueColor: _feeRecord.pendingAmount > 0 ? AppColors.warning : AppColors.gold,
+                ),
+              ],
+            ),
+            const SizedBox(height: AppSpacing.lg),
+            ClipRRect(
+              borderRadius: BorderRadius.circular(AppRadius.sm),
+              child: LinearProgressIndicator(
+                value: _feeRecord.paidAmount / _feeRecord.totalFees,
+                minHeight: 8,
+                backgroundColor: Colors.white.withAlpha((0.2 * 255).round()),
+                valueColor: const AlwaysStoppedAnimation<Color>(AppColors.gold),
+              ),
+            ),
+            const SizedBox(height: AppSpacing.lg),
+            const SizedBox(height: AppSpacing.xxs),
+            Align(
+              alignment: Alignment.centerRight,
+              child: Text(
+                "${_feeRecord.percentagePaid.toStringAsFixed(1)}% paid",
+                style: AppTextStyles.caption.copyWith(color: Colors.white70),
+              ),
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+}
+
+class _InstallmentTile extends StatelessWidget {
+  final FeeInstallment installment;
+
+  const _InstallmentTile({required this.installment});
+
+  @override
+  Widget build(BuildContext context) {
+    final isPaid = installment.status == FeeStatus.paid;
+    final color = isPaid ? AppColors.success : AppColors.warning;
+
+    return Container(
+      margin: const EdgeInsets.only(bottom: AppSpacing.md),
+      padding: const EdgeInsets.all(AppSpacing.md),
+      decoration: BoxDecoration(
+        color: Colors.white,
+        borderRadius: BorderRadius.circular(AppRadius.lg),
+        boxShadow: AppShadows.subtle,
+      ),
+      child: Row(
+        children: [
+          Container(
+            width: 44,
+            height: 44,
+            decoration: BoxDecoration(
+              color: color.withAlpha((0.1 * 255).round()),
+              borderRadius: BorderRadius.circular(10),
+            ),
+            alignment: Alignment.center,
+            child: Icon(
+              isPaid ? Icons.check_circle_rounded : Icons.pending_actions_rounded,
+              color: color,
+              size: 24,
+            ),
+          ),
+          const SizedBox(width: AppSpacing.md),
+          Expanded(
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Text(installment.title, style: AppTextStyles.labelLarge),
+                Text(
+                  "Due: ${installment.dueDate.toString().split(' ')[0]}",
+                  style: AppTextStyles.bodySmall.copyWith(color: AppColors.textSecondary),
+                ),
+                if (isPaid && installment.paidDate != null)
+                  Text(
+                    "Paid: ${installment.paidDate!.toString().split(' ')[0]}",
+                    style: AppTextStyles.caption.copyWith(color: AppColors.success),
+                  ),
+              ],
+            ),
+          ),
+          Column(
+            crossAxisAlignment: CrossAxisAlignment.end,
+            children: [
+              Text(
+                "₹${installment.amount.toInt()}",
+                style: AppTextStyles.labelLarge,
+              ),
+              const SizedBox(height: AppSpacing.xs),
+              Container(
+                padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 2),
+                decoration: BoxDecoration(
+                  color: color.withAlpha((0.1 * 255).round()),
+                  borderRadius: BorderRadius.circular(AppRadius.xxs),
+                ),
+                child: Text(
+                  installment.status.name.toUpperCase(),
+                  style: AppTextStyles.labelSmall.copyWith(color: color, fontSize: 10),
+                ),
+              ),
+            ],
+          ),
+        ],
+      ),
+    );
+  }
+}
+
 }
 
 class _FeeSummaryItem extends StatelessWidget {

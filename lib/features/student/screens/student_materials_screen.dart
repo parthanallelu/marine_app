@@ -87,8 +87,9 @@ class _StudentMaterialsScreenState extends State<StudentMaterialsScreen> {
           
           // Search Field
           Padding(
-            padding: EdgeInsets.fromLTRB(AppSpacing.lg, AppSpacing.lg, AppSpacing.lg, AppSpacing.sm),
+            padding: const EdgeInsets.fromLTRB(AppSpacing.lg, AppSpacing.lg, AppSpacing.lg, AppSpacing.sm),
             child: TextField(
+
               controller: _searchController,
               onChanged: (val) => setState(() => _searchQuery = val),
               decoration: InputDecoration(
@@ -117,14 +118,15 @@ class _StudentMaterialsScreenState extends State<StudentMaterialsScreen> {
             height: 44,
             child: ListView.builder(
               scrollDirection: Axis.horizontal,
-              padding: EdgeInsets.symmetric(horizontal: AppSpacing.lg),
+              padding: const EdgeInsets.symmetric(horizontal: AppSpacing.lg),
               itemCount: categories.length,
               itemBuilder: (context, index) {
                 final category = categories[index];
                 final isSelected = _selectedCategory == category;
                 return Padding(
-                  padding: EdgeInsets.symmetric(horizontal: AppSpacing.xs),
+                  padding: const EdgeInsets.symmetric(horizontal: AppSpacing.xs),
                   child: ChoiceChip(
+
                     label: Text(category),
                     selected: isSelected,
                     onSelected: (selected) {
@@ -159,9 +161,10 @@ class _StudentMaterialsScreenState extends State<StudentMaterialsScreen> {
                     subtitle: "Try adjusting your filters or search query.",
                   )
                 : ListView.builder(
-                    padding: EdgeInsets.all(AppSpacing.lg),
+                    padding: const EdgeInsets.all(AppSpacing.lg),
                     itemCount: filteredMaterials.length,
                     itemBuilder: (context, index) {
+
                       final material = filteredMaterials[index];
                       // REUSABLE COMPONENT: Using MaterialCard
                       return MaterialCard(

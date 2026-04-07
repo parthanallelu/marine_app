@@ -277,38 +277,7 @@ class _TestAttemptScreenState extends State<TestAttemptScreen> {
         ),
         body: Column(
           children: [
-            // PROGRESS SECTION
-            Container(
-              color: AppColors.background,
-              padding: EdgeInsets.symmetric(horizontal: AppSpacing.xl, vertical: AppSpacing.md),
-              child: Column(
-                children: [
-                  Row(
-                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                    children: [
-                      Text(
-                        "Question ${_currentIndex + 1} of $totalCount",
-                        style: AppTextStyles.labelLarge,
-                      ),
-                      Text(
-                        "$answeredCount answered",
-                        style: AppTextStyles.caption.copyWith(color: AppColors.textSecondary),
-                      ),
-                    ],
-                  ),
-                  SizedBox(height: AppSpacing.sm),
-                  ClipRRect(
-                    borderRadius: BorderRadius.circular(AppRadius.xs),
-                    child: LinearProgressIndicator(
-                      value: totalCount > 0 ? (_currentIndex + 1) / totalCount : 0,
-                      backgroundColor: AppColors.navyBlueSurface,
-                      color: AppColors.navyBlueBase,
-                      minHeight: 5,
-                    ),
-                  ),
-                ],
-              ),
-            ),
+            _buildProgressHeader(totalCount, answeredCount),
 
             // PAGE VIEW
             Expanded(
@@ -338,58 +307,96 @@ class _TestAttemptScreenState extends State<TestAttemptScreen> {
                   ),
             ),
 
-            // NAVIGATION ROW
-            Container(
-              padding: EdgeInsets.all(AppSpacing.xl),
-              decoration: BoxDecoration(
-                color: Colors.white,
-                boxShadow: [
-                  BoxShadow(
-                    color: AppColors.textPrimary.withAlpha((0.05 * 255).round()),
-                    blurRadius: 10,
-                    offset: const Offset(0, -5),
-                  ),
-                ],
-              ),
-              child: Row(
-                children: [
-                  if (_currentIndex > 0)
-                    Expanded(
-                      child: CustomButton(
-                        label: "Previous",
-                        isOutlined: true,
-                        onPressed: () {
-                          _pageController.previousPage(duration: const Duration(milliseconds: 300), curve: Curves.easeInOut);
-                        },
-                      ),
-                    ),
-                  if (_currentIndex > 0) SizedBox(width: AppSpacing.lg),
-                  Expanded(
-                    child: (totalCount > 0 && _currentIndex == totalCount - 1)
-                        ? CustomButton(
-                            label: "Submit Test",
-                            color: AppColors.success,
-                            onPressed: _showSubmitDialog,
-                          )
-                        : CustomButton(
-                            label: "Next",
-                            onPressed: () {
-                              if (totalCount > 0) {
-                                _pageController.nextPage(duration: const Duration(milliseconds: 300), curve: Curves.easeInOut);
-                              }
-                            },
-                          ),
-                  ),
-                ],
-              ),
-            ),
+            _buildNavigationFooter(totalCount),
           ],
         ),
+
         floatingActionButton: totalCount > 0 ? FloatingActionButton(
           onPressed: _showQuestionNavigator,
           backgroundColor: AppColors.navyBlueBase,
           child: const Icon(Icons.grid_view_rounded, color: Colors.white),
         ) : null,
+      ),
+    );
+  }
+
+  Widget _buildProgressHeader(int totalCount, int answeredCount) {
+    return Container(
+      color: AppColors.background,
+      padding: const EdgeInsets.symmetric(horizontal: AppSpacing.xl, vertical: AppSpacing.md),
+      child: Column(
+        children: [
+          Row(
+            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+            children: [
+              Text(
+                "Question ${_currentIndex + 1} of $totalCount",
+                style: AppTextStyles.labelLarge,
+              ),
+              Text(
+                "$answeredCount answered",
+                style: AppTextStyles.caption.copyWith(color: AppColors.textSecondary),
+              ),
+            ],
+          ),
+          const SizedBox(height: AppSpacing.sm),
+          ClipRRect(
+            borderRadius: BorderRadius.circular(AppRadius.xs),
+            child: LinearProgressIndicator(
+              value: totalCount > 0 ? (_currentIndex + 1) / totalCount : 0,
+              backgroundColor: AppColors.navyBlueSurface,
+              color: AppColors.navyBlueBase,
+              minHeight: 5,
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+
+  Widget _buildNavigationFooter(int totalCount) {
+    return Container(
+      padding: const EdgeInsets.all(AppSpacing.xl),
+      decoration: BoxDecoration(
+        color: Colors.white,
+        boxShadow: [
+          BoxShadow(
+            color: AppColors.textPrimary.withAlpha((0.05 * 255).round()),
+            blurRadius: 10,
+            offset: const Offset(0, -5),
+          ),
+        ],
+      ),
+      child: Row(
+        children: [
+          if (_currentIndex > 0)
+            Expanded(
+              child: CustomButton(
+                label: "Previous",
+                isOutlined: true,
+                onPressed: () {
+                  _pageController.previousPage(duration: const Duration(milliseconds: 300), curve: Curves.easeInOut);
+                },
+              ),
+            ),
+          if (_currentIndex > 0) const SizedBox(width: AppSpacing.lg),
+          Expanded(
+            child: (totalCount > 0 && _currentIndex == totalCount - 1)
+                ? CustomButton(
+                    label: "Submit Test",
+                    color: AppColors.success,
+                    onPressed: _showSubmitDialog,
+                  )
+                : CustomButton(
+                    label: "Next",
+                    onPressed: () {
+                      if (totalCount > 0) {
+                        _pageController.nextPage(duration: const Duration(milliseconds: 300), curve: Curves.easeInOut);
+                      }
+                    },
+                  ),
+          ),
+        ],
       ),
     );
   }
@@ -409,12 +416,12 @@ class _QuestionPage extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return SingleChildScrollView(
-      padding: EdgeInsets.all(AppSpacing.xl),
+      padding: const EdgeInsets.all(AppSpacing.xl),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           Container(
-            padding: EdgeInsets.symmetric(horizontal: AppSpacing.md, vertical: AppSpacing.xs),
+            padding: const EdgeInsets.symmetric(horizontal: AppSpacing.md, vertical: AppSpacing.xs),
             decoration: BoxDecoration(
               color: AppColors.navyBlueSurface,
               borderRadius: BorderRadius.circular(AppRadius.sm),
@@ -424,62 +431,21 @@ class _QuestionPage extends StatelessWidget {
               style: AppTextStyles.labelSmall.copyWith(color: AppColors.navyBlueBase),
             ),
           ),
-          SizedBox(height: AppSpacing.lg),
+          const SizedBox(height: AppSpacing.lg),
           Text(
             "QN. ${question.questionText}",
             style: AppTextStyles.headingSmall.copyWith(height: 1.5, fontSize: 18),
           ),
-          SizedBox(height: AppSpacing.xxl),
+          const SizedBox(height: AppSpacing.xxl),
           ...List.generate(question.options.length, (index) {
             final isSelected = selectedOption == index;
             final optionLabel = String.fromCharCode(65 + index); // A, B, C, D
 
-            return GestureDetector(
-                onTap: () => onOptionSelected(index),
-              child: AnimatedContainer(
-                duration: const Duration(milliseconds: 180),
-                margin: EdgeInsets.only(bottom: AppSpacing.md),
-                padding: EdgeInsets.all(AppSpacing.lg),
-                decoration: BoxDecoration(
-                  color: isSelected ? AppColors.navyBlueSurface : AppColors.background,
-                  borderRadius: BorderRadius.circular(AppRadius.md),
-                  border: Border.all(
-                    color: isSelected ? AppColors.navyBlueBase : AppColors.navyBlueSurface,
-                    width: isSelected ? 2 : 1,
-                  ),
-                ),
-                child: Row(
-                  children: [
-                    Container(
-                      width: 28,
-                      height: 28,
-                      decoration: BoxDecoration(
-                        color: isSelected ? AppColors.navyBlueBase : Colors.white,
-                        shape: BoxShape.circle,
-                        border: Border.all(color: AppColors.navyBlueBase),
-                      ),
-                      alignment: Alignment.center,
-                      child: Text(
-                        optionLabel,
-                        style: AppTextStyles.labelLarge.copyWith(
-                          color: isSelected ? Colors.white : AppColors.navyBlueBase,
-                        ),
-                      ),
-                    ),
-                    SizedBox(width: AppSpacing.lg),
-                    Expanded(
-                      child: Text(
-                        question.options[index],
-                        style: AppTextStyles.bodyMedium.copyWith(
-                          color: isSelected ? AppColors.navyBlueBase : AppColors.textPrimary,
-                          fontWeight: isSelected ? FontWeight.w600 : FontWeight.normal,
-                        ),
-                      ),
-                    ),
-                    if (isSelected) const Icon(Icons.check_circle, color: AppColors.navyBlueBase),
-                  ],
-                ),
-              ),
+            return _OptionTile(
+              label: optionLabel,
+              optionText: question.options[index],
+              isSelected: isSelected,
+              onTap: () => onOptionSelected(index),
             );
           }),
         ],
@@ -488,7 +454,74 @@ class _QuestionPage extends StatelessWidget {
   }
 }
 
+class _OptionTile extends StatelessWidget {
+  final String label;
+  final String optionText;
+  final bool isSelected;
+  final VoidCallback onTap;
+
+  const _OptionTile({
+    required this.label,
+    required this.optionText,
+    required this.isSelected,
+    required this.onTap,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    return GestureDetector(
+      onTap: onTap,
+      child: AnimatedContainer(
+        duration: const Duration(milliseconds: 180),
+        margin: const EdgeInsets.only(bottom: AppSpacing.md),
+        padding: const EdgeInsets.all(AppSpacing.lg),
+        decoration: BoxDecoration(
+          color: isSelected ? AppColors.navyBlueSurface : AppColors.background,
+          borderRadius: BorderRadius.circular(AppRadius.md),
+          border: Border.all(
+            color: isSelected ? AppColors.navyBlueBase : AppColors.navyBlueSurface,
+            width: isSelected ? 2 : 1,
+          ),
+        ),
+        child: Row(
+          children: [
+            Container(
+              width: 28,
+              height: 28,
+              decoration: BoxDecoration(
+                color: isSelected ? AppColors.navyBlueBase : Colors.white,
+                shape: BoxShape.circle,
+                border: Border.all(color: AppColors.navyBlueBase),
+              ),
+              alignment: Alignment.center,
+              child: Text(
+                label,
+                style: AppTextStyles.labelLarge.copyWith(
+                  color: isSelected ? Colors.white : AppColors.navyBlueBase,
+                ),
+              ),
+            ),
+            const SizedBox(width: AppSpacing.lg),
+            Expanded(
+              child: Text(
+                optionText,
+                style: AppTextStyles.bodyMedium.copyWith(
+                  color: isSelected ? AppColors.navyBlueBase : AppColors.textPrimary,
+                  fontWeight: isSelected ? FontWeight.w600 : FontWeight.normal,
+                ),
+              ),
+            ),
+            if (isSelected) const Icon(Icons.check_circle, color: AppColors.navyBlueBase),
+          ],
+        ),
+      ),
+    );
+  }
+}
+
+
 class _LegendItem extends StatelessWidget {
+
   final Color color;
   final String label;
   const _LegendItem({required this.color, required this.label});

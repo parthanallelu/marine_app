@@ -67,9 +67,10 @@ class _AdminStudentsScreenState extends State<AdminStudentsScreen> {
         content: Row(
           children: [
             const Icon(Icons.check_circle_rounded, color: Colors.white, size: 20),
-            SizedBox(width: AppSpacing.md),
+            const SizedBox(width: AppSpacing.md),
             Expanded(child: Text(message)),
           ],
+
         ),
         backgroundColor: AppColors.success,
         behavior: SnackBarBehavior.floating,
@@ -94,9 +95,10 @@ class _AdminStudentsScreenState extends State<AdminStudentsScreen> {
         children: [
           // SEARCH & FILTER BAR
           Container(
-            padding: EdgeInsets.fromLTRB(AppSpacing.lg, AppSpacing.sm, AppSpacing.lg, AppSpacing.lg),
+            padding: const EdgeInsets.fromLTRB(AppSpacing.lg, AppSpacing.sm, AppSpacing.lg, AppSpacing.lg),
             color: Colors.white,
             child: Column(
+
               children: [
                 CustomTextField(
                   hintText: "Search by name, roll no, email, batch...",
@@ -106,9 +108,10 @@ class _AdminStudentsScreenState extends State<AdminStudentsScreen> {
                     _applyFilters();
                   }),
                 ),
-                SizedBox(height: AppSpacing.md),
+                const SizedBox(height: AppSpacing.md),
                 Row(
                   children: [
+
                     Expanded(
                       child: _FilterButton(
                         label: _selectedBranch,
@@ -116,10 +119,11 @@ class _AdminStudentsScreenState extends State<AdminStudentsScreen> {
                         onTap: () => _showBranchSelector(),
                       ),
                     ),
-                    SizedBox(width: AppSpacing.md),
+                    const SizedBox(width: AppSpacing.md),
                     Expanded(
                       child: _FilterButton(
                         label: _selectedCourse,
+
                         icon: Icons.school_rounded,
                         onTap: () => _showCourseSelector(),
                       ),
@@ -132,9 +136,10 @@ class _AdminStudentsScreenState extends State<AdminStudentsScreen> {
 
           // STUDENT COUNT
           Padding(
-            padding: EdgeInsets.symmetric(horizontal: AppSpacing.lg, vertical: AppSpacing.md),
+            padding: const EdgeInsets.symmetric(horizontal: AppSpacing.lg, vertical: AppSpacing.md),
             child: Row(
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
+
               children: [
                 Text(
                   "Found ${_filteredStudents.length} Students",
@@ -163,9 +168,10 @@ class _AdminStudentsScreenState extends State<AdminStudentsScreen> {
                     subtitle: "Add students to get started or adjust your filters.",
                   )
                 : ListView.builder(
-                    padding: EdgeInsets.fromLTRB(AppSpacing.lg, 0, AppSpacing.lg, 80),
+                    padding: const EdgeInsets.fromLTRB(AppSpacing.lg, 0, AppSpacing.lg, 80),
                     itemCount: _filteredStudents.length,
                     itemBuilder: (context, index) {
+
                       final student = _filteredStudents[index];
                       return _AdminStudentTile(
                         student: student,
@@ -225,27 +231,13 @@ class _AdminStudentsScreenState extends State<AdminStudentsScreen> {
             Container(
               width: 40,
               height: 4,
-              margin: EdgeInsets.symmetric(vertical: AppSpacing.md),
-              decoration: BoxDecoration(
-                color: AppColors.divider,
-        decoration: BoxDecoration(
-          color: Colors.white,
-          borderRadius: BorderRadius.vertical(top: Radius.circular(AppRadius.xxl)),
-        ),
-        padding: EdgeInsets.only(
-          bottom: MediaQuery.of(context).viewInsets.bottom,
-        ),
-        child: Column(
-          children: [
-            Container(
-              width: 40,
-              height: 4,
-              margin: EdgeInsets.symmetric(vertical: AppSpacing.md),
+              margin: const EdgeInsets.symmetric(vertical: AppSpacing.md),
               decoration: BoxDecoration(
                 color: AppColors.divider,
                 borderRadius: BorderRadius.circular(AppRadius.xs),
               ),
             ),
+
             Expanded(
               child: SingleChildScrollView(
                 padding: EdgeInsets.all(AppSpacing.xl),
@@ -254,10 +246,11 @@ class _AdminStudentsScreenState extends State<AdminStudentsScreen> {
                   child: Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
-                      Text("Enroll New Student", style: AppTextStyles.headingMedium),
+                      const Text("Enroll New Student", style: AppTextStyles.headingMedium),
                       const SizedBox(height: AppSpacing.sm),
                       Text(
                         "Fill in the details below to add a student to the academy database.",
+
                         style: AppTextStyles.bodyMedium.copyWith(color: AppColors.textSecondary),
                       ),
                       const SizedBox(height: AppSpacing.xl),
@@ -425,10 +418,11 @@ class _AdminStudentsScreenState extends State<AdminStudentsScreen> {
                   child: Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
-                      Text("Edit Student", style: AppTextStyles.headingMedium),
+                      const Text("Edit Student", style: AppTextStyles.headingMedium),
                       const SizedBox(height: AppSpacing.sm),
                       Text(
                         "Update ${student.name}'s information below.",
+
                         style: AppTextStyles.bodyMedium.copyWith(color: AppColors.textSecondary),
                       ),
                       const SizedBox(height: AppSpacing.xl),
@@ -585,12 +579,13 @@ class _AdminStudentsScreenState extends State<AdminStudentsScreen> {
       shape: const RoundedRectangleBorder(borderRadius: BorderRadius.vertical(top: Radius.circular(AppRadius.xl))),
       builder: (context) => ListView(
         shrinkWrap: true,
-        padding: EdgeInsets.symmetric(vertical: AppSpacing.xl),
+        padding: const EdgeInsets.symmetric(vertical: AppSpacing.xl),
         children: [
           Padding(
-            padding: EdgeInsets.symmetric(horizontal: AppSpacing.xl, vertical: AppSpacing.sm),
-            child: Text("Filter by Branch", style: AppTextStyles.headingSmall),
+            padding: const EdgeInsets.symmetric(horizontal: AppSpacing.xl, vertical: AppSpacing.sm),
+            child: const Text("Filter by Branch", style: AppTextStyles.headingSmall),
           ),
+
           ...["All", ...AppConstants.branches].map((branch) => ListTile(
                 title: Text(branch),
                 leading: Radio<String>.adaptive(
@@ -623,12 +618,13 @@ class _AdminStudentsScreenState extends State<AdminStudentsScreen> {
       shape: const RoundedRectangleBorder(borderRadius: BorderRadius.vertical(top: Radius.circular(AppRadius.xl))),
       builder: (context) => ListView(
         shrinkWrap: true,
-        padding: EdgeInsets.symmetric(vertical: AppSpacing.xl),
+        padding: const EdgeInsets.symmetric(vertical: AppSpacing.xl),
         children: [
           Padding(
-            padding: EdgeInsets.symmetric(horizontal: AppSpacing.xl, vertical: AppSpacing.sm),
-            child: Text("Filter by Course", style: AppTextStyles.headingSmall),
+            padding: const EdgeInsets.symmetric(horizontal: AppSpacing.xl, vertical: AppSpacing.sm),
+            child: const Text("Filter by Course", style: AppTextStyles.headingSmall),
           ),
+
           ...["All", ...AppConstants.courseTypes].map((course) => ListTile(
                 title: Text(course),
                 leading: Radio<String>.adaptive(
@@ -681,11 +677,12 @@ class _FilterButton extends StatelessWidget {
         child: Row(
           children: [
             Icon(icon, size: 16, color: AppColors.navyBlueBase),
-            SizedBox(width: AppSpacing.sm),
+            const SizedBox(width: AppSpacing.sm),
             Expanded(
               child: Text(
                 label,
                 style: AppTextStyles.labelSmall,
+
                 overflow: TextOverflow.ellipsis,
               ),
             ),
@@ -716,10 +713,11 @@ class _AdminStudentTile extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Container(
-      margin: EdgeInsets.only(bottom: AppSpacing.md),
-      padding: EdgeInsets.all(AppSpacing.lg),
+      margin: const EdgeInsets.only(bottom: AppSpacing.md),
+      padding: const EdgeInsets.all(AppSpacing.lg),
       decoration: BoxDecoration(
         color: Colors.white,
+
         borderRadius: BorderRadius.circular(AppRadius.lg),
         boxShadow: AppShadows.subtle,
       ),
@@ -767,7 +765,7 @@ class _AdminStudentTile extends StatelessWidget {
                     child: Row(
                       children: [
                         const Icon(Icons.edit_outlined, size: 18),
-                        SizedBox(width: AppSpacing.sm),
+                        const SizedBox(width: AppSpacing.sm),
                         const Text("Edit"),
                       ],
                     ),
@@ -777,7 +775,7 @@ class _AdminStudentTile extends StatelessWidget {
                     child: Row(
                       children: [
                         const Icon(Icons.class_outlined, size: 18),
-                        SizedBox(width: AppSpacing.sm),
+                        const SizedBox(width: AppSpacing.sm),
                         const Text("Assign to Batch"),
                       ],
                     ),
@@ -787,17 +785,19 @@ class _AdminStudentTile extends StatelessWidget {
                     child: Row(
                       children: [
                         const Icon(Icons.delete_outline, size: 18, color: AppColors.error),
-                        SizedBox(width: AppSpacing.sm),
+                        const SizedBox(width: AppSpacing.sm),
                         Text("Delete", style: AppTextStyles.labelMedium.copyWith(color: AppColors.error)),
                       ],
                     ),
                   ),
+
                 ],
               ),
             ],
           ),
-          SizedBox(height: AppSpacing.sm),
+          const SizedBox(height: AppSpacing.sm),
           Row(
+
             children: [
               if (student.batchId.isNotEmpty)
                 Container(

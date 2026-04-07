@@ -88,63 +88,7 @@ class _MarkAttendanceScreenState extends State<MarkAttendanceScreen> {
       ),
       body: Column(
         children: [
-          Padding(
-            padding: EdgeInsets.all(AppSpacing.lg),
-            child: Column(
-              children: [
-                // Batch Selector
-                Container(
-                  padding: EdgeInsets.symmetric(horizontal: AppSpacing.lg),
-                  decoration: BoxDecoration(
-                    color: Colors.white.withAlpha((0.1 * 255).round()),
-                    borderRadius: BorderRadius.circular(AppRadius.md),
-                    border: Border.all(color: Colors.white.withAlpha((0.2 * 255).round())),
-                  ),
-                  child: DropdownButtonHideUnderline(
-                    child: DropdownButton<String>(
-                      value: _selectedBatch,
-                      hint: Text('Select Batch', style: AppTextStyles.bodyMedium.copyWith(color: Colors.white70)),
-                      dropdownColor: AppColors.navyBlueBase,
-                      icon: const Icon(Icons.keyboard_arrow_down_rounded, color: Colors.white),
-                      isExpanded: true,
-                      style: AppTextStyles.bodyMedium.copyWith(color: Colors.white),
-                      items: DummyData.batches.where((b) => b.professorId == (authProvider.currentUser?.id ?? '')).map((batch) {
-                        return DropdownMenuItem(
-                          value: batch.id,
-                          child: Text(batch.name),
-                        );
-                      }).toList(),
-                      onChanged: _onBatchChanged,
-                    ),
-                  ),
-                ),
-                SizedBox(height: AppSpacing.md),
-                // Date Selector
-                GestureDetector(
-                  onTap: _selectDate,
-                  child: Container(
-                    padding: EdgeInsets.all(AppSpacing.lg),
-                    decoration: BoxDecoration(
-                      color: Colors.white.withAlpha((0.1 * 255).round()),
-                      borderRadius: BorderRadius.circular(AppRadius.md),
-                    ),
-                    child: Row(
-                      children: [
-                        const Icon(Icons.calendar_today_rounded, color: Colors.white, size: 20),
-                        SizedBox(width: AppSpacing.md),
-                        Text(
-                          DateFormat('EEEE, MMM d, yyyy').format(_selectedDate),
-                          style: AppTextStyles.labelLarge.copyWith(color: Colors.white, fontWeight: FontWeight.w500),
-                        ),
-                        const Spacer(),
-                        const Icon(Icons.edit_calendar_rounded, color: Colors.white70, size: 18),
-                      ],
-                    ),
-                  ),
-                ),
-              ],
-            ),
-          ),
+          _buildHeader(authProvider),
           Expanded(
             child: Container(
               width: double.infinity,
@@ -165,6 +109,69 @@ class _MarkAttendanceScreenState extends State<MarkAttendanceScreen> {
     );
   }
 
+  Widget _buildHeader(AuthProvider authProvider) {
+    final dateDisplay = DateFormat('EEEE, MMM d, yyyy').format(_selectedDate);
+
+    return Padding(
+      padding: const EdgeInsets.all(AppSpacing.lg),
+      child: Column(
+        children: [
+          // Batch Selector
+          Container(
+            padding: const EdgeInsets.symmetric(horizontal: AppSpacing.lg),
+            decoration: BoxDecoration(
+              color: Colors.white.withAlpha((0.1 * 255).round()),
+              borderRadius: BorderRadius.circular(AppRadius.md),
+              border: Border.all(color: Colors.white.withAlpha((0.2 * 255).round())),
+            ),
+            child: DropdownButtonHideUnderline(
+              child: DropdownButton<String>(
+                value: _selectedBatch,
+                hint: Text('Select Batch', style: AppTextStyles.bodyMedium.copyWith(color: Colors.white70)),
+                dropdownColor: AppColors.navyBlueBase,
+                icon: const Icon(Icons.keyboard_arrow_down_rounded, color: Colors.white),
+                isExpanded: true,
+                style: AppTextStyles.bodyMedium.copyWith(color: Colors.white),
+                items: DummyData.batches.where((b) => b.professorId == (authProvider.currentUser?.id ?? '')).map((batch) {
+                  return DropdownMenuItem(
+                    value: batch.id,
+                    child: Text(batch.name),
+                  );
+                }).toList(),
+                onChanged: _onBatchChanged,
+              ),
+            ),
+          ),
+          const SizedBox(height: AppSpacing.md),
+          // Date Selector
+          GestureDetector(
+            onTap: _selectDate,
+            child: Container(
+              padding: const EdgeInsets.all(AppSpacing.lg),
+              decoration: BoxDecoration(
+                color: Colors.white.withAlpha((0.1 * 255).round()),
+                borderRadius: BorderRadius.circular(AppRadius.md),
+              ),
+              child: Row(
+                children: [
+                  const Icon(Icons.calendar_today_rounded, color: Colors.white, size: 20),
+                  const SizedBox(width: AppSpacing.md),
+                  Text(
+                    dateDisplay,
+                    style: AppTextStyles.labelLarge.copyWith(color: Colors.white, fontWeight: FontWeight.w500),
+                  ),
+                  const Spacer(),
+                  const Icon(Icons.edit_calendar_rounded, color: Colors.white70, size: 18),
+                ],
+              ),
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+
+
   Widget _buildAttendanceList() {
     if (_selectedBatch == null) {
       return const EmptyState(
@@ -184,28 +191,10 @@ class _MarkAttendanceScreenState extends State<MarkAttendanceScreen> {
 
     return Column(
       children: [
-        Padding(
-          padding: EdgeInsets.all(AppSpacing.lg),
-          child: Row(
-            mainAxisAlignment: MainAxisAlignment.spaceBetween,
-            children: [
-              Text(
-                'STUDENTS (${_students.length})',
-                style: AppTextStyles.labelSmall.copyWith(color: AppColors.textSecondary, letterSpacing: 1.2),
-              ),
-              Row(
-                children: [
-                  _bulkActionChip('All P', AppColors.success, () => _markAll(AttendanceStatus.present)),
-                  SizedBox(width: AppSpacing.sm),
-                  _bulkActionChip('All A', AppColors.absent, () => _markAll(AttendanceStatus.absent)),
-                ],
-              ),
-            ],
-          ),
-        ),
+        _buildAttendanceListHeader(),
         Expanded(
           child: ListView.builder(
-            padding: EdgeInsets.symmetric(horizontal: AppSpacing.lg),
+            padding: const EdgeInsets.symmetric(horizontal: AppSpacing.lg),
             itemCount: _students.length,
             itemBuilder: (context, index) {
               final student = _students[index];
@@ -218,7 +207,7 @@ class _MarkAttendanceScreenState extends State<MarkAttendanceScreen> {
                   mainAxisSize: MainAxisSize.min,
                   children: [
                     _statusToggle(student.id, AttendanceStatus.present, Icons.check_circle_rounded, AppColors.success, status == AttendanceStatus.present),
-                    SizedBox(width: AppSpacing.md),
+                    const SizedBox(width: AppSpacing.md),
                     _statusToggle(student.id, AttendanceStatus.absent, Icons.cancel_rounded, AppColors.absent, status == AttendanceStatus.absent),
                   ],
                 ),
@@ -226,29 +215,56 @@ class _MarkAttendanceScreenState extends State<MarkAttendanceScreen> {
             },
           ),
         ),
-        Container(
-          padding: EdgeInsets.all(AppSpacing.lg),
-          decoration: BoxDecoration(
-            color: Colors.white,
-            boxShadow: [
-              BoxShadow(
-                color: AppColors.textPrimary.withAlpha((0.05 * 255).round()),
-                blurRadius: 10,
-                offset: const Offset(0, -5),
-              ),
-            ],
-          ),
-          child: SafeArea(
-            child: CustomButton(
-              label: 'Submit Attendance',
-              onPressed: _saveAttendance,
-              width: double.infinity,
-            ),
-          ),
-        ),
+        _buildSubmitButton(),
       ],
     );
   }
+
+  Widget _buildAttendanceListHeader() {
+    return Padding(
+      padding: const EdgeInsets.all(AppSpacing.lg),
+      child: Row(
+        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+        children: [
+          Text(
+            'STUDENTS (${_students.length})',
+            style: AppTextStyles.labelSmall.copyWith(color: AppColors.textSecondary, letterSpacing: 1.2),
+          ),
+          Row(
+            children: [
+              _bulkActionChip('All P', AppColors.success, () => _markAll(AttendanceStatus.present)),
+              const SizedBox(width: AppSpacing.sm),
+              _bulkActionChip('All A', AppColors.absent, () => _markAll(AttendanceStatus.absent)),
+            ],
+          ),
+        ],
+      ),
+    );
+  }
+
+  Widget _buildSubmitButton() {
+    return Container(
+      padding: const EdgeInsets.all(AppSpacing.lg),
+      decoration: BoxDecoration(
+        color: Colors.white,
+        boxShadow: [
+          BoxShadow(
+            color: AppColors.textPrimary.withAlpha((0.05 * 255).round()),
+            blurRadius: 10,
+            offset: const Offset(0, -5),
+          ),
+        ],
+      ),
+      child: SafeArea(
+        child: CustomButton(
+          label: 'Submit Attendance',
+          onPressed: _saveAttendance,
+          width: double.infinity,
+        ),
+      ),
+    );
+  }
+
 
   Widget _bulkActionChip(String label, Color color, VoidCallback onTap) {
     return InkWell(
