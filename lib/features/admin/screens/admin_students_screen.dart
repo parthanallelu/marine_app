@@ -17,6 +17,8 @@ class _AdminStudentsScreenState extends State<AdminStudentsScreen> {
   late List<StudentModel> _allStudents;
   late List<StudentModel> _filteredStudents;
   String _selectedCourse = "All";
+  String _selectedBranch = "All";
+  String _searchQuery = "";
   bool _isSubmitting = false;
 
 
@@ -80,7 +82,7 @@ class _AdminStudentsScreenState extends State<AdminStudentsScreen> {
                 _applyFilters();
               });
               Navigator.pop(context);
-              AppSnackBar.show(context, "Student deleted successfully", isError: false);
+              AppSnackBar.showSuccess(context, "Student deleted successfully");
             },
             child: const Text("Delete", style: TextStyle(color: Colors.red)),
           ),
@@ -256,7 +258,7 @@ class _AdminStudentsScreenState extends State<AdminStudentsScreen> {
                   child: Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
-                      const Text("Enroll New Student", style: AppTextStyles.headingMedium),
+                      Text("Enroll New Student", style: AppTextStyles.headingMedium),
                       const SizedBox(height: AppSpacing.sm),
                       Text(
                         "Fill in the details below to add a student to the academy database.",
@@ -442,7 +444,7 @@ class _AdminStudentsScreenState extends State<AdminStudentsScreen> {
                   child: Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
-                      const Text("Edit Student", style: AppTextStyles.headingMedium),
+                      Text("Edit Student", style: AppTextStyles.headingMedium),
                       const SizedBox(height: AppSpacing.sm),
                       Text(
                         "Update ${student.name}'s information below.",
@@ -570,42 +572,6 @@ class _AdminStudentsScreenState extends State<AdminStudentsScreen> {
     );
   }
 
-  // ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
-  // DELETE STUDENT
-  // ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
-
-  void _confirmDeleteStudent(StudentModel student) {
-    showDialog(
-      context: context,
-      builder: (context) => AlertDialog(
-        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(AppRadius.lg)),
-        title: const Text("Delete Student?"),
-        content: Text(
-          "Are you sure you want to remove ${student.name}? This action cannot be undone.",
-        ),
-        actions: [
-          TextButton(
-            onPressed: () => Navigator.pop(context),
-            child: const Text("Cancel"),
-          ),
-          ElevatedButton(
-            style: ElevatedButton.styleFrom(backgroundColor: AppColors.error),
-            onPressed: () {
-              setState(() {
-                _allStudents.remove(student);
-                DummyData.students.remove(student);
-                _applyFilters();
-              });
-              Navigator.pop(context);
-              AppSnackBar.showSuccess(context, "Student deleted");
-            },
-            child: Text("Delete", style: AppTextStyles.labelLarge.copyWith(color: Colors.white)),
-          ),
-
-        ],
-      ),
-    );
-  }
 
   // ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
   // FILTER SELECTORS
@@ -621,7 +587,7 @@ class _AdminStudentsScreenState extends State<AdminStudentsScreen> {
         children: [
           Padding(
             padding: const EdgeInsets.symmetric(horizontal: AppSpacing.xl, vertical: AppSpacing.sm),
-            child: const Text("Filter by Branch", style: AppTextStyles.headingSmall),
+            child: Text("Filter by Branch", style: AppTextStyles.headingSmall),
           ),
 
           ...["All", ...AppConstants.branches].map((branch) => ListTile(
@@ -660,7 +626,7 @@ class _AdminStudentsScreenState extends State<AdminStudentsScreen> {
         children: [
           Padding(
             padding: const EdgeInsets.symmetric(horizontal: AppSpacing.xl, vertical: AppSpacing.sm),
-            child: const Text("Filter by Course", style: AppTextStyles.headingSmall),
+            child: Text("Filter by Course", style: AppTextStyles.headingSmall),
           ),
 
           ...["All", ...AppConstants.courseTypes].map((course) => ListTile(
@@ -903,7 +869,10 @@ class _AdminStudentTile extends StatelessWidget {
             ElevatedButton(
               onPressed: () {
                 if (selectedBatchId != null) {
-                  final batch = DummyData.batches.firstWhere((b) => b.id == selectedBatchId);
+                  final batch = DummyData.batches.firstWhere(
+                    (b) => b.id == selectedBatchId,
+                    orElse: () => DummyData.batches.first,
+                  );
                   student.batchId = batch.id;
                   student.batchName = batch.name;
                   onBatchChanged();

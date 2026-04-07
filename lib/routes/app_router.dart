@@ -27,6 +27,7 @@ import '../features/common/screens/splash_screen.dart';
 import '../features/common/screens/error_screen.dart';
 import '../providers/auth_provider.dart';
 import '../core/constants/app_constants.dart';
+import '../models/app_models.dart';
 
 class AppRouter {
   static final GlobalKey<NavigatorState> _rootNavigatorKey = GlobalKey<NavigatorState>();

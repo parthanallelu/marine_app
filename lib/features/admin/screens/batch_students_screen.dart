@@ -252,7 +252,7 @@ class _AddStudentsSheetState extends State<_AddStudentsSheet> {
                 child: Row(
                   mainAxisAlignment: MainAxisAlignment.spaceBetween,
                   children: [
-                    const Text("Assign Students", style: AppTextStyles.headingMedium),
+                    Text("Assign Students", style: AppTextStyles.headingMedium),
                     IconButton(
                       icon: const Icon(Icons.close),
                       onPressed: () => Navigator.pop(context),

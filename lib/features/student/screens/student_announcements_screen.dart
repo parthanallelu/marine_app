@@ -65,7 +65,7 @@ class _AnnouncementsScreenState extends State<AnnouncementsScreen> {
     return Scaffold(
       backgroundColor: AppColors.background,
       appBar: AppBar(
-        title: const Text("Notice Board", style: AppTextStyles.headingMedium),
+        title: Text("Notice Board", style: AppTextStyles.headingMedium),
         backgroundColor: Colors.white,
         elevation: 0,
         foregroundColor: AppColors.navyBlueBase,

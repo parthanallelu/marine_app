@@ -230,7 +230,7 @@ class _StudentProfileScreenState extends State<StudentProfileScreen> {
                   decoration: BoxDecoration(color: AppColors.gold.withAlpha((0.1 * 255).round()), borderRadius: BorderRadius.circular(AppRadius.sm)),
                   child: const Icon(Icons.receipt_long_rounded, color: AppColors.gold, size: 20),
                 ),
-                title: const Text("Fee Details", style: AppTextStyles.labelLarge),
+                title: Text("Fee Details", style: AppTextStyles.labelLarge),
                 trailing: const Icon(Icons.chevron_right_rounded),
                 onTap: () => context.pushNamed(AppRoutes.studentFeesName),
               ),
@@ -241,7 +241,7 @@ class _StudentProfileScreenState extends State<StudentProfileScreen> {
                   decoration: BoxDecoration(color: AppColors.warning.withAlpha((0.1 * 255).round()), borderRadius: BorderRadius.circular(AppRadius.sm)),
                   child: const Icon(Icons.campaign_rounded, color: AppColors.warning, size: 20),
                 ),
-                title: const Text("Announcements", style: AppTextStyles.labelLarge),
+                title: Text("Announcements", style: AppTextStyles.labelLarge),
                 trailing: const Icon(Icons.chevron_right_rounded),
                 onTap: () => context.pushNamed(AppRoutes.studentAnnouncementsName),
               ),
@@ -381,7 +381,7 @@ class _StudentFeesScreenState extends State<StudentFeesScreen> {
     return Scaffold(
       backgroundColor: AppColors.background,
       appBar: AppBar(
-        title: const Text("Fee Details", style: AppTextStyles.headingSmall),
+        title: Text("Fee Details", style: AppTextStyles.headingSmall),
         backgroundColor: Colors.white,
         elevation: 0,
         foregroundColor: AppColors.navyBlueBase,
@@ -544,7 +544,7 @@ class _InstallmentTile extends StatelessWidget {
                 padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 2),
                 decoration: BoxDecoration(
                   color: color.withAlpha((0.1 * 255).round()),
-                  borderRadius: BorderRadius.circular(AppRadius.xxs),
+                  borderRadius: BorderRadius.circular(AppRadius.xs),
                 ),
                 child: Text(
                   installment.status.name.toUpperCase(),
@@ -559,7 +559,7 @@ class _InstallmentTile extends StatelessWidget {
   }
 }
 
-}
+
 
 class _FeeSummaryItem extends StatelessWidget {
   final String label;

@@ -300,7 +300,7 @@ class _AdminBatchesScreenState extends State<AdminBatchesScreen> {
                               
                               if (!mounted) return;
 
-                              final prof = DummyData.professors.firstWhere((p) => p.id == selectedProfessor);
+                              final prof = DummyData.professors.firstWhere((p) => p.id == selectedProfessor, orElse: () => DummyData.professors.first);
                               final newBatch = BatchModel(
                                 id: const Uuid().v4(),
                                 name: _nameController.text,
@@ -446,7 +446,7 @@ class _AdminBatchesScreenState extends State<AdminBatchesScreen> {
                             
                             if (!mounted) return;
 
-                            final prof = DummyData.professors.firstWhere((p) => p.id == selectedProfessor);
+                            final prof = DummyData.professors.firstWhere((p) => p.id == selectedProfessor, orElse: () => DummyData.professors.first);
                             setState(() {
                               batch.name = _nameController.text;
                               batch.courseType = selectedCourse;
@@ -636,12 +636,12 @@ class _AdminBatchCard extends StatelessWidget {
                       ],
                     ),
                   ),
-                  const PopupMenuItem(
+                  PopupMenuItem(
                     value: 'delete',
                     child: Row(
                       children: [
-                        Icon(Icons.delete_outline, size: 18, color: AppColors.error),
-                        SizedBox(width: AppSpacing.sm),
+                        const Icon(Icons.delete_outline, size: 18, color: AppColors.error),
+                        const SizedBox(width: AppSpacing.sm),
                         Text("Delete", style: AppTextStyles.labelMedium.copyWith(color: AppColors.error)),
                       ],
                     ),

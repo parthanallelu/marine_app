@@ -299,7 +299,7 @@ class _ProfessorHomeScreenState extends State<ProfessorHomeScreen> {
             const SizedBox(height: AppSpacing.lg),
             Padding(
               padding: const EdgeInsets.symmetric(horizontal: AppSpacing.xl),
-              child: const Text('Assigned Students', style: AppTextStyles.headingSmall),
+              child: Text('Assigned Students', style: AppTextStyles.headingSmall),
             ),
             const SizedBox(height: AppSpacing.xl),
             if (students.isEmpty)

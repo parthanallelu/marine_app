@@ -295,13 +295,13 @@ class _TestAttemptScreenState extends State<TestAttemptScreen> {
             _buildProgressHeader(totalCount, answeredCount),
 
             if (_isSubmitting)
-              const Expanded(
+              Expanded(
                 child: Center(
                   child: Column(
                     mainAxisAlignment: MainAxisAlignment.center,
                     children: [
-                      CircularProgressIndicator(),
-                      SizedBox(height: AppSpacing.lg),
+                      const CircularProgressIndicator(),
+                      const SizedBox(height: AppSpacing.lg),
                       Text("Submitting your answers...", style: AppTextStyles.labelLarge),
                     ],
                   ),

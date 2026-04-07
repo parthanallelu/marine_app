@@ -213,6 +213,10 @@ class _StudentHomeScreenState extends State<StudentHomeScreen> {
                   color: AppColors.course12th,
                   onTap: () => context.pushNamed(AppRoutes.studentFeesName),
                 ),
+                QuickActionTile(
+                  label: "Schedule",
+                  icon: Icons.calendar_month_rounded,
+                  color: AppColors.navyBlueLight,
                   onTap: () => AppSnackBar.showInfo(context, "Schedule feature coming soon!"),
                 ),
 
@@ -242,8 +246,8 @@ class _StudentHomeScreenState extends State<StudentHomeScreen> {
           actionLabel: "All Tests",
           onAction: () => context.goNamed(AppRoutes.studentTestsName),
           child: _upcomingTests.isEmpty 
-              ? const Padding(
-                  padding: EdgeInsets.symmetric(vertical: AppSpacing.xl),
+              ? Padding(
+                  padding: const EdgeInsets.symmetric(vertical: AppSpacing.xl),
                   child: Text("No upcoming tests scheduled", style: AppTextStyles.bodyMedium),
                 )
               : Column(

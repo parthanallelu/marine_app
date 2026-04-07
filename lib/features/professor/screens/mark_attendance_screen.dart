@@ -43,7 +43,7 @@ class _MarkAttendanceScreenState extends State<MarkAttendanceScreen> {
     // Mock loading students for the batch
     Future.delayed(const Duration(milliseconds: 500), () {
       if (!mounted) return;
-      final batch = DummyData.batches.firstWhere((b) => b.id == batchId);
+      final batch = DummyData.batches.firstWhere((b) => b.id == batchId, orElse: () => DummyData.batches.first);
       setState(() {
         _students = DummyData.students.where((s) => batch.studentIds.contains(s.id)).toList();
         // Initialize all as present by default

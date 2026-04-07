@@ -35,8 +35,8 @@ class RoleSelectionScreen extends StatelessWidget {
                     child: const Icon(Icons.anchor_rounded, color: AppColors.navyBlueDark, size: 44),
                   ),
                   SizedBox(height: AppSpacing.lg),
-                  const Text(
-                    AppConstants.appName,
+                  Text(
+                    'Select Profile',
                     style: AppTextStyles.headingLarge,
                     textAlign: TextAlign.center,
                   ),
