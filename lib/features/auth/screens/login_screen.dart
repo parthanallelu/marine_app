@@ -88,11 +88,15 @@ class _LoginScreenState extends State<LoginScreen> {
                       children: [
                         Container(
                           padding: const EdgeInsets.all(AppSpacing.xs),
-                          decoration: BoxDecoration(
+                          decoration: const BoxDecoration(
                             color: Colors.white,
                             shape: BoxShape.circle,
                           ),
-                          child: ClipOval(child: Image.asset('assets/images/logo.jpg', width: 44, height: 44, fit: BoxFit.cover)),
+                          child: CircleAvatar(
+                            radius: 20,
+                            backgroundColor: Colors.white,
+                            backgroundImage: AssetImage(AppConstants.logo),
+                          ),
                         ),
                         const SizedBox(width: AppSpacing.lg),
                         Column(

@@ -168,7 +168,7 @@ class _StudentHomeScreenState extends State<StudentHomeScreen> {
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
             const SectionHeader(title: "Quick Actions"),
-            SizedBox(height: AppSpacing.md),
+            const SizedBox(height: AppSpacing.md),
             GridView.count(
               crossAxisCount: 4,
               crossAxisSpacing: 10,
@@ -238,7 +238,7 @@ class _StudentHomeScreenState extends State<StudentHomeScreen> {
   Widget _buildUpcomingTests(BuildContext context) {
     return SliverToBoxAdapter(
       child: Padding(
-        padding: EdgeInsets.fromLTRB(AppSpacing.xl, AppSpacing.xxl, AppSpacing.xl, 0),
+        padding: const EdgeInsets.fromLTRB(AppSpacing.xl, AppSpacing.xxl, AppSpacing.xl, 0),
         child: DashboardCard(
           title: "Upcoming Tests",
           icon: Icons.quiz_rounded,
@@ -247,7 +247,7 @@ class _StudentHomeScreenState extends State<StudentHomeScreen> {
           onAction: () => context.goNamed(AppRoutes.studentTestsName),
           child: _upcomingTests.isEmpty 
               ? Padding(
-                  padding: EdgeInsets.symmetric(vertical: AppSpacing.xl),
+                  padding: const EdgeInsets.symmetric(vertical: AppSpacing.xl),
                   child: Text("No upcoming tests scheduled", style: AppTextStyles.bodyMedium),
                 )
               : Column(
@@ -378,15 +378,6 @@ class _StudentHeader extends StatelessWidget {
             children: [
               Row(
                 children: [
-                  Container(
-                    padding: const EdgeInsets.all(AppSpacing.xs),
-                    decoration: BoxDecoration(
-                      color: Colors.white.withAlpha((0.15 * 255).round()),
-                      borderRadius: BorderRadius.circular(AppRadius.sm),
-                    ),
-                    child: Image.asset('assets/images/logo.jpg', width: 40, height: 40),
-                  ),
-                  const SizedBox(width: AppSpacing.md),
                   Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [

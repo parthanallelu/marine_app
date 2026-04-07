@@ -23,22 +23,21 @@ class _SplashScreenState extends State<SplashScreen> {
     // 800ms delay for splash
     await Future.delayed(const Duration(milliseconds: 800));
     if (!mounted) return;
-    
-    final navigator = GoRouter.of(context);
+
     final authProvider = context.read<AuthProvider>();
     final isLoggedIn = authProvider.isLoggedIn;
-    
+
     if (!isLoggedIn) {
-      navigator.go(AppRoutes.roleSelection);
+      context.go(AppRoutes.roleSelection);
     } else {
       if (authProvider.isStudent) {
-        navigator.go(AppRoutes.studentHome);
+        context.go(AppRoutes.studentHome);
       } else if (authProvider.isProfessor) {
-        navigator.go(AppRoutes.professorHome);
+        context.go(AppRoutes.professorHome);
       } else if (authProvider.isAdmin) {
-        navigator.go(AppRoutes.adminHome);
+        context.go(AppRoutes.adminHome);
       } else {
-        navigator.go(AppRoutes.roleSelection);
+        context.go(AppRoutes.roleSelection);
       }
     }
   }
@@ -46,35 +45,46 @@ class _SplashScreenState extends State<SplashScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: AppColors.navyBlueBase,
+      backgroundColor: AppColors.surface,
       body: Center(
         child: Column(
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
             Container(
-              width: 120,
-              height: 120,
+              padding: const EdgeInsets.all(AppSpacing.xxl),
               decoration: BoxDecoration(
                 color: Colors.white,
                 shape: BoxShape.circle,
-                boxShadow: [
-                  BoxShadow(color: Colors.black.withAlpha((0.1 * 255).round()), blurRadius: 10, spreadRadius: 2),
-                ],
+                boxShadow: AppShadows.subtle,
               ),
-              child: ClipOval(child: Image.asset('assets/images/logo.jpg', fit: BoxFit.cover)),
+              child: Image.asset(
+                AppConstants.logo,
+                width: 140,
+                height: 140,
+              ),
             ),
-            const SizedBox(height: 32),
+            const SizedBox(height: AppSpacing.xxl),
+            const CircularProgressIndicator(
+              valueColor: AlwaysStoppedAnimation<Color>(AppColors.navyBlueBase),
+              strokeWidth: 2,
+            ),
+            const SizedBox(height: AppSpacing.xl),
             Text(
-              AppConstants.appName,
-              style: AppTextStyles.headingMedium.copyWith(color: Colors.white, letterSpacing: 1.2),
+              AppConstants.appName.toUpperCase(),
+              style: AppTextStyles.headingMedium.copyWith(
+                color: AppColors.navyBlueBase,
+                letterSpacing: 2,
+                fontWeight: FontWeight.w700,
+              ),
             ),
-            SizedBox(height: AppSpacing.sm),
+            const SizedBox(height: AppSpacing.xs),
             Text(
               AppConstants.appTagline,
-              style: AppTextStyles.bodySmall.copyWith(color: Colors.white70),
+              style: AppTextStyles.bodySmall.copyWith(
+                color: AppColors.textHint,
+                letterSpacing: 1.5,
+              ),
             ),
-            const SizedBox(height: 48),
-            const CircularProgressIndicator(valueColor: AlwaysStoppedAnimation<Color>(AppColors.gold)),
           ],
         ),
       ),

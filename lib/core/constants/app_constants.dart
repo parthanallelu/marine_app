@@ -59,6 +59,7 @@ class AppConstants {
   static const String adminRoleDesc = "Academy management & reports";
 
   static String get defaultBranch => branches[0];
+  static const String logo = "assets/images/logo.jpg";
 }
 
 class AppRoutes {

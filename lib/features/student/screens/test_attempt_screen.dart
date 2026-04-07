@@ -301,7 +301,7 @@ class _TestAttemptScreenState extends State<TestAttemptScreen> {
                     mainAxisAlignment: MainAxisAlignment.center,
                     children: [
                       const CircularProgressIndicator(),
-                      SizedBox(height: AppSpacing.lg),
+                      const SizedBox(height: AppSpacing.lg),
                       Text("Submitting your answers...", style: AppTextStyles.labelLarge),
                     ],
                   ),
@@ -352,7 +352,7 @@ class _TestAttemptScreenState extends State<TestAttemptScreen> {
   Widget _buildProgressHeader(int totalCount, int answeredCount) {
     return Container(
       color: AppColors.background,
-      padding: EdgeInsets.symmetric(horizontal: AppSpacing.xl, vertical: AppSpacing.md),
+      padding: const EdgeInsets.symmetric(horizontal: AppSpacing.xl, vertical: AppSpacing.md),
       child: Column(
         children: [
           Row(
@@ -368,7 +368,7 @@ class _TestAttemptScreenState extends State<TestAttemptScreen> {
               ),
             ],
           ),
-          SizedBox(height: AppSpacing.sm),
+          const SizedBox(height: AppSpacing.sm),
           ClipRRect(
             borderRadius: BorderRadius.circular(AppRadius.xs),
             child: LinearProgressIndicator(
@@ -385,7 +385,7 @@ class _TestAttemptScreenState extends State<TestAttemptScreen> {
 
   Widget _buildNavigationFooter(int totalCount) {
     return Container(
-      padding: EdgeInsets.all(AppSpacing.xl),
+      padding: const EdgeInsets.all(AppSpacing.xl),
       decoration: BoxDecoration(
         color: Colors.white,
         boxShadow: [
@@ -408,7 +408,7 @@ class _TestAttemptScreenState extends State<TestAttemptScreen> {
                 },
               ),
             ),
-          if (_currentIndex > 0) SizedBox(width: AppSpacing.lg),
+          if (_currentIndex > 0) const SizedBox(width: AppSpacing.lg),
           Expanded(
             child: (totalCount > 0 && _currentIndex == totalCount - 1)
                 ? CustomButton(
@@ -445,12 +445,12 @@ class _QuestionPage extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return SingleChildScrollView(
-      padding: EdgeInsets.all(AppSpacing.xl),
+      padding: const EdgeInsets.all(AppSpacing.xl),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           Container(
-            padding: EdgeInsets.symmetric(horizontal: AppSpacing.md, vertical: AppSpacing.xs),
+            padding: const EdgeInsets.symmetric(horizontal: AppSpacing.md, vertical: AppSpacing.xs),
             decoration: BoxDecoration(
               color: AppColors.navyBlueSurface,
               borderRadius: BorderRadius.circular(AppRadius.sm),
@@ -460,12 +460,12 @@ class _QuestionPage extends StatelessWidget {
               style: AppTextStyles.labelSmall.copyWith(color: AppColors.navyBlueBase),
             ),
           ),
-          SizedBox(height: AppSpacing.lg),
+          const SizedBox(height: AppSpacing.lg),
           Text(
             "QN. ${question.questionText}",
             style: AppTextStyles.headingSmall.copyWith(height: 1.5, fontSize: 18),
           ),
-          SizedBox(height: AppSpacing.xxl),
+          const SizedBox(height: AppSpacing.xxl),
           ...List.generate(question.options.length, (index) {
             final isSelected = selectedOption == index;
             final optionLabel = String.fromCharCode(65 + index); // A, B, C, D
@@ -502,8 +502,8 @@ class _OptionTile extends StatelessWidget {
       onTap: onTap,
       child: AnimatedContainer(
         duration: const Duration(milliseconds: 180),
-        margin: EdgeInsets.only(bottom: AppSpacing.md),
-        padding: EdgeInsets.all(AppSpacing.lg),
+        margin: const EdgeInsets.only(bottom: AppSpacing.md),
+        padding: const EdgeInsets.all(AppSpacing.lg),
         decoration: BoxDecoration(
           color: isSelected ? AppColors.navyBlueSurface : AppColors.background,
           borderRadius: BorderRadius.circular(AppRadius.md),
@@ -530,7 +530,7 @@ class _OptionTile extends StatelessWidget {
                 ),
               ),
             ),
-            SizedBox(width: AppSpacing.lg),
+            const SizedBox(width: AppSpacing.lg),
             Expanded(
               child: Text(
                 optionText,

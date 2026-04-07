@@ -27,12 +27,13 @@ class RoleSelectionScreen extends StatelessWidget {
                   Container(
                     width: 100,
                     height: 100,
+                    padding: const EdgeInsets.all(AppSpacing.sm),
                     decoration: BoxDecoration(
                       color: Colors.white,
                       shape: BoxShape.circle,
                       boxShadow: AppShadows.goldGlow,
                     ),
-                    child: ClipOval(child: Image.asset('assets/images/logo.jpg', fit: BoxFit.cover)),
+                    child: Image.asset(AppConstants.logo),
                   ),
                   SizedBox(height: AppSpacing.lg),
                   Text(
