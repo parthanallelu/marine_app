@@ -89,7 +89,7 @@ class _StudentTestsScreenState extends State<StudentTestsScreen> with SingleTick
               child: Column(
                 children: [
                   Padding(
-                    padding: const EdgeInsets.fromLTRB(AppSpacing.lg, AppSpacing.md, AppSpacing.lg, AppSpacing.sm),
+                    padding: EdgeInsets.fromLTRB(AppSpacing.lg, AppSpacing.md, AppSpacing.lg, AppSpacing.sm),
                     child: Row(
                       children: [
                         Text(
@@ -150,7 +150,7 @@ class _TestList extends StatelessWidget {
 
     // LIST PERFORMANCE: Using ListView.builder for dynamic lists
     return ListView.builder(
-      padding: const EdgeInsets.all(AppSpacing.lg),
+      padding: EdgeInsets.all(AppSpacing.lg),
       itemCount: tests.length,
       itemBuilder: (context, index) {
         final test = tests[index];
@@ -193,7 +193,7 @@ class _TestCard extends StatelessWidget {
     }
 
     return Container(
-      margin: const EdgeInsets.only(bottom: AppSpacing.lg),
+      margin: EdgeInsets.only(bottom: AppSpacing.lg),
       decoration: BoxDecoration(
         color: Colors.white,
         borderRadius: AppRadius.cardRadius,
@@ -211,7 +211,7 @@ class _TestCard extends StatelessWidget {
             ),
           ),
           Padding(
-            padding: const EdgeInsets.all(AppSpacing.lg),
+            padding: EdgeInsets.all(AppSpacing.lg),
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
@@ -246,25 +246,25 @@ class _TestCard extends StatelessWidget {
                     ],
                   ],
                 ),
-                const SizedBox(height: AppSpacing.md),
+                SizedBox(height: AppSpacing.md),
                 Text(test.title, style: AppTextStyles.headingSmall),
-                const SizedBox(height: AppSpacing.lg),
+                SizedBox(height: AppSpacing.lg),
                 Row(
                   children: [
                     _MetaChip(icon: Icons.help_outline_rounded, label: "${test.questions.length} Qns"),
-                    const SizedBox(width: AppSpacing.sm),
+                    SizedBox(width: AppSpacing.sm),
                     _MetaChip(icon: Icons.timer_outlined, label: "${test.durationMinutes}m"),
                     const SizedBox(width: AppSpacing.sm),
                     _MetaChip(icon: Icons.stars_rounded, label: "${test.totalMarks.toInt()} Marks"),
 
                   ],
                 ),
-                const SizedBox(height: AppSpacing.lg),
+                SizedBox(height: AppSpacing.lg),
 
                     Row(
                       children: [
                         const Icon(Icons.calendar_today_outlined, size: 14, color: AppColors.textHint),
-                        const SizedBox(width: AppSpacing.xs),
+                        SizedBox(width: AppSpacing.xs),
                         Text(
                           test.scheduledDate.toString().split(' ')[0],
                           style: AppTextStyles.caption.copyWith(color: AppColors.textSecondary),
@@ -298,7 +298,7 @@ class _MetaChip extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Container(
-        padding: const EdgeInsets.symmetric(horizontal: AppSpacing.sm, vertical: AppSpacing.xs),
+        padding: EdgeInsets.symmetric(horizontal: AppSpacing.sm, vertical: AppSpacing.xs),
         decoration: BoxDecoration(
           color: AppColors.background,
           borderRadius: BorderRadius.circular(AppRadius.sm),
@@ -329,7 +329,7 @@ class _ResultList extends StatelessWidget {
     }
 
     return ListView.builder(
-      padding: const EdgeInsets.all(AppSpacing.lg),
+      padding: EdgeInsets.all(AppSpacing.lg),
       itemCount: results.length,
       itemBuilder: (context, index) {
         final result = results[index];
@@ -353,8 +353,8 @@ class _ResultCard extends StatelessWidget {
     return GestureDetector(
       onTap: () => context.pushNamed(AppRoutes.testResultName, pathParameters: {'resultId': result.id}),
       child: Container(
-        margin: const EdgeInsets.only(bottom: AppSpacing.lg),
-        padding: const EdgeInsets.all(AppSpacing.lg),
+        margin: EdgeInsets.only(bottom: AppSpacing.lg),
+        padding: EdgeInsets.all(AppSpacing.lg),
         decoration: BoxDecoration(
           color: Colors.white,
           borderRadius: AppRadius.cardRadius,
@@ -376,7 +376,7 @@ class _ResultCard extends StatelessWidget {
                 style: AppTextStyles.headingMedium.copyWith(color: color, fontWeight: FontWeight.bold),
               ),
             ),
-            const SizedBox(width: AppSpacing.lg),
+            SizedBox(width: AppSpacing.lg),
 
             Expanded(
               child: Column(
@@ -396,7 +396,7 @@ class _ResultCard extends StatelessWidget {
               ),
             ),
             Container(
-              padding: const EdgeInsets.symmetric(horizontal: AppSpacing.sm, vertical: AppSpacing.xs),
+              padding: EdgeInsets.symmetric(horizontal: AppSpacing.sm, vertical: AppSpacing.xs),
               decoration: BoxDecoration(
                 color: bgColor,
                 borderRadius: BorderRadius.circular(AppRadius.xxl),

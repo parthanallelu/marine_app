@@ -87,12 +87,12 @@ class _LoginScreenState extends State<LoginScreen> {
                     Row(
                       children: [
                         Container(
-                          padding: const EdgeInsets.all(AppSpacing.sm),
+                          padding: const EdgeInsets.all(AppSpacing.xs),
                           decoration: BoxDecoration(
-                            color: Colors.white.withAlpha((0.15 * 255).round()),
-                            borderRadius: BorderRadius.circular(AppRadius.md),
+                            color: Colors.white,
+                            shape: BoxShape.circle,
                           ),
-                          child: Icon(roleIcon, color: Colors.white, size: 32),
+                          child: ClipOval(child: Image.asset('assets/images/logo.jpg', width: 44, height: 44, fit: BoxFit.cover)),
                         ),
                         const SizedBox(width: AppSpacing.lg),
                         Column(

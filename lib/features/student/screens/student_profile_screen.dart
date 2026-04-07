@@ -99,7 +99,7 @@ class _StudentProfileScreenState extends State<StudentProfileScreen> {
         ),
         child: SafeArea(
           child: Padding(
-            padding: const EdgeInsets.fromLTRB(AppSpacing.xl, AppSpacing.lg, AppSpacing.xl, AppSpacing.xxl),
+            padding: EdgeInsets.fromLTRB(AppSpacing.xl, AppSpacing.lg, AppSpacing.xl, AppSpacing.xxl),
             child: Column(
               children: [
                 CircleAvatar(
@@ -110,7 +110,7 @@ class _StudentProfileScreenState extends State<StudentProfileScreen> {
                     style: AppTextStyles.headingLarge.copyWith(color: AppColors.gold, fontSize: 32),
                   ),
                 ),
-                const SizedBox(height: AppSpacing.md),
+                SizedBox(height: AppSpacing.md),
                 Text(
                   student.name,
                   style: AppTextStyles.headingMedium.copyWith(color: Colors.white),
@@ -120,12 +120,12 @@ class _StudentProfileScreenState extends State<StudentProfileScreen> {
                   "Roll No: ${student.rollNumber}",
                   style: AppTextStyles.bodySmall.copyWith(color: Colors.white54),
                 ),
-                const SizedBox(height: AppSpacing.md),
+                SizedBox(height: AppSpacing.md),
                 Row(
                   mainAxisAlignment: MainAxisAlignment.center,
                   children: [
                     CourseBadge(courseType: student.courseType),
-                    const SizedBox(width: AppSpacing.sm),
+                    SizedBox(width: AppSpacing.sm),
                     BranchBadge(branch: student.branch),
                   ],
                 ),
@@ -142,9 +142,9 @@ class _StudentProfileScreenState extends State<StudentProfileScreen> {
       child: Transform.translate(
         offset: const Offset(0, -16),
         child: Padding(
-          padding: const EdgeInsets.symmetric(horizontal: AppSpacing.xl),
+          padding: EdgeInsets.symmetric(horizontal: AppSpacing.xl),
           child: Container(
-            padding: const EdgeInsets.all(AppSpacing.lg),
+            padding: EdgeInsets.all(AppSpacing.lg),
             decoration: BoxDecoration(
               color: Colors.white,
               borderRadius: AppRadius.cardRadius,
@@ -159,14 +159,14 @@ class _StudentProfileScreenState extends State<StudentProfileScreen> {
                     icon: Icons.calendar_today,
                     color: AppColors.success,
                   ),
-                  const VerticalDivider(width: AppSpacing.xxxl),
+                  VerticalDivider(width: AppSpacing.xxxl),
                   _ProfileStat(
                     label: "Test Avg",
                     value: "${_avgScore.toStringAsFixed(0)}%",
                     icon: Icons.quiz_rounded,
                     color: AppColors.oceanBlue,
                   ),
-                  const VerticalDivider(width: AppSpacing.xxxl),
+                  VerticalDivider(width: AppSpacing.xxxl),
                   _ProfileStat(
                     label: "Fees Paid",
                     value: "${_feeRecord.percentagePaid.toStringAsFixed(0)}%",
@@ -185,7 +185,7 @@ class _StudentProfileScreenState extends State<StudentProfileScreen> {
   Widget _buildPersonalInfo(StudentModel student) {
     return SliverToBoxAdapter(
       child: Padding(
-        padding: const EdgeInsets.fromLTRB(AppSpacing.xl, 0, AppSpacing.xl, AppSpacing.xxl),
+        padding: EdgeInsets.fromLTRB(AppSpacing.xl, 0, AppSpacing.xl, AppSpacing.xxl),
         child: DashboardCard(
           title: "Personal Information",
           child: Column(
@@ -218,7 +218,7 @@ class _StudentProfileScreenState extends State<StudentProfileScreen> {
   Widget _buildQuickLinks(BuildContext context) {
     return SliverToBoxAdapter(
       child: Padding(
-        padding: const EdgeInsets.fromLTRB(AppSpacing.xl, 0, AppSpacing.xl, AppSpacing.xxl),
+        padding: EdgeInsets.fromLTRB(AppSpacing.xl, 0, AppSpacing.xl, AppSpacing.xxl),
         child: DashboardCard(
           title: "Quick Links",
           padding: EdgeInsets.zero,
@@ -226,7 +226,7 @@ class _StudentProfileScreenState extends State<StudentProfileScreen> {
             children: [
               ListTile(
                 leading: Container(
-                  padding: const EdgeInsets.all(AppSpacing.sm),
+                  padding: EdgeInsets.all(AppSpacing.sm),
                   decoration: BoxDecoration(color: AppColors.gold.withAlpha((0.1 * 255).round()), borderRadius: BorderRadius.circular(AppRadius.sm)),
                   child: const Icon(Icons.receipt_long_rounded, color: AppColors.gold, size: 20),
                 ),
@@ -237,7 +237,7 @@ class _StudentProfileScreenState extends State<StudentProfileScreen> {
               const Divider(height: 1, indent: 52),
               ListTile(
                 leading: Container(
-                  padding: const EdgeInsets.all(AppSpacing.sm),
+                  padding: EdgeInsets.all(AppSpacing.sm),
                   decoration: BoxDecoration(color: AppColors.warning.withAlpha((0.1 * 255).round()), borderRadius: BorderRadius.circular(AppRadius.sm)),
                   child: const Icon(Icons.campaign_rounded, color: AppColors.warning, size: 20),
                 ),
@@ -255,7 +255,7 @@ class _StudentProfileScreenState extends State<StudentProfileScreen> {
   Widget _buildLogoutButton(BuildContext context, AuthProvider authProvider) {
     return SliverToBoxAdapter(
       child: Padding(
-        padding: const EdgeInsets.fromLTRB(AppSpacing.xl, 0, AppSpacing.xl, AppSpacing.xxxl),
+        padding: EdgeInsets.fromLTRB(AppSpacing.xl, 0, AppSpacing.xl, AppSpacing.xxxl),
         child: CustomButton(
           label: "Logout",
           isOutlined: true,
@@ -306,7 +306,7 @@ class _ProfileStat extends StatelessWidget {
       child: Column(
         children: [
           Icon(icon, color: color, size: 20),
-          const SizedBox(height: AppSpacing.xs),
+          SizedBox(height: AppSpacing.xs),
           Text(
             value,
             style: AppTextStyles.headingSmall.copyWith(color: color, fontSize: 18),
@@ -399,7 +399,7 @@ class _StudentFeesScreenState extends State<StudentFeesScreen> {
           ),
           
           SliverPadding(
-            padding: const EdgeInsets.all(AppSpacing.xl),
+            padding: EdgeInsets.all(AppSpacing.xl),
             sliver: SliverList(
               delegate: SliverChildBuilderDelegate(
                 (context, index) {

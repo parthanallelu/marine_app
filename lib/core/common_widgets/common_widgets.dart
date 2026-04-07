@@ -590,9 +590,19 @@ class NavyHeader extends StatelessWidget {
             children: [
               Row(
                 children: [
-                  ?leadingWidget,
+                  if (leadingWidget != null)
+                    leadingWidget
+                  else
+                    Container(
+                      padding: const EdgeInsets.all(AppSpacing.xs),
+                      decoration: BoxDecoration(
+                        color: Colors.white.withAlpha((0.15 * 255).round()),
+                        borderRadius: BorderRadius.circular(AppRadius.sm),
+                      ),
+                      child: Image.asset('assets/images/logo.jpg', width: 28, height: 28),
+                    ),
                   const Spacer(),
-                  ...?actionsList,
+                  if (actionsList != null) ...actionsList,
                 ],
               ),
               SizedBox(height: AppSpacing.lg),

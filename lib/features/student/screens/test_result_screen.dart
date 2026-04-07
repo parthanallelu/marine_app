@@ -58,7 +58,7 @@ class TestResultScreen extends StatelessWidget {
               ),
               child: SafeArea(
                 child: Padding(
-                  padding: const EdgeInsets.symmetric(horizontal: AppSpacing.xxl, vertical: AppSpacing.xxxl),
+                  padding: EdgeInsets.symmetric(horizontal: AppSpacing.xxl, vertical: AppSpacing.xxxl),
                   child: Column(
                     children: [
                       Container(
@@ -74,18 +74,18 @@ class TestResultScreen extends StatelessWidget {
                           style: AppTextStyles.gradeLarge,
                         ),
                       ),
-                      const SizedBox(height: AppSpacing.lg),
+                      SizedBox(height: AppSpacing.lg),
                       Text(
                         hasPassed ? "Congratulations!" : "Keep Trying!",
                         style: AppTextStyles.headingLarge.copyWith(color: Colors.white),
                       ),
-                      const SizedBox(height: AppSpacing.xs),
+                      SizedBox(height: AppSpacing.xs),
                       Text(
                         testResult.testTitle,
                         style: AppTextStyles.bodyMedium.copyWith(color: Colors.white.withAlpha((0.8 * 255).round())),
                         textAlign: TextAlign.center,
                       ),
-                      const SizedBox(height: AppSpacing.xxl),
+                      SizedBox(height: AppSpacing.xxl),
                       Row(
                         mainAxisAlignment: MainAxisAlignment.spaceEvenly,
                         children: [
@@ -113,7 +113,7 @@ class TestResultScreen extends StatelessWidget {
 
   // SLIVER 2 — Actions
   SliverPadding(
-    padding: const EdgeInsets.all(AppSpacing.lg),
+    padding: EdgeInsets.all(AppSpacing.lg),
     sliver: SliverToBoxAdapter(
       child: Column(
         children: [
@@ -124,7 +124,7 @@ class TestResultScreen extends StatelessWidget {
             // NAVIGATION SAFETY: Using goNamed
             onPressed: () => context.goNamed(AppRoutes.studentTestsName),
           ),
-          const SizedBox(height: AppSpacing.md),
+          SizedBox(height: AppSpacing.md),
           CustomButton(
             label: "Dashboard",
             width: double.infinity,

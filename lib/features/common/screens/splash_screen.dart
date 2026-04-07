@@ -23,21 +23,22 @@ class _SplashScreenState extends State<SplashScreen> {
     // 800ms delay for splash
     await Future.delayed(const Duration(milliseconds: 800));
     if (!mounted) return;
-
+    
+    final navigator = GoRouter.of(context);
     final authProvider = context.read<AuthProvider>();
     final isLoggedIn = authProvider.isLoggedIn;
-
+    
     if (!isLoggedIn) {
-      context.go(AppRoutes.roleSelection);
+      navigator.go(AppRoutes.roleSelection);
     } else {
       if (authProvider.isStudent) {
-        context.go(AppRoutes.studentHome);
+        navigator.go(AppRoutes.studentHome);
       } else if (authProvider.isProfessor) {
-        context.go(AppRoutes.professorHome);
+        navigator.go(AppRoutes.professorHome);
       } else if (authProvider.isAdmin) {
-        context.go(AppRoutes.adminHome);
+        navigator.go(AppRoutes.adminHome);
       } else {
-        context.go(AppRoutes.roleSelection);
+        navigator.go(AppRoutes.roleSelection);
       }
     }
   }
@@ -50,17 +51,35 @@ class _SplashScreenState extends State<SplashScreen> {
         child: Column(
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
-            const CircularProgressIndicator(
-              valueColor: AlwaysStoppedAnimation<Color>(Colors.white),
+            Container(
+              width: 120,
+              height: 120,
+              decoration: BoxDecoration(
+                color: Colors.white,
+                shape: BoxShape.circle,
+                boxShadow: [
+                  BoxShadow(color: Colors.black.withAlpha((0.1 * 255).round()), blurRadius: 10, spreadRadius: 2),
+                ],
+              ),
+              child: ClipOval(child: Image.asset('assets/images/logo.jpg', fit: BoxFit.cover)),
             ),
-            const SizedBox(height: 24),
+            const SizedBox(height: 32),
             Text(
               AppConstants.appName,
-              style: AppTextStyles.headingMedium.copyWith(color: Colors.white),
+              style: AppTextStyles.headingMedium.copyWith(color: Colors.white, letterSpacing: 1.2),
             ),
+            SizedBox(height: AppSpacing.sm),
+            Text(
+              AppConstants.appTagline,
+              style: AppTextStyles.bodySmall.copyWith(color: Colors.white70),
+            ),
+            const SizedBox(height: 48),
+            const CircularProgressIndicator(valueColor: AlwaysStoppedAnimation<Color>(AppColors.gold)),
           ],
         ),
       ),
     );
+  }
+}
   }
 }
