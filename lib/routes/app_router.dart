@@ -74,7 +74,12 @@ class AppRouter {
               return AppRoutes.professorHome;
             }
           }
-          // Admin has access to all (No specific guard needed here unless admin shouldn't see certain student-only sub-pages)
+          // Admin Guards
+          if (role == AppConstants.roleAdmin) {
+            if (location.startsWith('/student') || location.startsWith('/professor')) {
+              return AppRoutes.adminHome;
+            }
+          }
         }
 
         return null;
@@ -142,6 +147,7 @@ class AppRouter {
                       name: 'test_result',
                       builder: (context, state) => TestResultScreen(
                         resultId: state.pathParameters['resultId'] ?? '',
+                        result: state.extra as TestResult?,
                       ),
                     ),
                   ],

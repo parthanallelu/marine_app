@@ -78,7 +78,6 @@ class AppRoutes {
   // Professor
   static const String professorHome = '/professor/home';
   static const String professorAttendance = '/professor/attendance';
-  static const String markAttendance = '/professor/attendance/mark';
   static const String professorTests = '/professor/tests';
   static const String professorMaterials = '/professor/materials';
   static const String professorProfile = '/professor/profile';

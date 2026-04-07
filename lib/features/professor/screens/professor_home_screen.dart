@@ -178,7 +178,7 @@ class _ProfessorHomeScreenState extends State<ProfessorHomeScreen> {
               label: 'Attendance',
               icon: Icons.how_to_reg_rounded,
               color: AppColors.navyBlueBase,
-              onTap: () => context.push(AppRoutes.markAttendance),
+              onTap: () => context.push(AppRoutes.professorAttendance),
             ),
             QuickActionTile(
               label: 'Upload',
@@ -229,7 +229,7 @@ class _ProfessorHomeScreenState extends State<ProfessorHomeScreen> {
                   branch: batch.branch,
                   studentCount: _batchStudentCounts[batch.id] ?? 0,
                   actionLabel: 'Mark Attendance',
-                  onAction: () => context.push(AppRoutes.markAttendance),
+                  onAction: () => context.push(AppRoutes.professorAttendance),
                 ),
               )),
       ],
