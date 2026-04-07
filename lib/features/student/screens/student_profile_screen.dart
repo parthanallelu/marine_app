@@ -547,7 +547,7 @@ class _InstallmentTile extends StatelessWidget {
                   borderRadius: BorderRadius.circular(AppRadius.xs),
                 ),
                 child: Text(
-                  installment.status.name.toUpperCase(),
+                  installment.status.toString().split('.').last.toUpperCase(),
                   style: AppTextStyles.labelSmall.copyWith(color: color, fontSize: 10),
                 ),
               ),

@@ -15,7 +15,7 @@ enum AttendanceStatus {
 
   static AttendanceStatus fromString(String status) {
     return AttendanceStatus.values.firstWhere(
-      (e) => e.name == status,
+      (e) => e.toString().split('.').last == status,
       orElse: () => AttendanceStatus.absent,
     );
   }
@@ -29,7 +29,7 @@ enum FileType {
 
   static FileType fromString(String type) {
     return FileType.values.firstWhere(
-      (e) => e.name == type,
+      (e) => e.toString().split('.').last == type,
       orElse: () => FileType.link,
     );
   }
@@ -43,7 +43,7 @@ enum FeeStatus {
 
   static FeeStatus fromString(String status) {
     return FeeStatus.values.firstWhere(
-      (e) => e.name == status,
+      (e) => e.toString().split('.').last == status,
       orElse: () => FeeStatus.pending,
     );
   }
@@ -553,7 +553,10 @@ class AttendanceRecord extends Equatable implements BaseModel {
     }
   }
 
-  String get statusLabel => status.name[0].toUpperCase() + status.name.substring(1);
+  String get statusLabel {
+    final name = status.toString().split('.').last;
+    return name[0].toUpperCase() + name.substring(1);
+  }
 
   @override
   Map<String, dynamic> toMap() {
@@ -563,7 +566,7 @@ class AttendanceRecord extends Equatable implements BaseModel {
       'studentName': studentName,
       'batchId': batchId,
       'date': date.toIso8601String(),
-      'status': status.name,
+      'status': status.toString().split('.').last,
       'markedByProfessorId': markedByProfessorId,
       'remarks': remarks,
     };
@@ -1046,7 +1049,7 @@ class StudyMaterialModel extends Equatable implements BaseModel {
       'category': category,
       'subject': subject,
       'fileUrl': fileUrl,
-      'fileType': fileType.name,
+      'fileType': fileType.toString().split('.').last,
       'uploadedByProfessorId': uploadedByProfessorId,
       'uploaderName': uploaderName,
       'uploadedAt': uploadedAt.toIso8601String(),
@@ -1160,7 +1163,10 @@ class FeeInstallment extends Equatable implements BaseModel {
     }
   }
 
-  String get statusLabel => status.name[0].toUpperCase() + status.name.substring(1);
+  String get statusLabel {
+    final name = status.toString().split('.').last;
+    return name[0].toUpperCase() + name.substring(1);
+  }
 
   @override
   Map<String, dynamic> toMap() {
@@ -1170,7 +1176,7 @@ class FeeInstallment extends Equatable implements BaseModel {
       'amount': amount,
       'dueDate': dueDate.toIso8601String(),
       'paidDate': paidDate?.toIso8601String(),
-      'status': status.name,
+      'status': status.toString().split('.').last,
       'receiptNumber': receiptNumber,
       'paymentMode': paymentMode,
     };

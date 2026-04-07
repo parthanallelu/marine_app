@@ -987,7 +987,7 @@ class MaterialCard extends StatelessWidget {
             ),
             alignment: Alignment.center,
             child: Icon(
-              material.fileType.name == 'pdf' ? Icons.description_rounded : Icons.play_circle_rounded,
+              material.fileType == FileType.pdf ? Icons.description_rounded : Icons.play_circle_rounded,
               color: categoryColor,
               size: 28,
             ),
