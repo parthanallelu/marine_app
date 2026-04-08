@@ -104,13 +104,16 @@ class _ProfessorHomeScreenState extends State<ProfessorHomeScreen> {
       backgroundColor: AppColors.background,
       body: CustomScrollView(
         slivers: [
-          NavyHeader(
-            title: 'Welcome Back,',
-            subtitle: professor.name,
+          SliverToBoxAdapter(
+            child: NavyHeader(
+              title: 'Welcome Back,',
+              subtitle: professor.name,
+              logoPath: 'assets/images/logo.jpg',
+            ),
           ),
           SliverToBoxAdapter(
             child: Padding(
-              padding: const EdgeInsets.all(AppSpacing.lg),
+              padding: const EdgeInsets.symmetric(horizontal: AppSpacing.xl, vertical: AppSpacing.xl),
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
@@ -139,6 +142,7 @@ class _ProfessorHomeScreenState extends State<ProfessorHomeScreen> {
       physics: const NeverScrollableScrollPhysics(),
       crossAxisSpacing: AppSpacing.md,
       mainAxisSpacing: AppSpacing.md,
+      childAspectRatio: 0.85, // Increased height to prevent overflow
       children: [
         StatCard(
           label: 'Batches',
@@ -175,6 +179,7 @@ class _ProfessorHomeScreenState extends State<ProfessorHomeScreen> {
           physics: const NeverScrollableScrollPhysics(),
           crossAxisSpacing: AppSpacing.md,
           mainAxisSpacing: AppSpacing.md,
+          childAspectRatio: 0.9, // Improved height to prevent overflow
           children: [
             QuickActionTile(
               label: 'Attendance',

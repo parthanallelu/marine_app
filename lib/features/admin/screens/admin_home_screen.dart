@@ -59,16 +59,18 @@ class _AdminHomeScreenState extends State<AdminHomeScreen> {
       body: CustomScrollView(
         slivers: [
           // SLIVER 1 — NavyHeader
-          NavyHeader(
-            title: "Admin Panel",
-            subtitle: AppConstants.appName,
-            actions: [
-              CircleAvatar(
-                radius: AppRadius.lg,
-                backgroundColor: AppColors.gold.withAlpha((0.2 * 255).round()),
-                child: Text('A', style: AppTextStyles.labelLarge.copyWith(color: AppColors.gold)),
-              ),
-            ],
+          SliverToBoxAdapter(
+            child: NavyHeader(
+              title: "Admin Panel",
+              subtitle: AppConstants.appName,
+              actions: [
+                CircleAvatar(
+                  radius: AppRadius.lg,
+                  backgroundColor: AppColors.gold.withAlpha((0.2 * 255).round()),
+                  child: Text('A', style: AppTextStyles.labelLarge.copyWith(color: AppColors.gold)),
+                ),
+              ],
+            ),
           ),
 
           // SLIVER 2 — Stat Cards
@@ -95,40 +97,39 @@ class _AdminHomeScreenState extends State<AdminHomeScreen> {
     return SliverPadding(
       padding: const EdgeInsets.all(AppSpacing.xl),
       sliver: SliverToBoxAdapter(
-        child: SizedBox(
-          height: 220,
-          child: GridView.count(
-            crossAxisCount: 2,
-            crossAxisSpacing: AppSpacing.md,
-            mainAxisSpacing: AppSpacing.md,
-            physics: const NeverScrollableScrollPhysics(),
-            children: [
-              StatCard(
-                label: "Total Students",
-                value: totalStudents.toString(),
-                icon: Icons.school_rounded,
-                color: AppColors.navyBlueBase,
-              ),
-              StatCard(
-                label: "Professors",
-                value: totalProfessors.toString(),
-                icon: Icons.person_rounded,
-                color: AppColors.oceanBlue,
-              ),
-              StatCard(
-                label: "Active Batches",
-                value: activeBatches.toString(),
-                icon: Icons.class_rounded,
-                color: AppColors.success,
-              ),
-              StatCard(
-                label: "Pending Fees",
-                value: "₹${totalFeesPending.toStringAsFixed(0)}",
-                icon: Icons.payments_rounded,
-                color: AppColors.error,
-              ),
-            ],
-          ),
+        child: GridView.count(
+          crossAxisCount: 2,
+          shrinkWrap: true,
+          crossAxisSpacing: AppSpacing.md,
+          mainAxisSpacing: AppSpacing.md,
+          childAspectRatio: 1.0, // Fixed 1px overflow by giving more height
+          physics: const NeverScrollableScrollPhysics(),
+          children: [
+            StatCard(
+              label: "Total Students",
+              value: totalStudents.toString(),
+              icon: Icons.school_rounded,
+              color: AppColors.navyBlueBase,
+            ),
+            StatCard(
+              label: "Professors",
+              value: totalProfessors.toString(),
+              icon: Icons.person_rounded,
+              color: AppColors.oceanBlue,
+            ),
+            StatCard(
+              label: "Active Batches",
+              value: activeBatches.toString(),
+              icon: Icons.class_rounded,
+              color: AppColors.success,
+            ),
+            StatCard(
+              label: "Pending Fees",
+              value: "₹${totalFeesPending.toStringAsFixed(0)}",
+              icon: Icons.payments_rounded,
+              color: AppColors.error,
+            ),
+          ],
         ),
       ),
     );

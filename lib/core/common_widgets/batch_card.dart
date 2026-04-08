@@ -26,44 +26,59 @@ class BatchCard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return DashboardCard(
-      title: name,
-      subtitle: timing,
+    return GestureDetector(
       onTap: onTap,
-      onAction: onAction,
-      actionLabel: actionLabel,
-      leading: Container(
-        padding: const EdgeInsets.all(AppSpacing.sm),
+      child: Container(
+        margin: const EdgeInsets.only(bottom: AppSpacing.md),
+        padding: const EdgeInsets.all(AppSpacing.xl),
         decoration: BoxDecoration(
-          color: AppColors.navyBlueSurface,
-          borderRadius: BorderRadius.circular(AppRadius.md),
+          color: Colors.white,
+          borderRadius: AppRadius.cardRadius,
+          boxShadow: AppShadows.card,
         ),
-        child: const Icon(Icons.school_rounded, color: AppColors.navyBlueBase),
-      ),
-      child: Column(
-        children: [
-          Row(
-            mainAxisAlignment: MainAxisAlignment.spaceBetween,
-            children: [
-              CourseBadge(courseType: courseType),
-              Text(
-                '$studentCount Students',
-                style: AppTextStyles.bodySmall.copyWith(color: AppColors.textSecondary),
-              ),
-            ],
-          ),
-          const SizedBox(height: AppSpacing.sm),
-          Row(
-            children: [
-              const Icon(Icons.location_on_rounded, size: 14, color: AppColors.textHint),
-              const SizedBox(width: AppSpacing.xs),
-              Text(
-                branch,
-                style: AppTextStyles.bodySmall.copyWith(color: AppColors.textHint),
-              ),
-            ],
-          ),
-        ],
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Text(
+              name,
+              style: AppTextStyles.headingSmall.copyWith(fontSize: 20),
+            ),
+            const SizedBox(height: AppSpacing.xs),
+            Text(
+              timing,
+              style: AppTextStyles.bodyLarge.copyWith(color: AppColors.textPrimary),
+            ),
+            const SizedBox(height: AppSpacing.md),
+            Row(
+              children: [
+                CourseBadge(courseType: courseType),
+                const SizedBox(width: AppSpacing.sm),
+                BranchBadge(branch: branch),
+              ],
+            ),
+            const SizedBox(height: AppSpacing.lg),
+            Row(
+              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+              children: [
+                if (actionLabel != null)
+                  CustomButton(
+                    label: actionLabel!,
+                    onPressed: onAction,
+                    height: 40,
+                    width: 160,
+                  ),
+                const Spacer(),
+                Text(
+                  '$studentCount Students',
+                  style: AppTextStyles.bodyMedium.copyWith(
+                    color: AppColors.textPrimary,
+                    fontWeight: FontWeight.w500,
+                  ),
+                ),
+              ],
+            ),
+          ],
+        ),
       ),
     );
   }

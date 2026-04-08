@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import '../../models/app_models.dart';
 import '../theme/app_theme.dart';
 
 // ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
@@ -31,7 +32,7 @@ class StatCard extends StatelessWidget {
     return GestureDetector(
       onTap: onTap,
       child: Container(
-        padding: AppSpacing.cardPadding,
+        padding: const EdgeInsets.all(AppSpacing.md),
         decoration: BoxDecoration(
           color: Colors.white,
           borderRadius: AppRadius.cardRadius,
@@ -39,39 +40,34 @@ class StatCard extends StatelessWidget {
         ),
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
-          mainAxisSize: MainAxisSize.min,
+          mainAxisAlignment: MainAxisAlignment.spaceBetween,
           children: [
             Row(
+              crossAxisAlignment: CrossAxisAlignment.start,
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
               children: [
+                Text(
+                  value,
+                  style: AppTextStyles.statNumber.copyWith(color: AppColors.textPrimary, fontSize: 32),
+                ),
                 Container(
-                  padding: EdgeInsets.all(AppSpacing.sm),
+                  padding: const EdgeInsets.all(AppSpacing.sm),
                   decoration: BoxDecoration(
-                    color: (bgColor ?? cardColor).withAlpha((0.08 * 255).round()),
+                    color: (bgColor ?? cardColor).withAlpha((0.15 * 255).round()),
                     borderRadius: BorderRadius.circular(AppRadius.md),
                   ),
-                  child: Icon(icon, color: cardColor, size: 24),
+                  child: Icon(icon, color: cardColor, size: 20),
                 ),
-                if (subtitle != null)
-                  Container(
-                    padding: EdgeInsets.symmetric(horizontal: AppSpacing.sm, vertical: AppSpacing.xs),
-                    decoration: BoxDecoration(
-                      color: AppColors.navyBlueSurface,
-                      borderRadius: BorderRadius.circular(AppRadius.xxl),
-                    ),
-                    child: Text(
-                      subtitle!,
-                      style: AppTextStyles.labelSmall.copyWith(color: AppColors.navyBlueBase),
-                    ),
-                  ),
               ],
             ),
-            const SizedBox(height: AppSpacing.md),
+            const SizedBox(height: AppSpacing.sm),
             Text(
-              value,
-              style: AppTextStyles.statNumber.copyWith(color: cardColor),
+              label,
+              style: AppTextStyles.bodyMedium.copyWith(
+                color: AppColors.textSecondary,
+                fontWeight: FontWeight.w600,
+              ),
             ),
-            Text(label, style: AppTextStyles.bodySmall),
           ],
         ),
       ),
@@ -449,8 +445,16 @@ class InfoRow extends StatelessWidget {
           Icon(icon, size: 16, color: iconColor ?? AppColors.textHint),
           SizedBox(width: AppSpacing.sm),
           Text(label, style: AppTextStyles.bodyMedium.copyWith(color: AppColors.textHint)),
-          const Spacer(),
-          Text(value, style: AppTextStyles.labelLarge),
+          const SizedBox(width: AppSpacing.md),
+          Expanded(
+            child: Text(
+              value,
+              style: AppTextStyles.labelLarge,
+              textAlign: TextAlign.end,
+              overflow: TextOverflow.ellipsis,
+              maxLines: 1,
+            ),
+          ),
         ],
       ),
     );
@@ -516,7 +520,7 @@ class EmptyState extends StatelessWidget {
   Widget build(BuildContext context) {
     return Center(
       child: Padding(
-        padding: EdgeInsets.all(AppSpacing.xxl),
+        padding: const EdgeInsets.all(AppSpacing.xxl),
         child: Column(
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
@@ -529,12 +533,12 @@ class EmptyState extends StatelessWidget {
               ),
               child: Icon(icon, size: 40, color: AppColors.navyBlueBase),
             ),
-            SizedBox(height: AppSpacing.xl),
+            const SizedBox(height: AppSpacing.xl),
             Text(title, style: AppTextStyles.headingSmall, textAlign: TextAlign.center),
-            SizedBox(height: AppSpacing.sm),
+            const SizedBox(height: AppSpacing.sm),
             Text(subtitle, style: AppTextStyles.bodyMedium, textAlign: TextAlign.center),
             if (actionLabel != null) ...[
-              SizedBox(height: AppSpacing.xl),
+              const SizedBox(height: AppSpacing.xl),
               CustomButton(label: actionLabel!, onPressed: onAction),
             ],
           ],
@@ -552,7 +556,7 @@ class NavyHeader extends StatelessWidget {
   final String title;
   final String? subtitle;
   final List<Widget>? actions;
-  final Widget? leading;
+  final String? logoPath;
   final double minHeight;
 
   const NavyHeader({
@@ -560,16 +564,12 @@ class NavyHeader extends StatelessWidget {
     required this.title,
     this.subtitle,
     this.actions,
-    this.leading,
-    this.minHeight = 120,
+    this.logoPath,
+    this.minHeight = 140,
   });
 
   @override
   Widget build(BuildContext context) {
-    final Widget? leadingWidget = leading;
-    final List<Widget>? actionsList = actions;
-    final String? subtitleText = subtitle;
-
     return Container(
       width: double.infinity,
       constraints: BoxConstraints(minHeight: minHeight),
@@ -583,27 +583,53 @@ class NavyHeader extends StatelessWidget {
       child: SafeArea(
         bottom: false,
         child: Padding(
-          padding: EdgeInsets.fromLTRB(AppSpacing.lg, AppSpacing.md, AppSpacing.lg, AppSpacing.lg),
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            mainAxisSize: MainAxisSize.min,
+          padding: const EdgeInsets.all(AppSpacing.xl),
+          child: Row(
+            crossAxisAlignment: CrossAxisAlignment.center,
             children: [
-              Row(
-                children: [
-                  ?leadingWidget,
-                  const Spacer(),
-                  ...?actionsList,
-                ],
-              ),
-              SizedBox(height: AppSpacing.lg),
-              Text(title, style: AppTextStyles.headingLarge.copyWith(color: Colors.white)),
-              if (subtitleText != null) ...[
-                SizedBox(height: AppSpacing.xs),
-                Text(
-                  subtitleText,
-                  style: AppTextStyles.bodyMedium.copyWith(color: Colors.white70),
+              if (logoPath != null)
+                Container(
+                  padding: const EdgeInsets.all(AppSpacing.xs),
+                  decoration: BoxDecoration(
+                    color: Colors.white,
+                    shape: BoxShape.circle,
+                    boxShadow: [
+                      BoxShadow(
+                        color: Colors.black.withAlpha((0.2 * 255).round()),
+                        blurRadius: 10,
+                        offset: const Offset(0, 4),
+                      ),
+                    ],
+                  ),
+                  child: CircleAvatar(
+                    radius: 35,
+                    backgroundColor: Colors.white,
+                    backgroundImage: AssetImage(logoPath!),
+                  ),
                 ),
-              ],
+              if (logoPath != null) const SizedBox(width: AppSpacing.lg),
+              Expanded(
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  children: [
+                    Text(
+                      title,
+                      style: AppTextStyles.bodyMedium.copyWith(color: Colors.white70),
+                    ),
+                    const SizedBox(height: AppSpacing.xxs),
+                    Text(
+                      subtitle ?? '',
+                      style: AppTextStyles.headingLarge.copyWith(
+                        color: Colors.white,
+                        fontWeight: FontWeight.bold,
+                        fontSize: 28,
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+              if (actions != null) ...actions!,
             ],
           ),
         ),
