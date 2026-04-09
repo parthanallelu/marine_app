@@ -30,7 +30,7 @@ class BatchCard extends StatelessWidget {
       onTap: onTap,
       child: Container(
         margin: const EdgeInsets.only(bottom: AppSpacing.md),
-        padding: const EdgeInsets.all(AppSpacing.xl),
+        padding: const EdgeInsets.all(AppSpacing.lg),
         decoration: BoxDecoration(
           color: Colors.white,
           borderRadius: AppRadius.cardRadius,
@@ -41,37 +41,43 @@ class BatchCard extends StatelessWidget {
           children: [
             Text(
               name,
-              style: AppTextStyles.headingSmall.copyWith(fontSize: 20),
+              style: AppTextStyles.headingSmall.copyWith(fontSize: 16),
             ),
-            const SizedBox(height: AppSpacing.xs),
+            const SizedBox(height: AppSpacing.xxs),
             Text(
               timing,
-              style: AppTextStyles.bodyLarge.copyWith(color: AppColors.textPrimary),
+              style: AppTextStyles.bodySmall.copyWith(color: AppColors.textPrimary),
             ),
             const SizedBox(height: AppSpacing.md),
-            Row(
-              children: [
-                CourseBadge(courseType: courseType),
-                const SizedBox(width: AppSpacing.sm),
-                BranchBadge(branch: branch),
-              ],
+            SingleChildScrollView(
+              scrollDirection: Axis.horizontal,
+              physics: const NeverScrollableScrollPhysics(),
+              child: Row(
+                children: [
+                  CourseBadge(courseType: courseType),
+                  const SizedBox(width: AppSpacing.sm),
+                  BranchBadge(branch: branch),
+                ],
+              ),
             ),
-            const SizedBox(height: AppSpacing.lg),
+            const SizedBox(height: AppSpacing.md),
             Row(
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
               children: [
                 if (actionLabel != null)
-                  CustomButton(
-                    label: actionLabel!,
-                    onPressed: onAction,
-                    height: 40,
-                    width: 160,
+                  Flexible(
+                    child: CustomButton(
+                      label: actionLabel!,
+                      onPressed: onAction,
+                      height: 36,
+                      // width: 150, // Removed fixed width
+                    ),
                   ),
-                const Spacer(),
+                const SizedBox(width: AppSpacing.md),
                 Text(
                   '$studentCount Students',
-                  style: AppTextStyles.bodyMedium.copyWith(
-                    color: AppColors.textPrimary,
+                  style: AppTextStyles.bodySmall.copyWith(
+                    color: AppColors.textSecondary,
                     fontWeight: FontWeight.w500,
                   ),
                 ),

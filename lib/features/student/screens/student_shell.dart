@@ -14,52 +14,40 @@ class StudentShell extends StatelessWidget {
   Widget build(BuildContext context) {
     return Scaffold(
       body: navigationShell,
-      bottomNavigationBar: Container(
-        decoration: BoxDecoration(
-          boxShadow: [
-            BoxShadow(
-              color: AppColors.navyBlueBase.withAlpha((0.08 * 255).round()),
-              blurRadius: 20,
-              offset: const Offset(0, -4),
-            ),
-          ],
-        ),
-        child: SafeArea(
-          top: false,
-          child: NavigationBar(
-            backgroundColor: Colors.white,
-            elevation: 0,
-            selectedIndex: navigationShell.currentIndex,
-            onDestinationSelected: (index) => navigationShell.goBranch(index),
-            destinations: const [
-              NavigationDestination(
-                icon: Icon(Icons.home_outlined),
-                selectedIcon: Icon(Icons.home_rounded),
-                label: 'Home',
-              ),
-              NavigationDestination(
-                icon: Icon(Icons.calendar_today_outlined),
-                selectedIcon: Icon(Icons.calendar_today_rounded),
-                label: 'Attendance',
-              ),
-              NavigationDestination(
-                icon: Icon(Icons.quiz_outlined),
-                selectedIcon: Icon(Icons.quiz_rounded),
-                label: 'Tests',
-              ),
-              NavigationDestination(
-                icon: Icon(Icons.menu_book_outlined),
-                selectedIcon: Icon(Icons.menu_book_rounded),
-                label: 'Materials',
-              ),
-              NavigationDestination(
-                icon: Icon(Icons.person_outline_rounded),
-                selectedIcon: Icon(Icons.person_rounded),
-                label: 'Profile',
-              ),
-            ],
+      bottomNavigationBar: NavigationBar(
+        backgroundColor: Colors.white,
+        elevation: 0,
+        indicatorColor: AppColors.navyBlueBase.withAlpha((0.1 * 255).round()),
+        selectedIndex: navigationShell.currentIndex,
+        onDestinationSelected: (index) => navigationShell.goBranch(index),
+        labelBehavior: NavigationDestinationLabelBehavior.alwaysShow,
+        destinations: [
+          NavigationDestination(
+            icon: Icon(Icons.home_outlined, color: AppColors.textHint),
+            selectedIcon: const Icon(Icons.home_rounded, color: AppColors.navyBlueBase),
+            label: 'Home',
           ),
-        ),
+          NavigationDestination(
+            icon: Icon(Icons.calendar_month_outlined, color: AppColors.textHint),
+            selectedIcon: const Icon(Icons.calendar_month_rounded, color: AppColors.navyBlueBase),
+            label: 'Attendance',
+          ),
+          NavigationDestination(
+            icon: Icon(Icons.assignment_outlined, color: AppColors.textHint),
+            selectedIcon: const Icon(Icons.assignment_rounded, color: AppColors.navyBlueBase),
+            label: 'Tests',
+          ),
+          NavigationDestination(
+            icon: Icon(Icons.folder_open_outlined, color: AppColors.textHint),
+            selectedIcon: const Icon(Icons.folder_rounded, color: AppColors.navyBlueBase),
+            label: 'Materials',
+          ),
+          NavigationDestination(
+            icon: Icon(Icons.person_outline_rounded, color: AppColors.textHint),
+            selectedIcon: const Icon(Icons.person_rounded, color: AppColors.navyBlueBase),
+            label: 'Profile',
+          ),
+        ],
       ),
     );
   }

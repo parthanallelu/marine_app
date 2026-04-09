@@ -12,108 +12,117 @@ class RoleSelectionScreen extends StatelessWidget {
   Widget build(BuildContext context) {
     return Scaffold(
       backgroundColor: AppColors.navyBlueDark,
-      body: Column(
-        children: [
-          // ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
-          // TOP SECTION
-          // ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
-          Expanded(
-            flex: 2,
-            child: Padding(
-              padding: EdgeInsets.symmetric(horizontal: AppSpacing.xxl),
-              child: Column(
-                mainAxisAlignment: MainAxisAlignment.center,
-                children: [
-                  Container(
-                    width: 100,
-                    height: 100,
-                    padding: const EdgeInsets.all(AppSpacing.sm),
-                    decoration: BoxDecoration(
-                      color: Colors.white,
-                      shape: BoxShape.circle,
-                      boxShadow: AppShadows.goldGlow,
-                    ),
-                    child: Image.asset(AppConstants.logo),
-                  ),
-                  SizedBox(height: AppSpacing.lg),
-                  Text(
-                    'Select Profile',
-                    style: AppTextStyles.headingLarge,
-                    textAlign: TextAlign.center,
-                  ),
-                  SizedBox(height: AppSpacing.xs),
-                  Text(
-                    AppConstants.appTagline,
-                    style: AppTextStyles.bodyMedium.copyWith(
-                      color: AppColors.gold,
-                      letterSpacing: 1,
-                    ),
-                    textAlign: TextAlign.center,
-                  ),
-                ],
-              ),
-            ),
-          ),
-
-          // ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
-          // BOTTOM SECTION
-          // ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
-          Expanded(
-            flex: 3,
-            child: Container(
-              width: double.infinity,
-              decoration: const BoxDecoration(
-                color: AppColors.background,
-                borderRadius: BorderRadius.only(
-                  topLeft: Radius.circular(AppRadius.xxl),
-                  topRight: Radius.circular(AppRadius.xxl),
+      body: Center(
+        child: SingleChildScrollView(
+          padding: const EdgeInsets.symmetric(vertical: 80),
+          child: Stack(
+            clipBehavior: Clip.none,
+            alignment: Alignment.topCenter,
+            children: [
+              // ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+              // MAIN WHITE CARD
+              // ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+              Container(
+                width: MediaQuery.of(context).size.width * 0.9,
+                margin: const EdgeInsets.symmetric(horizontal: AppSpacing.xl),
+                padding: const EdgeInsets.fromLTRB(
+                  AppSpacing.xl, 
+                  70, // Padding for logo overlap
+                  AppSpacing.xl, 
+                  AppSpacing.xl
                 ),
-              ),
-              child: Padding(
-                padding: EdgeInsets.fromLTRB(AppSpacing.xl, AppSpacing.xxl, AppSpacing.xl, AppSpacing.xl),
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    Text(AppConstants.whoAreYou, style: AppTextStyles.headingLarge),
-                    SizedBox(height: AppSpacing.xs),
-                    Text(AppConstants.selectRoleToContinue, style: AppTextStyles.bodyMedium),
-                    SizedBox(height: AppSpacing.xl),
-                    Expanded(
-                      child: Column(
-                        children: [
-                          _RoleCard(
-                            roleName: AppConstants.roleStudent,
-                            subtitle: AppConstants.studentRoleDesc,
-                            icon: Icons.school_rounded,
-                            color: AppColors.navyBlueBase,
-                            onTap: () => _selectRoleAndNavigate(context, AppConstants.roleStudent),
-                          ),
-                          SizedBox(height: AppSpacing.md),
-                          _RoleCard(
-                            roleName: AppConstants.roleProfessor,
-                            subtitle: AppConstants.professorRoleDesc,
-                            icon: Icons.person_search_rounded,
-                            color: AppColors.oceanBlue,
-                            onTap: () => _selectRoleAndNavigate(context, AppConstants.roleProfessor),
-                          ),
-                          SizedBox(height: AppSpacing.md),
-                          _RoleCard(
-                            roleName: AppConstants.roleAdmin,
-                            subtitle: AppConstants.adminRoleDesc,
-                            icon: Icons.admin_panel_settings_rounded,
-                            color: AppColors.gold,
-                            textColor: AppColors.navyBlueDark,
-                            onTap: () => _selectRoleAndNavigate(context, AppConstants.roleAdmin),
-                          ),
-                        ],
-                      ),
+                decoration: BoxDecoration(
+                  color: Colors.white,
+                  borderRadius: BorderRadius.circular(AppRadius.xxl),
+                  boxShadow: [
+                    BoxShadow(
+                      color: Colors.black.withAlpha((0.4 * 255).round()),
+                      blurRadius: 40,
+                      offset: const Offset(0, 15),
                     ),
                   ],
                 ),
+                child: Column(
+                  mainAxisSize: MainAxisSize.min,
+                  children: [
+                    Text(
+                      AppConstants.whoAreYou,
+                      style: AppTextStyles.headingLarge.copyWith(
+                        color: AppColors.navyBlueDark,
+                        fontWeight: FontWeight.bold,
+                        fontSize: 32,
+                      ),
+                      textAlign: TextAlign.center,
+                    ),
+                    const SizedBox(height: AppSpacing.sm),
+                    Text(
+                      AppConstants.selectRoleToContinue,
+                      style: AppTextStyles.bodyLarge.copyWith(
+                        color: AppColors.textPrimary,
+                      ),
+                      textAlign: TextAlign.center,
+                    ),
+                    const SizedBox(height: AppSpacing.xxl),
+                    _RoleCard(
+                      roleName: AppConstants.roleStudent,
+                      subtitle: AppConstants.studentRoleDesc,
+                      icon: Icons.school_rounded,
+                      color: AppColors.navyBlueDark,
+                      onTap: () => _selectRoleAndNavigate(context, AppConstants.roleStudent),
+                    ),
+                    const SizedBox(height: AppSpacing.md),
+                    _RoleCard(
+                      roleName: AppConstants.roleProfessor,
+                      subtitle: AppConstants.professorRoleDesc,
+                      icon: Icons.person_search_rounded,
+                      color: AppColors.oceanBlue,
+                      onTap: () => _selectRoleAndNavigate(context, AppConstants.roleProfessor),
+                    ),
+                    const SizedBox(height: AppSpacing.md),
+                    _RoleCard(
+                      roleName: AppConstants.roleAdmin,
+                      subtitle: AppConstants.adminRoleDesc,
+                      icon: Icons.admin_panel_settings_rounded,
+                      color: AppColors.gold,
+                      textColor: Colors.white,
+                      onTap: () => _selectRoleAndNavigate(context, AppConstants.roleAdmin),
+                    ),
+                    const SizedBox(height: AppSpacing.lg),
+                  ],
+                ),
               ),
-            ),
+
+              // ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+              // OVERLAPPING LOGO
+              // ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+              Positioned(
+                top: -50, // Half of logo height (100)
+                child: Container(
+                  width: 100,
+                  height: 100,
+                  decoration: BoxDecoration(
+                    color: Colors.white,
+                    shape: BoxShape.circle,
+                    boxShadow: [
+                      BoxShadow(
+                        color: Colors.black.withAlpha((0.25 * 255).round()),
+                        blurRadius: 15,
+                        offset: const Offset(0, 5),
+                      ),
+                    ],
+                    border: Border.all(color: Colors.white, width: 4),
+                  ),
+                  child: Padding(
+                    padding: const EdgeInsets.all(2), // Slight inset for circle border
+                    child: ClipOval(
+                      child: Image.asset(AppConstants.logo, fit: BoxFit.cover),
+                    ),
+                  ),
+                ),
+              ),
+            ],
           ),
-        ],
+        ),
       ),
     );
   }
@@ -148,49 +157,66 @@ class _RoleCard extends StatelessWidget {
     return GestureDetector(
       onTap: onTap,
       child: Container(
-        padding: EdgeInsets.all(AppSpacing.lg),
+        padding: const EdgeInsets.symmetric(
+          horizontal: AppSpacing.lg,
+          vertical: AppSpacing.lg,
+        ),
         decoration: BoxDecoration(
           color: color,
           borderRadius: BorderRadius.circular(AppRadius.lg),
           boxShadow: [
             BoxShadow(
-              color: color.withAlpha((0.30 * 255).round()),
-              blurRadius: 12,
+              color: color.withAlpha((0.2 * 255).round()),
+              blurRadius: 10,
               offset: const Offset(0, 4),
             ),
           ],
         ),
         child: Row(
           children: [
+            // ICON BOX
             Container(
-              width: 48,
-              height: 48,
+              width: 52,
+              height: 52,
               decoration: BoxDecoration(
                 color: Colors.white.withAlpha((0.15 * 255).round()),
                 borderRadius: BorderRadius.circular(AppRadius.md),
               ),
               child: Icon(icon, color: effectiveTextColor, size: 28),
             ),
-            SizedBox(width: AppSpacing.lg),
+            const SizedBox(width: AppSpacing.lg),
+            
+            // CONTENT
             Expanded(
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
+                mainAxisSize: MainAxisSize.min,
                 children: [
                   Text(
                     roleName,
-                    style: AppTextStyles.labelLarge.copyWith(color: effectiveTextColor),
+                    style: AppTextStyles.headingSmall.copyWith(
+                      color: effectiveTextColor,
+                      fontSize: 22,
+                    ),
                   ),
-                  SizedBox(height: AppSpacing.xxs),
+                  const SizedBox(height: 2),
                   Text(
                     subtitle,
-                    style: AppTextStyles.bodySmall.copyWith(
-                      color: effectiveTextColor.withAlpha((0.7 * 255).round()),
+                    style: AppTextStyles.bodyMedium.copyWith(
+                      color: effectiveTextColor.withAlpha((0.85 * 255).round()),
+                      fontSize: 13,
                     ),
                   ),
                 ],
               ),
             ),
-            Icon(Icons.chevron_right_rounded, color: effectiveTextColor),
+            
+            // CHEVRON
+            Icon(
+              Icons.chevron_right_rounded, 
+              color: effectiveTextColor, 
+              size: 32
+            ),
           ],
         ),
       ),

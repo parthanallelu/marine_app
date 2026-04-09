@@ -48,7 +48,7 @@ class StatCard extends StatelessWidget {
               children: [
                 Text(
                   value,
-                  style: AppTextStyles.statNumber.copyWith(color: AppColors.textPrimary, fontSize: 32),
+                  style: AppTextStyles.statNumber.copyWith(color: AppColors.textPrimary, fontSize: 18),
                 ),
                 Container(
                   padding: const EdgeInsets.all(AppSpacing.sm),
@@ -70,6 +70,106 @@ class StatCard extends StatelessWidget {
             ),
           ],
         ),
+      ),
+    );
+  }
+}
+
+class StudentStatCard extends StatelessWidget {
+  final String label;
+  final String value;
+  final IconData icon;
+  final Color valueColor;
+  final String? statusLabel;
+  final IconData? statusIcon;
+  final Color? statusColor;
+
+  const StudentStatCard({
+    super.key,
+    required this.label,
+    required this.value,
+    required this.icon,
+    required this.valueColor,
+    this.statusLabel,
+    this.statusIcon,
+    this.statusColor,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    return Container(
+      padding: const EdgeInsets.symmetric(vertical: 14, horizontal: 10),
+      decoration: BoxDecoration(
+        color: Colors.white,
+        borderRadius: BorderRadius.circular(14),
+        border: Border.all(color: AppColors.textHint.withAlpha((0.2 * 255).round()), width: 0.5),
+        boxShadow: [
+          BoxShadow(
+            color: Colors.black.withAlpha((0.04 * 255).round()),
+            blurRadius: 12,
+            offset: const Offset(0, 4),
+          ),
+        ],
+      ),
+      child: Column(
+        children: [
+          Container(
+            width: 32,
+            height: 32,
+            decoration: BoxDecoration(
+              color: valueColor.withAlpha((0.12 * 255).round()),
+              borderRadius: BorderRadius.circular(8),
+            ),
+            child: Icon(icon, color: valueColor, size: 18),
+          ),
+          const SizedBox(height: 10),
+          FittedBox(
+            fit: BoxFit.scaleDown,
+            child: Text(
+              value,
+              style: AppTextStyles.headingLarge.copyWith(
+                fontSize: 20,
+                fontWeight: FontWeight.w500,
+                color: valueColor,
+              ),
+            ),
+          ),
+          const SizedBox(height: 2),
+          Text(
+            label,
+            style: AppTextStyles.bodySmall.copyWith(
+              color: AppColors.textSecondary,
+              fontSize: 11,
+            ),
+            textAlign: TextAlign.center,
+            maxLines: 1,
+            overflow: TextOverflow.ellipsis,
+          ),
+          if (statusLabel != null) ...[
+            const SizedBox(height: 6),
+            Row(
+              mainAxisAlignment: MainAxisAlignment.center,
+              children: [
+                if (statusIcon != null) ...[
+                  Icon(statusIcon, color: statusColor, size: 10),
+                  const SizedBox(width: 4),
+                ],
+                Flexible(
+                  child: Text(
+                    statusLabel!,
+                    style: AppTextStyles.labelSmall.copyWith(
+                      color: statusColor,
+                      fontSize: 10,
+                      fontWeight: FontWeight.bold,
+                    ),
+                    maxLines: 1,
+                    overflow: TextOverflow.ellipsis,
+                  ),
+                ),
+              ],
+            ),
+          ],
+        ],
       ),
     );
   }
@@ -196,49 +296,65 @@ class QuickActionTile extends StatelessWidget {
     return GestureDetector(
       onTap: onTap,
       child: Container(
+        padding: const EdgeInsets.symmetric(vertical: 12, horizontal: 6),
         decoration: BoxDecoration(
           color: Colors.white,
-          borderRadius: AppRadius.cardRadius,
-          boxShadow: AppShadows.subtle,
+          borderRadius: BorderRadius.circular(12),
+          border: Border.all(color: AppColors.textHint.withAlpha((0.1 * 255).round())),
+          boxShadow: [
+            BoxShadow(
+              color: Colors.black.withAlpha((0.02 * 255).round()),
+              blurRadius: 8,
+              offset: const Offset(0, 2),
+            ),
+          ],
         ),
         child: Stack(
           alignment: Alignment.center,
+          clipBehavior: Clip.none,
           children: [
             Column(
               mainAxisAlignment: MainAxisAlignment.center,
               children: [
                 Container(
-                  width: 48,
-                  height: 48,
+                  width: 40,
+                  height: 40,
                   decoration: BoxDecoration(
-                    color: color.withAlpha((0.10 * 255).round()),
-                    borderRadius: BorderRadius.circular(AppRadius.lg),
+                    color: color.withAlpha((0.12 * 255).round()),
+                    borderRadius: BorderRadius.circular(11),
                   ),
-                  child: Icon(icon, color: color, size: 24),
+                  child: Icon(icon, color: color, size: 20),
                 ),
-                SizedBox(height: AppSpacing.sm),
-                Text(
-                  label,
-                  style: AppTextStyles.labelMedium.copyWith(fontSize: 11),
-                  textAlign: TextAlign.center,
+                const SizedBox(height: 10),
+                Expanded(
+                  child: Text(
+                    label,
+                    style: AppTextStyles.labelMedium.copyWith(
+                      fontSize: 10,
+                      color: AppColors.textSecondary,
+                    ),
+                    textAlign: TextAlign.center,
+                    maxLines: 2,
+                    overflow: TextOverflow.ellipsis,
+                  ),
                 ),
               ],
             ),
             if (badgeCount != null && badgeCount! > 0)
               Positioned(
-                top: AppSpacing.sm,
-                right: AppSpacing.sm,
+                top: -4,
+                right: -4,
                 child: Container(
-                  width: 18,
-                  height: 18,
+                  padding: const EdgeInsets.all(4),
                   decoration: const BoxDecoration(
                     color: AppColors.error,
                     shape: BoxShape.circle,
                   ),
+                  constraints: const BoxConstraints(minWidth: 16, minHeight: 16),
                   alignment: Alignment.center,
                   child: Text(
                     badgeCount.toString(),
-                    style: const TextStyle(color: Colors.white, fontSize: 10, fontWeight: FontWeight.bold),
+                    style: const TextStyle(color: Colors.white, fontSize: 9, fontWeight: FontWeight.bold),
                   ),
                 ),
               ),
@@ -583,7 +699,7 @@ class NavyHeader extends StatelessWidget {
       child: SafeArea(
         bottom: false,
         child: Padding(
-          padding: const EdgeInsets.all(AppSpacing.xl),
+          padding: const EdgeInsets.symmetric(horizontal: AppSpacing.xl, vertical: AppSpacing.lg),
           child: Row(
             crossAxisAlignment: CrossAxisAlignment.center,
             children: [
@@ -602,7 +718,7 @@ class NavyHeader extends StatelessWidget {
                     ],
                   ),
                   child: CircleAvatar(
-                    radius: 35,
+                    radius: 30,
                     backgroundColor: Colors.white,
                     backgroundImage: AssetImage(logoPath!),
                   ),
@@ -623,7 +739,7 @@ class NavyHeader extends StatelessWidget {
                       style: AppTextStyles.headingLarge.copyWith(
                         color: Colors.white,
                         fontWeight: FontWeight.bold,
-                        fontSize: 28,
+                        fontSize: 18,
                       ),
                     ),
                   ],
@@ -853,46 +969,65 @@ class UpcomingTestTile extends StatelessWidget {
     return GestureDetector(
       onTap: onTap,
       child: Container(
-        margin: EdgeInsets.only(bottom: AppSpacing.sm),
-        padding: EdgeInsets.all(AppSpacing.md),
+        margin: const EdgeInsets.only(bottom: 12),
+        padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 12),
         decoration: BoxDecoration(
-          color: AppColors.oceanBlueSurface,
-          borderRadius: BorderRadius.circular(AppRadius.md),
+          color: Colors.white,
+          borderRadius: BorderRadius.circular(12),
+          border: Border.all(color: AppColors.textHint.withAlpha((0.1 * 255).round())),
+          boxShadow: [
+            BoxShadow(
+              color: Colors.black.withAlpha((0.02 * 255).round()),
+              blurRadius: 8,
+              offset: const Offset(0, 2),
+            ),
+          ],
         ),
         child: Row(
           children: [
             Container(
-              padding: EdgeInsets.all(AppSpacing.sm),
+              width: 40,
+              height: 40,
               decoration: BoxDecoration(
-                color: AppColors.oceanBlue.withAlpha((0.15 * 255).round()),
-                borderRadius: BorderRadius.circular(AppRadius.md),
+                color: AppColors.oceanBlue.withAlpha((0.12 * 255).round()),
+                borderRadius: BorderRadius.circular(10),
               ),
-              child: const Icon(Icons.quiz_rounded, color: AppColors.oceanBlue, size: 24),
+              child: const Icon(Icons.assignment_rounded, color: AppColors.oceanBlue, size: 20),
             ),
-            SizedBox(width: AppSpacing.md),
+            const SizedBox(width: 14),
             Expanded(
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  Text(test.title, style: AppTextStyles.labelLarge),
                   Text(
-                    "${test.durationMinutes}m • ${test.questions.length} Questions",
-                    style: AppTextStyles.bodySmall.copyWith(color: AppColors.textSecondary),
+                    test.title,
+                    style: AppTextStyles.labelLarge.copyWith(fontSize: 13, fontWeight: FontWeight.w500),
+                    maxLines: 1,
+                    overflow: TextOverflow.ellipsis,
+                  ),
+                  const SizedBox(height: 2),
+                  Text(
+                    "${test.durationMinutes}min • ${test.questions.length} questions • ${test.type}",
+                    style: AppTextStyles.bodySmall.copyWith(color: AppColors.textSecondary, fontSize: 11),
+                    maxLines: 1,
+                    overflow: TextOverflow.ellipsis,
                   ),
                 ],
               ),
             ),
+            const SizedBox(width: 12),
             Container(
-              padding: EdgeInsets.symmetric(horizontal: AppSpacing.sm, vertical: AppSpacing.xs),
+              padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
               decoration: BoxDecoration(
-                color: isUrgent ? AppColors.errorSurface : AppColors.navyBlueSurface,
-                borderRadius: BorderRadius.circular(AppRadius.xs),
+                color: (isUrgent ? AppColors.error : AppColors.navyBlueBase).withAlpha((0.1 * 255).round()),
+                borderRadius: BorderRadius.circular(20),
               ),
               child: Text(
                 daysLabel,
                 style: AppTextStyles.labelSmall.copyWith(
                   color: isUrgent ? AppColors.error : AppColors.navyBlueBase,
                   fontWeight: FontWeight.bold,
+                  fontSize: 10,
                 ),
               ),
             ),
@@ -916,44 +1051,79 @@ class AnnouncementTile extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final isHigh = announcement.priority.toLowerCase() == 'high';
-    final bgColor = isHigh ? AppColors.errorSurface : AppColors.warningSurface;
-    final color = isHigh ? AppColors.error : AppColors.warning;
+    final isMedium = announcement.priority.toLowerCase() == 'medium';
+    final color = isHigh ? AppColors.error : (isMedium ? AppColors.warning : AppColors.success);
 
     return GestureDetector(
       onTap: onTap,
       child: Container(
-        margin: const EdgeInsets.only(bottom: 10),
-        padding: const EdgeInsets.all(AppSpacing.md),
+        margin: const EdgeInsets.only(bottom: 12),
         decoration: BoxDecoration(
-          color: bgColor,
+          color: Colors.white,
           borderRadius: BorderRadius.circular(12),
-        ),
-        child: Row(
-          children: [
-            Icon(isHigh ? Icons.push_pin_rounded : Icons.announcement_rounded, color: color, size: 20),
-            const SizedBox(width: 12),
-            Expanded(
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  Text(
-                    announcement.title,
-                    style: AppTextStyles.labelLarge,
-                    maxLines: 1,
-                    overflow: TextOverflow.ellipsis,
-                  ),
-                  Text(
-                    announcement.description,
-                    style: AppTextStyles.bodySmall.copyWith(color: AppColors.textSecondary),
-                    maxLines: 1,
-                    overflow: TextOverflow.ellipsis,
-                  ),
-                ],
-              ),
+          border: Border.all(color: AppColors.textHint.withAlpha((0.1 * 255).round())),
+          boxShadow: [
+            BoxShadow(
+              color: Colors.black.withAlpha((0.02 * 255).round()),
+              blurRadius: 8,
+              offset: const Offset(0, 2),
             ),
-            const SizedBox(width: 8),
-            PriorityTag(priority: announcement.priority),
           ],
+        ),
+        clipBehavior: Clip.antiAlias,
+        child: IntrinsicHeight(
+          child: Row(
+            crossAxisAlignment: CrossAxisAlignment.stretch,
+            children: [
+              Container(width: 3, color: color),
+              Expanded(
+                child: Padding(
+                  padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 12),
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Row(
+                        children: [
+                          Expanded(
+                            child: Text(
+                              announcement.title,
+                              style: AppTextStyles.labelLarge.copyWith(fontWeight: FontWeight.w600),
+                              maxLines: 1,
+                              overflow: TextOverflow.ellipsis,
+                            ),
+                          ),
+                          const SizedBox(width: 8),
+                          PriorityTag(priority: announcement.priority),
+                        ],
+                      ),
+                      const SizedBox(height: 6),
+                      Text(
+                        announcement.description,
+                        style: AppTextStyles.bodySmall.copyWith(color: AppColors.textSecondary, height: 1.4),
+                        maxLines: 2,
+                        overflow: TextOverflow.ellipsis,
+                      ),
+                      const SizedBox(height: 12),
+                      Row(
+                        children: [
+                          Icon(Icons.calendar_today_rounded, size: 10, color: AppColors.textHint),
+                          const SizedBox(width: 4),
+                          Expanded(
+                            child: Text(
+                              "${announcement.daysAgo} days ago • ${announcement.branch ?? 'All branches'}",
+                              style: AppTextStyles.caption.copyWith(color: AppColors.textHint, fontSize: 10),
+                              maxLines: 1,
+                              overflow: TextOverflow.ellipsis,
+                            ),
+                          ),
+                        ],
+                      ),
+                    ],
+                  ),
+                ),
+              ),
+            ],
+          ),
         ),
       ),
     );

@@ -113,7 +113,7 @@ class _ProfessorHomeScreenState extends State<ProfessorHomeScreen> {
           ),
           SliverToBoxAdapter(
             child: Padding(
-              padding: const EdgeInsets.symmetric(horizontal: AppSpacing.xl, vertical: AppSpacing.xl),
+              padding: const EdgeInsets.all(AppSpacing.lg),
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
@@ -209,15 +209,9 @@ class _ProfessorHomeScreenState extends State<ProfessorHomeScreen> {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        Row(
-          mainAxisAlignment: MainAxisAlignment.spaceBetween,
-          children: [
-            const SectionHeader(title: "Today's Classes"),
-            Text(
-              DateFormat('EEEE, MMM d').format(DateTime.now()),
-              style: AppTextStyles.bodySmall.copyWith(color: AppColors.textSecondary),
-            ),
-          ],
+        SectionHeader(
+          title: "Today's Classes",
+          actionLabel: DateFormat('EEEE, MMM d').format(DateTime.now()),
         ),
         const SizedBox(height: AppSpacing.md),
 
@@ -272,6 +266,8 @@ class _ProfessorHomeScreenState extends State<ProfessorHomeScreen> {
                   timing: batch.timing,
                   branch: batch.branch,
                   studentCount: _batchStudentCounts[batch.id] ?? 0,
+                  actionLabel: 'Mark Attendance',
+                  onAction: () => context.pushNamed(AppRoutes.professorAttendanceName),
                   onTap: () {
                     // Future: Batch details screen
                   },
