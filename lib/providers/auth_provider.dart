@@ -37,34 +37,34 @@ class AuthProvider extends ChangeNotifier {
 
     try {
       if (_selectedRole == AppConstants.roleStudent) {
-        final student = DummyData.students.firstWhere(
-          (s) => s.email == email,
-          orElse: () => DummyData.students.first, // Fallback to first student for demo
-        );
+        final student = DummyData.students.where((s) => s.email == email || s.phone == email).firstOrNull;
+        if (student == null) throw Exception('User not found');
         _currentUser = student;
       } else if (_selectedRole == AppConstants.roleProfessor) {
-        final professor = DummyData.professors.firstWhere(
-          (p) => p.email == email,
-          orElse: () => DummyData.professors.first, // Fallback to first professor for demo
-        );
+        final professor = DummyData.professors.where((p) => p.email == email || p.phone == email).firstOrNull;
+        if (professor == null) throw Exception('User not found');
         _currentUser = professor;
       } else if (_selectedRole == AppConstants.roleAdmin) {
-        // Mock admin user
-        _currentUser = UserModel(
-          id: 'admin_001',
-          name: 'Capt. Manaal',
-          email: 'admin@academy.com',
-          phone: '9988776655',
-          role: AppConstants.roleAdmin,
-          branch: AppConstants.branches[0],
-          createdAt: DateTime.now(),
-        );
+        if (email == 'admin@academy.com') {
+          _currentUser = UserModel(
+            id: 'admin_001',
+            name: 'Capt. Manaal',
+            email: 'admin@academy.com',
+            phone: '9988776655',
+            role: AppConstants.roleAdmin,
+            branch: AppConstants.branches[0],
+            createdAt: DateTime.now(),
+          );
+        } else {
+          throw Exception('User not found');
+        }
       } else {
         throw Exception('Please select a role');
       }
 
       _isLoggedIn = true;
       _isLoading = false;
+      _errorMessage = null;
       notifyListeners();
       return true;
     } catch (e) {

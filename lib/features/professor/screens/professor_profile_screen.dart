@@ -301,22 +301,15 @@ class _ProfessorProfileScreenState extends State<ProfessorProfileScreen> {
   }
 
   void _confirmLogout(BuildContext context) {
-    showDialog(
-      context: context,
-      builder: (context) => AlertDialog(
-        title: const Text("Logout"),
-        content: const Text("Are you sure you want to log out?"),
-        actions: [
-          TextButton(onPressed: () => Navigator.pop(context), child: Text("CANCEL", style: AppTextStyles.labelLarge)),
-          TextButton(
-            onPressed: () {
-              Navigator.pop(context);
-              context.read<AuthProvider>().logout();
-            },
-            child: Text("LOGOUT", style: AppTextStyles.labelLarge.copyWith(color: AppColors.error)),
-          ),
-        ],
-      ),
+    GenericConfirmationDialog.show(
+      context,
+      title: "Logout",
+      content: "Are you sure you want to log out?",
+      confirmLabel: "Logout",
+      isDestructive: true,
+      onConfirm: () {
+        context.read<AuthProvider>().logout();
+      },
     );
   }
 }

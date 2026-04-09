@@ -84,8 +84,9 @@ class _AdminAnnouncementsScreenState extends State<AdminAnnouncementsScreen> {
                     itemCount: announcements.length,
                     itemBuilder: (context, index) {
                       final announcement = announcements[index];
-                      return _AdminAnnouncementCard(
+                      return AnnouncementTile(
                         announcement: announcement,
+                        onTap: () {}, // Detail view could be added here
                         onDelete: () => _confirmDeleteAnnouncement(announcement),
                       );
                     },
@@ -244,6 +245,7 @@ class _AdminAnnouncementsScreenState extends State<AdminAnnouncementsScreen> {
                               });
                               
                               _setSubmitting(false);
+                              if (!context.mounted) return;
                               Navigator.pop(context);
                               AppSnackBar.showSuccess(context, "Notice published successfully");
                             } else {
@@ -266,31 +268,19 @@ class _AdminAnnouncementsScreenState extends State<AdminAnnouncementsScreen> {
   }
 
   void _confirmDeleteAnnouncement(AnnouncementModel announcement) {
-    showDialog(
-      context: context,
-      builder: (context) => AlertDialog(
-        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(AppRadius.lg)),
-        title: const Text("Delete Announcement?"),
-        content: const Text("This action cannot be undone."),
-        actions: [
-          TextButton(
-            onPressed: () => Navigator.pop(context),
-            child: const Text("Cancel"),
-          ),
-          ElevatedButton(
-            style: ElevatedButton.styleFrom(backgroundColor: AppColors.error),
-            onPressed: () {
-              setState(() {
-              DummyData.announcements.remove(announcement);
-              });
-              Navigator.pop(context);
-              AppSnackBar.showSuccess(context, "Announcement deleted successfully");
-            },
-            child: const Text("Delete", style: TextStyle(color: Colors.white)),
-          ),
-
-        ],
-      ),
+    GenericConfirmationDialog.show(
+      context,
+      title: "Delete Notice?",
+      content: "This announcement will be removed for everyone. This action cannot be undone.",
+      confirmLabel: "Delete",
+      isDestructive: true,
+      onConfirm: () {
+        setState(() {
+          _allAnnouncements.removeWhere((a) => a.id == announcement.id);
+          DummyData.announcements.removeWhere((a) => a.id == announcement.id);
+        });
+        AppSnackBar.showSuccess(context, "Announcement deleted successfully");
+      },
     );
   }
 }
@@ -329,69 +319,3 @@ class _BranchChip extends StatelessWidget {
   }
 }
 
-class _AdminAnnouncementCard extends StatelessWidget {
-  final AnnouncementModel announcement;
-  final VoidCallback onDelete;
-  const _AdminAnnouncementCard({required this.announcement, required this.onDelete});
-
-  @override
-  Widget build(BuildContext context) {
-    return Container(
-      margin: EdgeInsets.only(bottom: AppSpacing.lg),
-      padding: EdgeInsets.all(AppSpacing.lg),
-      decoration: BoxDecoration(
-        color: Colors.white,
-        borderRadius: BorderRadius.circular(AppRadius.lg),
-        boxShadow: AppShadows.subtle,
-      ),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          Row(
-            children: [
-              PriorityTag(priority: announcement.priority),
-              const Spacer(),
-              if (announcement.isPinned)
-                const Icon(Icons.push_pin_rounded, size: 16, color: AppColors.gold),
-              SizedBox(width: AppSpacing.xs),
-              IconButton(
-                icon: const Icon(Icons.delete_outline, size: 18, color: AppColors.error),
-                onPressed: onDelete,
-                tooltip: "Delete",
-                padding: EdgeInsets.zero,
-                constraints: const BoxConstraints(),
-              ),
-            ],
-          ),
-          SizedBox(height: AppSpacing.md),
-          Text(announcement.title, style: AppTextStyles.labelLarge),
-          SizedBox(height: AppSpacing.xs),
-          Text(
-            announcement.description,
-            style: AppTextStyles.bodySmall.copyWith(color: AppColors.textSecondary),
-          ),
-          Divider(height: AppSpacing.xl),
-          Row(
-            children: [
-              CircleAvatar(
-                radius: AppRadius.md,
-                backgroundColor: AppColors.navyBlueSurface,
-                child: Text(announcement.authorName[0], style: AppTextStyles.caption.copyWith(color: AppColors.navyBlueBase, fontSize: 10)),
-              ),
-              SizedBox(width: AppSpacing.sm),
-              Text(
-                "By ${announcement.authorName}",
-                style: AppTextStyles.caption.copyWith(color: AppColors.textSecondary),
-              ),
-              const Spacer(),
-              Text(
-                "${announcement.createdAt.day}/${announcement.createdAt.month}/${announcement.createdAt.year}",
-                style: AppTextStyles.caption.copyWith(color: AppColors.textHint),
-              ),
-            ],
-          ),
-        ],
-      ),
-    );
-  }
-}

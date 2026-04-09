@@ -262,22 +262,15 @@ class _StudentProfileScreenState extends State<StudentProfileScreen> {
           color: AppColors.error,
           icon: Icons.logout_rounded,
           onPressed: () {
-            showDialog(
-              context: context,
-              builder: (context) => AlertDialog(
-                title: const Text("Logout"),
-                content: const Text("Are you sure you want to log out?"),
-                actions: [
-                  TextButton(onPressed: () => Navigator.pop(context), child: const Text("CANCEL")),
-                  TextButton(
-                    onPressed: () {
-                      Navigator.pop(context);
-                      authProvider.logout();
-                    },
-                    child: Text("LOGOUT", style: AppTextStyles.labelLarge.copyWith(color: AppColors.error)),
-                  ),
-                ],
-              ),
+            GenericConfirmationDialog.show(
+              context,
+              title: "Logout",
+              content: "Are you sure you want to log out from your student account?",
+              confirmLabel: "Logout",
+              isDestructive: true,
+              onConfirm: () {
+                authProvider.logout();
+              },
             );
           },
         ),

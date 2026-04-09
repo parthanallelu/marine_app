@@ -68,26 +68,19 @@ class _AdminStudentsScreenState extends State<AdminStudentsScreen> {
   }
 
   void _confirmDeleteStudent(StudentModel student) {
-    showDialog(
-      context: context,
-      builder: (context) => AlertDialog(
-        title: const Text("Delete Student"),
-        content: Text("Are you sure you want to delete ${student.name}?"),
-        actions: [
-          TextButton(onPressed: () => Navigator.pop(context), child: const Text("Cancel")),
-          TextButton(
-            onPressed: () {
-              setState(() {
-                _allStudents.removeWhere((s) => s.id == student.id);
-                _applyFilters();
-              });
-              Navigator.pop(context);
-              AppSnackBar.showSuccess(context, "Student deleted successfully");
-            },
-            child: const Text("Delete", style: TextStyle(color: Colors.red)),
-          ),
-        ],
-      ),
+    GenericConfirmationDialog.show(
+      context,
+      title: "Delete Student",
+      content: "Are you sure you want to delete ${student.name}? This action cannot be undone.",
+      confirmLabel: "Delete",
+      isDestructive: true,
+      onConfirm: () {
+        setState(() {
+          _allStudents.removeWhere((s) => s.id == student.id);
+          _applyFilters();
+        });
+        AppSnackBar.showSuccess(context, "Student deleted successfully");
+      },
     );
   }
 
@@ -185,13 +178,11 @@ class _AdminStudentsScreenState extends State<AdminStudentsScreen> {
                     itemBuilder: (context, index) {
 
                       final student = _filteredStudents[index];
-                      return _AdminStudentTile(
+                      return StudentCard(
                         student: student,
                         onEdit: () => _showEditStudentSheet(student),
                         onDelete: () => _confirmDeleteStudent(student),
-                        onBatchChanged: () => setState(() {
-                          _applyFilters();
-                        }),
+                        onAssignBatch: () => _showBatchSelectorForStudent(student),
                       );
                     },
                   ),
@@ -270,6 +261,7 @@ class _AdminStudentsScreenState extends State<AdminStudentsScreen> {
                         label: "Full Name",
                         hintText: "Enter student's full name",
                         controller: _nameController,
+                        textInputAction: TextInputAction.next,
                         prefixIcon: Icons.person_outline_rounded,
                         validator: (v) => v == null || v.isEmpty ? "Name is required" : null,
                       ),
@@ -279,6 +271,7 @@ class _AdminStudentsScreenState extends State<AdminStudentsScreen> {
                         hintText: "example@academy.com",
                         controller: _emailController,
                         keyboardType: TextInputType.emailAddress,
+                        textInputAction: TextInputAction.next,
                         prefixIcon: Icons.email_outlined,
                         validator: (v) => v == null || !v.contains('@') ? "Enter a valid email" : null,
                       ),
@@ -291,6 +284,7 @@ class _AdminStudentsScreenState extends State<AdminStudentsScreen> {
                               hintText: "10-digit number",
                               controller: _phoneController,
                               keyboardType: TextInputType.phone,
+                              textInputAction: TextInputAction.next,
                               prefixIcon: Icons.phone_outlined,
                               validator: (v) => v == null || v.length < 10 ? "Min 10 digits" : null,
                             ),
@@ -301,6 +295,7 @@ class _AdminStudentsScreenState extends State<AdminStudentsScreen> {
                               label: "Roll Number",
                               hintText: "MA-2024-XXX",
                               controller: _rollController,
+                              textInputAction: TextInputAction.next,
                               prefixIcon: Icons.badge_outlined,
                               validator: (v) => v == null || v.isEmpty ? "Required" : null,
                             ),
@@ -313,6 +308,7 @@ class _AdminStudentsScreenState extends State<AdminStudentsScreen> {
                         hintText: "Parent's 10-digit number",
                         controller: _parentPhoneController,
                         keyboardType: TextInputType.phone,
+                        textInputAction: TextInputAction.next,
                         prefixIcon: Icons.family_restroom_outlined,
                         validator: (v) => v == null || v.length < 10 ? "Min 10 digits" : null,
                       ),
@@ -321,6 +317,7 @@ class _AdminStudentsScreenState extends State<AdminStudentsScreen> {
                         label: "Target Company (Optional)",
                         hintText: "e.g. Synergy, Anglo Eastern",
                         controller: _targetCompanyController,
+                        textInputAction: TextInputAction.done,
                         prefixIcon: Icons.business_outlined,
                       ),
                       const SizedBox(height: AppSpacing.lg),
@@ -374,6 +371,7 @@ class _AdminStudentsScreenState extends State<AdminStudentsScreen> {
                             });
                             
                             _setSubmitting(false);
+                            if (!context.mounted) return;
                             Navigator.pop(context);
                             AppSnackBar.showSuccess(context, "Student enrolled successfully");
                           } else {
@@ -520,7 +518,7 @@ class _AdminStudentsScreenState extends State<AdminStudentsScreen> {
                       const SizedBox(height: AppSpacing.lg),
                       DropdownButtonFormField<String>(
                         decoration: const InputDecoration(labelText: "Course Type", prefixIcon: Icon(Icons.school_outlined, size: 20)),
-                        value: selectedCourse,
+                        initialValue: selectedCourse,
                         items: AppConstants.courseTypes.map((c) => DropdownMenuItem(value: c, child: Text(c))).toList(),
                         onChanged: (val) => selectedCourse = val!,
                         validator: (v) => v == null ? "Required" : null,
@@ -552,6 +550,7 @@ class _AdminStudentsScreenState extends State<AdminStudentsScreen> {
                             });
                             
                             _setSubmitting(false);
+                            if (!context.mounted) return;
                             Navigator.pop(context);
                             AppSnackBar.showSuccess(context, "Student records updated");
                           } else {
@@ -654,201 +653,8 @@ class _AdminStudentsScreenState extends State<AdminStudentsScreen> {
       ),
     );
   }
-}
 
-// ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
-// FILTER BUTTON
-// ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
-
-class _FilterButton extends StatelessWidget {
-  final String label;
-  final IconData icon;
-  final VoidCallback onTap;
-
-  const _FilterButton({required this.label, required this.icon, required this.onTap});
-
-  @override
-  Widget build(BuildContext context) {
-    return GestureDetector(
-      onTap: onTap,
-      child: Container(
-        padding: EdgeInsets.symmetric(horizontal: AppSpacing.lg, vertical: 10),
-        decoration: BoxDecoration(
-          color: AppColors.background,
-          borderRadius: BorderRadius.circular(AppRadius.md),
-          border: Border.all(color: AppColors.divider),
-        ),
-        child: Row(
-          children: [
-            Icon(icon, size: 16, color: AppColors.navyBlueBase),
-            const SizedBox(width: AppSpacing.sm),
-            Expanded(
-              child: Text(
-                label,
-                style: AppTextStyles.labelSmall,
-
-                overflow: TextOverflow.ellipsis,
-              ),
-            ),
-            const Icon(Icons.arrow_drop_down, size: 18, color: AppColors.textHint),
-          ],
-        ),
-      ),
-    );
-  }
-}
-
-// ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
-// STUDENT TILE
-// ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
-
-class _AdminStudentTile extends StatelessWidget {
-  final StudentModel student;
-  final VoidCallback onEdit;
-  final VoidCallback onDelete;
-  final VoidCallback onBatchChanged;
-  const _AdminStudentTile({
-    required this.student,
-    required this.onEdit,
-    required this.onDelete,
-    required this.onBatchChanged,
-  });
-
-  @override
-  Widget build(BuildContext context) {
-    return Container(
-      margin: const EdgeInsets.only(bottom: AppSpacing.md),
-      padding: const EdgeInsets.all(AppSpacing.lg),
-      decoration: BoxDecoration(
-        color: Colors.white,
-
-        borderRadius: BorderRadius.circular(AppRadius.lg),
-        boxShadow: AppShadows.subtle,
-      ),
-      child: Column(
-        children: [
-          Row(
-            children: [
-              CircleAvatar(
-                radius: AppRadius.xxl,
-                backgroundColor: AppColors.navyBlueSurface,
-                child: Text(
-                  student.name.isNotEmpty ? student.name[0] : 'S',
-                  style: AppTextStyles.labelLarge.copyWith(color: AppColors.navyBlueBase),
-                ),
-              ),
-              const SizedBox(width: AppSpacing.lg),
-              Expanded(
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    Text(student.name, style: AppTextStyles.labelLarge),
-                    Text(student.rollNumber, style: AppTextStyles.caption.copyWith(color: AppColors.textHint)),
-                  ],
-                ),
-              ),
-              PopupMenuButton<String>(
-                icon: const Icon(Icons.more_vert_rounded, color: AppColors.textHint),
-                tooltip: "Manage Student",
-                onSelected: (val) {
-                  switch (val) {
-                    case 'edit':
-                      onEdit();
-                      break;
-                    case 'assign':
-                      _showBatchSelector(context);
-                      break;
-                    case 'delete':
-                      onDelete();
-                      break;
-                  }
-                },
-                itemBuilder: (context) => [
-                  PopupMenuItem(
-                    value: 'edit',
-                    child: Row(
-                      children: [
-                        const Icon(Icons.edit_outlined, size: 18),
-                        const SizedBox(width: AppSpacing.sm),
-                        const Text("Edit"),
-                      ],
-                    ),
-                  ),
-                  PopupMenuItem(
-                    value: 'batch',
-                    child: Row(
-                      children: [
-                        const Icon(Icons.class_outlined, size: 18),
-                        const SizedBox(width: AppSpacing.sm),
-                        const Text("Assign to Batch"),
-                      ],
-                    ),
-                  ),
-                  PopupMenuItem(
-                    value: 'delete',
-                    child: Row(
-                      children: [
-                        const Icon(Icons.delete_outline, size: 18, color: AppColors.error),
-                        const SizedBox(width: AppSpacing.sm),
-                        Text("Delete", style: AppTextStyles.labelMedium.copyWith(color: AppColors.error)),
-                      ],
-                    ),
-                  ),
-
-                ],
-              ),
-            ],
-          ),
-          const SizedBox(height: AppSpacing.sm),
-          Row(
-
-            children: [
-              if (student.batchId.isNotEmpty)
-                Container(
-                  padding: EdgeInsets.symmetric(horizontal: AppSpacing.sm, vertical: AppSpacing.xs),
-                  decoration: BoxDecoration(
-                    color: AppColors.gold.withAlpha((0.2 * 255).round()),
-                    borderRadius: BorderRadius.circular(AppRadius.sm),
-                  ),
-                  child: Row(
-                    children: [
-                      const Icon(Icons.class_outlined, size: 14, color: AppColors.gold),
-                      SizedBox(width: AppSpacing.xs),
-                      Text(student.batchName, style: AppTextStyles.caption.copyWith(color: AppColors.gold, fontWeight: FontWeight.bold)),
-                    ],
-                  ),
-                )
-              else
-                Container(
-                  padding: const EdgeInsets.symmetric(horizontal: AppSpacing.sm, vertical: AppSpacing.xs),
-                  decoration: BoxDecoration(
-                    color: AppColors.warning.withAlpha((0.2 * 255).round()),
-                    borderRadius: BorderRadius.circular(AppRadius.sm),
-                  ),
-                  child: Row(
-                    children: [
-                      const Icon(Icons.warning_amber_rounded, size: 14, color: AppColors.warning),
-                      SizedBox(width: AppSpacing.xs),
-                      Text("Not Assigned", style: AppTextStyles.caption.copyWith(color: AppColors.warning, fontWeight: FontWeight.bold)),
-                    ],
-                  ),
-                ),
-            ],
-          ),
-          Divider(height: AppSpacing.xxl),
-          Row(
-            mainAxisAlignment: MainAxisAlignment.spaceBetween,
-            children: [
-              BranchBadge(branch: student.branch),
-              CourseBadge(courseType: student.courseType),
-            ],
-          ),
-        ],
-      ),
-    );
-  }
-
-  void _showBatchSelector(BuildContext context) {
+  void _showBatchSelectorForStudent(StudentModel student) {
     showDialog(
       context: context,
       builder: (context) {
@@ -873,32 +679,66 @@ class _AdminStudentTile extends StatelessWidget {
                     (b) => b.id == selectedBatchId,
                     orElse: () => DummyData.batches.first,
                   );
-                  student.batchId = batch.id;
-                  student.batchName = batch.name;
-                  onBatchChanged();
+                  setState(() {
+                    student.batchId = batch.id;
+                    student.batchName = batch.name;
+                    _applyFilters();
+                  });
                   Navigator.pop(context);
-                  ScaffoldMessenger.of(context).showSnackBar(
-                    SnackBar(
-                      content: Row(
-                        children: [
-                          const Icon(Icons.check_circle_rounded, color: Colors.white, size: 20),
-                          SizedBox(width: AppSpacing.md),
-                          Text("Assigned to ${batch.name}"),
-                        ],
-                      ),
-                      backgroundColor: AppColors.success,
-                      behavior: SnackBarBehavior.floating,
-                      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(AppRadius.md)),
-                      margin: EdgeInsets.all(AppSpacing.lg),
-                    ),
-                  );
+                  AppSnackBar.showSuccess(context, "Assigned to ${batch.name}");
                 }
               },
-              child: Text("Assign", style: AppTextStyles.labelLarge.copyWith(color: Colors.white)),
+              style: ElevatedButton.styleFrom(
+                backgroundColor: AppColors.navyBlueBase,
+                foregroundColor: Colors.white,
+                shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(AppRadius.md)),
+              ),
+              child: const Text("Assign"),
             ),
           ],
         );
       },
+    );
+  }
+}
+
+// ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+// FILTER BUTTON
+// ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+class _FilterButton extends StatelessWidget {
+  final String label;
+  final IconData icon;
+  final VoidCallback onTap;
+
+  const _FilterButton({required this.label, required this.icon, required this.onTap});
+
+  @override
+  Widget build(BuildContext context) {
+    return GestureDetector(
+      onTap: onTap,
+      child: Container(
+        padding: const EdgeInsets.symmetric(horizontal: AppSpacing.lg, vertical: 10),
+        decoration: BoxDecoration(
+          color: AppColors.background,
+          borderRadius: BorderRadius.circular(AppRadius.md),
+          border: Border.all(color: AppColors.divider),
+        ),
+        child: Row(
+          children: [
+            Icon(icon, size: 16, color: AppColors.navyBlueBase),
+            const SizedBox(width: AppSpacing.sm),
+            Expanded(
+              child: Text(
+                label,
+                style: AppTextStyles.labelSmall,
+                overflow: TextOverflow.ellipsis,
+              ),
+            ),
+            const Icon(Icons.arrow_drop_down, size: 18, color: AppColors.textHint),
+          ],
+        ),
+      ),
     );
   }
 }

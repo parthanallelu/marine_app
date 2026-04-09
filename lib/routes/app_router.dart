@@ -148,7 +148,7 @@ class AppRouter {
                       name: 'test_result',
                       builder: (context, state) => TestResultScreen(
                         resultId: state.pathParameters['resultId'] ?? '',
-                        result: state.extra as TestResult?,
+                        result: state.extra is TestResult ? state.extra as TestResult : null,
                       ),
                     ),
                   ],

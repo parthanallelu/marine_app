@@ -142,10 +142,10 @@ class _AdminBatchesScreenState extends State<AdminBatchesScreen> {
                               ],
                             ),
                           ),
-                          ...batchesInBranch.map((batch) => _AdminBatchCard(
+                          ...batchesInBranch.map((batch) => BatchCard(
                                 batch: batch,
                                 studentCount: _batchStudentCounts[batch.id] ?? 0,
-                                onManageStudents: () {
+                                onManage: () {
                                   Navigator.push(
                                     context,
                                     MaterialPageRoute(builder: (_) => BatchStudentsScreen(batch: batch)),
@@ -321,6 +321,7 @@ class _AdminBatchesScreenState extends State<AdminBatchesScreen> {
                               });
                               
                               _setSubmitting(false);
+                              if (!context.mounted) return;
                               Navigator.pop(context);
                               AppSnackBar.showSuccess(context, "Batch created successfully");
                             } else {
@@ -488,213 +489,27 @@ class _AdminBatchesScreenState extends State<AdminBatchesScreen> {
 
   void _confirmDeleteBatch(BatchModel batch) {
     final studentCount = DummyData.students.where((s) => s.batchId == batch.id).length;
-    showDialog(
-      context: context,
-      builder: (context) => AlertDialog(
-        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(AppRadius.lg)),
-        title: const Text("Delete this batch?"),
-        content: Column(
-          mainAxisSize: MainAxisSize.min,
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            const Text("This action cannot be undone."),
-            if (studentCount > 0) ...[
-              SizedBox(height: AppSpacing.md),
-              Container(
-                padding: EdgeInsets.all(AppSpacing.md),
-                decoration: BoxDecoration(
-                  color: AppColors.warning.withAlpha((0.1 * 255).round()),
-                  borderRadius: BorderRadius.circular(AppRadius.sm),
-                ),
-                child: Row(
-                  children: [
-                    const Icon(Icons.warning_amber_rounded, color: AppColors.warning, size: 20),
-                    SizedBox(width: AppSpacing.sm),
-                    Expanded(
-                      child: Text(
-                        "$studentCount students will become unassigned.",
-                        style: AppTextStyles.bodySmall.copyWith(color: AppColors.warning),
-                      ),
-                    ),
-                  ],
-                ),
-              ),
-            ],
-          ],
-        ),
-        actions: [
-          TextButton(
-            onPressed: () => Navigator.pop(context),
-            child: const Text("Cancel"),
-          ),
-          ElevatedButton(
-            style: ElevatedButton.styleFrom(backgroundColor: AppColors.error),
-            onPressed: () {
-              setState(() {
-                // Unassign all students from this batch
-                for (var student in DummyData.students.where((s) => s.batchId == batch.id)) {
-                  student.batchId = '';
-                  student.batchName = '';
-                }
-                _processBatches();
-              });
-              Navigator.pop(context);
-              AppSnackBar.showSuccess(context, "Batch deleted successfully");
-            },
-            child: const Text("Delete", style: TextStyle(color: Colors.white)),
-          ),
-
-        ],
-      ),
-    );
-  }
-}
-
-// ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
-// BATCH CARD
-// ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
-
-class _AdminBatchCard extends StatelessWidget {
-  final BatchModel batch;
-  final int studentCount;
-  final VoidCallback onManageStudents;
-  final VoidCallback onEdit;
-  final VoidCallback onDelete;
-  const _AdminBatchCard({
-    required this.batch,
-    required this.studentCount,
-    required this.onManageStudents,
-    required this.onEdit,
-    required this.onDelete,
-  });
-
-  @override
-  Widget build(BuildContext context) {
-    return Container(
-      margin: EdgeInsets.only(bottom: AppSpacing.md),
-      padding: EdgeInsets.all(AppSpacing.lg),
-      decoration: BoxDecoration(
-        color: Colors.white,
-        borderRadius: BorderRadius.circular(AppRadius.lg),
-        boxShadow: AppShadows.subtle,
-      ),
-      child: Column(
-        children: [
-          Row(
-            children: [
-              Container(
-                padding: EdgeInsets.all(AppSpacing.md),
-                decoration: BoxDecoration(
-                  color: AppColors.gold.withAlpha((0.1 * 255).round()),
-                  borderRadius: BorderRadius.circular(AppRadius.md),
-                ),
-                child: const Icon(Icons.class_outlined, color: AppColors.gold, size: 24),
-              ),
-              SizedBox(width: AppSpacing.lg),
-              Expanded(
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    Text(batch.name, style: AppTextStyles.labelLarge),
-                    Text(batch.courseType, style: AppTextStyles.caption.copyWith(color: AppColors.textHint)),
-                  ],
-                ),
-              ),
-              PopupMenuButton<String>(
-                icon: const Icon(Icons.more_vert_rounded, color: AppColors.textHint),
-                onSelected: (val) {
-                  switch (val) {
-                    case 'edit':
-                      onEdit();
-                      break;
-                    case 'manage':
-                      onManageStudents();
-                      break;
-                    case 'delete':
-                      onDelete();
-                      break;
-                  }
-                },
-                itemBuilder: (context) => [
-                  const PopupMenuItem(
-                    value: 'edit',
-                    child: Row(
-                      children: [
-                        Icon(Icons.edit_outlined, size: 18),
-                        SizedBox(width: AppSpacing.sm),
-                        Text("Edit Batch"),
-                      ],
-                    ),
-                  ),
-                  const PopupMenuItem(
-                    value: 'manage',
-                    child: Row(
-                      children: [
-                        Icon(Icons.group_rounded, size: 18),
-                        SizedBox(width: AppSpacing.sm),
-                        Text("Manage Students"),
-                      ],
-                    ),
-                  ),
-                  PopupMenuItem(
-                    value: 'delete',
-                    child: Row(
-                      children: [
-                        const Icon(Icons.delete_outline, size: 18, color: AppColors.error),
-                        const SizedBox(width: AppSpacing.sm),
-                        Text("Delete", style: AppTextStyles.labelMedium.copyWith(color: AppColors.error)),
-                      ],
-                    ),
-                  ),
-                ],
-              ),
-            ],
-          ),
-          Divider(height: AppSpacing.xl),
-          Row(
-            children: [
-              _BatchMeta(icon: Icons.person_pin_outlined, label: batch.professorName),
-              const Spacer(),
-              _BatchMeta(icon: Icons.access_time_rounded, label: batch.timing),
-            ],
-          ),
-          SizedBox(height: AppSpacing.md),
-          Row(
-            children: [
-              _BatchMeta(icon: Icons.people_alt_outlined, label: "$studentCount Students enrolled"),
-              const Spacer(),
-              TextButton.icon(
-                onPressed: onManageStudents,
-                icon: const Icon(Icons.group_rounded, size: 18),
-                label: const Text("Manage"),
-                style: TextButton.styleFrom(
-                  foregroundColor: AppColors.navyBlueBase,
-                  padding: EdgeInsets.symmetric(horizontal: AppSpacing.lg),
-                ),
-              ),
-            ],
-          ),
-        ],
-      ),
-    );
-  }
-}
-
-class _BatchMeta extends StatelessWidget {
-  final IconData icon;
-  final String label;
-
-  const _BatchMeta({required this.icon, required this.label});
-
-  @override
-  Widget build(BuildContext context) {
-    return Row(
-      mainAxisSize: MainAxisSize.min,
-      children: [
-        Icon(icon, size: 14, color: AppColors.oceanBlue),
-        SizedBox(width: AppSpacing.xs),
-        Text(label, style: AppTextStyles.bodySmall.copyWith(color: AppColors.textSecondary)),
-      ],
+    GenericConfirmationDialog.show(
+      context,
+      title: "Delete Batch?",
+      content: studentCount > 0 
+        ? "This batch has $studentCount students. They will all become unassigned if you delete it."
+        : "Are you sure you want to delete this batch? This action cannot be undone.",
+      confirmLabel: "Delete",
+      isDestructive: true,
+      onConfirm: () {
+        setState(() {
+          // Unassign all students from this batch
+          for (var student in DummyData.students.where((s) => s.batchId == batch.id)) {
+            student.batchId = '';
+            student.batchName = '';
+          }
+          _allBatches.removeWhere((b) => b.id == batch.id); // Also remove from local list
+          DummyData.batches.removeWhere((b) => b.id == batch.id);
+          _processBatches();
+        });
+        AppSnackBar.showSuccess(context, "Batch deleted successfully");
+      },
     );
   }
 }

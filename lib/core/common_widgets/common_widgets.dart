@@ -945,7 +945,7 @@ class CustomTextField extends StatelessWidget {
 // ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 
 class UpcomingTestTile extends StatelessWidget {
-  final dynamic test; // Using dynamic for now to support both TestModel and future types
+  final TestModel test;
   final VoidCallback? onTap;
 
   const UpcomingTestTile({super.key, required this.test, this.onTap});
@@ -953,7 +953,7 @@ class UpcomingTestTile extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final now = DateTime.now();
-    final scheduledDate = test.scheduledDate as DateTime;
+    final scheduledDate = test.scheduledDate;
     final difference = scheduledDate.difference(DateTime(now.year, now.month, now.day)).inDays;
     
     String daysLabel;
@@ -1043,10 +1043,16 @@ class UpcomingTestTile extends StatelessWidget {
 // ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 
 class AnnouncementTile extends StatelessWidget {
-  final dynamic announcement;
+  final AnnouncementModel announcement;
   final VoidCallback? onTap;
+  final VoidCallback? onDelete;
 
-  const AnnouncementTile({super.key, required this.announcement, this.onTap});
+  const AnnouncementTile({
+    super.key,
+    required this.announcement,
+    this.onTap,
+    this.onDelete,
+  });
 
   @override
   Widget build(BuildContext context) {
@@ -1094,6 +1100,15 @@ class AnnouncementTile extends StatelessWidget {
                           ),
                           const SizedBox(width: 8),
                           PriorityTag(priority: announcement.priority),
+                          if (onDelete != null) ...[
+                            const SizedBox(width: 4),
+                            IconButton(
+                              onPressed: onDelete,
+                              icon: const Icon(Icons.delete_outline, size: 20, color: AppColors.error),
+                              padding: EdgeInsets.zero,
+                              constraints: const BoxConstraints(),
+                            ),
+                          ],
                         ],
                       ),
                       const SizedBox(height: 6),
@@ -1135,7 +1150,7 @@ class AnnouncementTile extends StatelessWidget {
 // ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 
 class MaterialCard extends StatelessWidget {
-  final dynamic material;
+  final StudyMaterialModel material;
   final VoidCallback? onDownload;
 
   const MaterialCard({super.key, required this.material, this.onDownload});
@@ -1237,6 +1252,720 @@ class MaterialCard extends StatelessWidget {
             icon: const Icon(Icons.file_download_outlined, color: AppColors.navyBlueBase),
           ),
         ],
+      ),
+    );
+  }
+}
+// ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+// GenericConfirmationDialog
+// ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+class GenericConfirmationDialog extends StatelessWidget {
+  final String title;
+  final String content;
+  final String confirmLabel;
+  final String cancelLabel;
+  final VoidCallback onConfirm;
+  final bool isDestructive;
+
+  const GenericConfirmationDialog({
+    super.key,
+    required this.title,
+    required this.content,
+    this.confirmLabel = "Confirm",
+    this.cancelLabel = "Cancel",
+    required this.onConfirm,
+    this.isDestructive = false,
+  });
+
+  static Future<bool?> show(
+    BuildContext context, {
+    required String title,
+    required String content,
+    String confirmLabel = "Confirm",
+    String cancelLabel = "Cancel",
+    required VoidCallback onConfirm,
+    bool isDestructive = false,
+  }) {
+    return showDialog<bool>(
+      context: context,
+      builder: (context) => GenericConfirmationDialog(
+        title: title,
+        content: content,
+        confirmLabel: confirmLabel,
+        cancelLabel: cancelLabel,
+        onConfirm: onConfirm,
+        isDestructive: isDestructive,
+      ),
+    );
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return AlertDialog(
+      title: Text(title, style: AppTextStyles.headingSmall),
+      content: Text(content, style: AppTextStyles.bodyMedium),
+      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(AppRadius.lg)),
+      actions: [
+        TextButton(
+          onPressed: () => Navigator.pop(context, false),
+          child: Text(cancelLabel, style: AppTextStyles.labelLarge.copyWith(color: AppColors.textSecondary)),
+        ),
+        ElevatedButton(
+          onPressed: () {
+            onConfirm();
+            Navigator.pop(context, true);
+          },
+          style: ElevatedButton.styleFrom(
+            backgroundColor: isDestructive ? AppColors.error : AppColors.navyBlueBase,
+            foregroundColor: Colors.white,
+            shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(AppRadius.md)),
+            elevation: 0,
+          ),
+          child: Text(confirmLabel),
+        ),
+      ],
+    );
+  }
+}
+
+// ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+// StudentCard
+// ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+class StudentCard extends StatelessWidget {
+  final StudentModel student;
+  final VoidCallback onEdit;
+  final VoidCallback onDelete;
+  final VoidCallback? onAssignBatch;
+  final Widget? trailing;
+
+  const StudentCard({
+    super.key,
+    required this.student,
+    required this.onEdit,
+    required this.onDelete,
+    this.onAssignBatch,
+    this.trailing,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    return Container(
+      margin: const EdgeInsets.only(bottom: AppSpacing.md),
+      padding: const EdgeInsets.all(AppSpacing.lg),
+      decoration: BoxDecoration(
+        color: Colors.white,
+        borderRadius: BorderRadius.circular(AppRadius.lg),
+        boxShadow: AppShadows.subtle,
+      ),
+      child: Column(
+        children: [
+          Row(
+            children: [
+              CircleAvatar(
+                radius: AppRadius.xxl,
+                backgroundColor: AppColors.navyBlueSurface,
+                child: Text(
+                  student.name.isNotEmpty ? student.name[0] : 'S',
+                  style: AppTextStyles.labelLarge.copyWith(color: AppColors.navyBlueBase),
+                ),
+              ),
+              const SizedBox(width: AppSpacing.lg),
+              Expanded(
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Text(student.name, style: AppTextStyles.labelLarge),
+                    Text(student.rollNumber, style: AppTextStyles.caption.copyWith(color: AppColors.textHint)),
+                  ],
+                ),
+              ),
+              if (trailing != null) 
+                trailing!
+              else 
+                PopupMenuButton<String>(
+                  icon: const Icon(Icons.more_vert_rounded, color: AppColors.textHint),
+                  tooltip: "Manage Student",
+                  onSelected: (val) {
+                    switch (val) {
+                      case 'edit': onEdit(); break;
+                      case 'assign': onAssignBatch?.call(); break;
+                      case 'delete': onDelete(); break;
+                    }
+                  },
+                  itemBuilder: (context) => [
+                    const PopupMenuItem(
+                      value: 'edit',
+                      child: Row(
+                        children: [
+                          Icon(Icons.edit_outlined, size: 18),
+                          SizedBox(width: AppSpacing.sm),
+                          Text("Edit Info"),
+                        ],
+                      ),
+                    ),
+                    if (onAssignBatch != null)
+                      const PopupMenuItem(
+                        value: 'assign',
+                        child: Row(
+                          children: [
+                            Icon(Icons.class_outlined, size: 18),
+                            SizedBox(width: AppSpacing.sm),
+                            Text("Assign Batch"),
+                          ],
+                        ),
+                      ),
+                    PopupMenuItem(
+                      value: 'delete',
+                      child: Row(
+                        children: [
+                          const Icon(Icons.delete_outline, size: 18, color: AppColors.error),
+                          const SizedBox(width: AppSpacing.sm),
+                          Text("Delete", style: AppTextStyles.labelMedium.copyWith(color: AppColors.error)),
+                        ],
+                      ),
+                    ),
+                  ],
+                ),
+            ],
+          ),
+          const SizedBox(height: AppSpacing.sm),
+          Row(
+            children: [
+              if (student.batchId.isNotEmpty)
+                Container(
+                  padding: const EdgeInsets.symmetric(horizontal: AppSpacing.sm, vertical: AppSpacing.xs),
+                  decoration: BoxDecoration(
+                    color: AppColors.gold.withAlpha((0.1 * 255).round()),
+                    borderRadius: BorderRadius.circular(AppRadius.sm),
+                  ),
+                  child: Row(
+                    children: [
+                      const Icon(Icons.class_outlined, size: 14, color: AppColors.gold),
+                      const SizedBox(width: AppSpacing.xs),
+                      Text(student.batchName, style: AppTextStyles.caption.copyWith(color: AppColors.gold, fontWeight: FontWeight.bold)),
+                    ],
+                  ),
+                )
+              else
+                Container(
+                  padding: const EdgeInsets.symmetric(horizontal: AppSpacing.sm, vertical: AppSpacing.xs),
+                  decoration: BoxDecoration(
+                    color: AppColors.warning.withAlpha((0.1 * 255).round()),
+                    borderRadius: BorderRadius.circular(AppRadius.sm),
+                  ),
+                  child: Row(
+                    children: [
+                      const Icon(Icons.warning_amber_rounded, size: 14, color: AppColors.warning),
+                      const SizedBox(width: AppSpacing.xs),
+                      Text("Not Assigned", style: AppTextStyles.caption.copyWith(color: AppColors.warning, fontWeight: FontWeight.bold)),
+                    ],
+                  ),
+                ),
+            ],
+          ),
+          const Divider(height: AppSpacing.xxl),
+          Row(
+            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+            children: [
+              BranchBadge(branch: student.branch),
+              CourseBadge(courseType: student.courseType),
+            ],
+          ),
+        ],
+      ),
+    );
+  }
+}
+
+// ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+// StudentTile (Simplified version of StudentCard for dense lists)
+// ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+class StudentTile extends StatelessWidget {
+  final String name;
+  final String rollNumber;
+  final Widget? trailing;
+
+  const StudentTile({
+    super.key,
+    required this.name,
+    required this.rollNumber,
+    this.trailing,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    return Container(
+      margin: const EdgeInsets.only(bottom: AppSpacing.md),
+      padding: const EdgeInsets.symmetric(horizontal: AppSpacing.lg, vertical: AppSpacing.md),
+      decoration: BoxDecoration(
+        color: Colors.white,
+        borderRadius: BorderRadius.circular(AppRadius.md),
+        boxShadow: AppShadows.subtle,
+      ),
+      child: Row(
+        children: [
+          CircleAvatar(
+            radius: 18,
+            backgroundColor: AppColors.navyBlueSurface,
+            child: Text(
+              name.isNotEmpty ? name[0] : 'S',
+              style: AppTextStyles.labelMedium.copyWith(color: AppColors.navyBlueBase, fontSize: 12),
+            ),
+          ),
+          const SizedBox(width: AppSpacing.md),
+          Expanded(
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Text(name, style: AppTextStyles.labelMedium.copyWith(fontSize: 14)),
+                Text(rollNumber, style: AppTextStyles.caption.copyWith(color: AppColors.textHint, fontSize: 11)),
+              ],
+            ),
+          ),
+          if (trailing != null) trailing!,
+        ],
+      ),
+    );
+  }
+}
+
+class BatchCard extends StatelessWidget {
+  final BatchModel batch;
+  final int studentCount;
+  final VoidCallback? onManage;
+  final VoidCallback? onEdit;
+  final VoidCallback? onDelete;
+
+  const BatchCard({
+    super.key,
+    required this.batch,
+    required this.studentCount,
+    this.onManage,
+    this.onEdit,
+    this.onDelete,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    return Container(
+      margin: const EdgeInsets.only(bottom: AppSpacing.md),
+      padding: const EdgeInsets.all(AppSpacing.lg),
+      decoration: BoxDecoration(
+        color: Colors.white,
+        borderRadius: BorderRadius.circular(AppRadius.lg),
+        boxShadow: AppShadows.subtle,
+      ),
+      child: Column(
+        children: [
+          Row(
+            children: [
+              Container(
+                padding: const EdgeInsets.all(AppSpacing.md),
+                decoration: BoxDecoration(
+                  color: AppColors.gold.withAlpha((0.1 * 255).round()),
+                  borderRadius: BorderRadius.circular(AppRadius.md),
+                ),
+                child: const Icon(Icons.class_outlined, color: AppColors.gold, size: 24),
+              ),
+              const SizedBox(width: AppSpacing.lg),
+              Expanded(
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Text(batch.name, style: AppTextStyles.labelLarge),
+                    Text(batch.courseType, style: AppTextStyles.caption.copyWith(color: AppColors.textHint)),
+                  ],
+                ),
+              ),
+              if (onEdit != null || onManage != null || onDelete != null)
+                PopupMenuButton<String>(
+                  icon: const Icon(Icons.more_vert_rounded, color: AppColors.textHint),
+                  onSelected: (val) {
+                    switch (val) {
+                      case 'edit': onEdit?.call(); break;
+                      case 'manage': onManage?.call(); break;
+                      case 'delete': onDelete?.call(); break;
+                    }
+                  },
+                  itemBuilder: (context) => [
+                    if (onEdit != null)
+                      const PopupMenuItem(
+                        value: 'edit',
+                        child: Row(
+                          children: [
+                            Icon(Icons.edit_outlined, size: 18),
+                            SizedBox(width: AppSpacing.sm),
+                            Text("Edit Batch"),
+                          ],
+                        ),
+                      ),
+                    if (onManage != null)
+                      const PopupMenuItem(
+                        value: 'manage',
+                        child: Row(
+                          children: [
+                            Icon(Icons.group_rounded, size: 18),
+                            SizedBox(width: AppSpacing.sm),
+                            Text("Manage Students"),
+                          ],
+                        ),
+                      ),
+                    if (onDelete != null)
+                      PopupMenuItem(
+                        value: 'delete',
+                        child: Row(
+                          children: [
+                            const Icon(Icons.delete_outline, size: 18, color: AppColors.error),
+                            const SizedBox(width: AppSpacing.sm),
+                            Text("Delete", style: AppTextStyles.labelMedium.copyWith(color: AppColors.error)),
+                          ],
+                        ),
+                      ),
+                  ],
+                ),
+            ],
+          ),
+          const Divider(height: AppSpacing.xl),
+          Row(
+            children: [
+              _BatchMeta(icon: Icons.person_pin_outlined, label: batch.professorName),
+              const Spacer(),
+              _BatchMeta(icon: Icons.access_time_rounded, label: batch.timing),
+            ],
+          ),
+          const SizedBox(height: AppSpacing.md),
+          Row(
+            children: [
+              _BatchMeta(icon: Icons.people_alt_outlined, label: "$studentCount Enrolled"),
+              const Spacer(),
+              TextButton.icon(
+                onPressed: onManage,
+                icon: const Icon(Icons.group_rounded, size: 18),
+                label: const Text("Manage"),
+                style: TextButton.styleFrom(
+                  foregroundColor: AppColors.navyBlueBase,
+                  padding: const EdgeInsets.symmetric(horizontal: AppSpacing.lg),
+                ),
+              ),
+            ],
+          ),
+        ],
+      ),
+    );
+  }
+}
+
+class _BatchMeta extends StatelessWidget {
+  final IconData icon;
+  final String label;
+
+  const _BatchMeta({required this.icon, required this.label});
+
+  @override
+  Widget build(BuildContext context) {
+    return Row(
+      mainAxisSize: MainAxisSize.min,
+      children: [
+        Icon(icon, size: 14, color: AppColors.oceanBlue),
+        const SizedBox(width: AppSpacing.xs),
+        Text(label, style: AppTextStyles.bodySmall.copyWith(color: AppColors.textSecondary)),
+      ],
+    );
+  }
+}
+
+// ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+// TestCard
+// ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+class TestCard extends StatelessWidget {
+  final TestModel test;
+  final String? batchName;
+  final bool isUpcoming;
+  final VoidCallback? onStart;
+  final VoidCallback? onDelete;
+  final VoidCallback? onTap;
+
+  const TestCard({
+    super.key,
+    required this.test,
+    this.batchName,
+    this.isUpcoming = false,
+    this.onStart,
+    this.onDelete,
+    this.onTap,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    Color typeColor;
+    switch (test.type.toLowerCase()) {
+      case 'mock test':
+      case 'imu-cet mock':
+        typeColor = AppColors.navyBlueBase;
+        break;
+      case 'company specific':
+        typeColor = AppColors.gold;
+        break;
+      case 'psychometric':
+      case 'assessment':
+        typeColor = AppColors.course12th;
+        break;
+      case 'english':
+        typeColor = AppColors.oceanBlue;
+        break;
+      case 'unit test':
+      case 'practice test':
+        typeColor = AppColors.success;
+        break;
+      default:
+        typeColor = AppColors.navyBlueBase;
+    }
+
+    return GestureDetector(
+      onTap: onTap,
+      child: Container(
+        margin: const EdgeInsets.only(bottom: AppSpacing.md),
+        decoration: BoxDecoration(
+          color: Colors.white,
+          borderRadius: AppRadius.cardRadius,
+          boxShadow: AppShadows.subtle,
+        ),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Container(
+              height: 4,
+              decoration: BoxDecoration(
+                color: typeColor,
+                borderRadius: const BorderRadius.vertical(top: Radius.circular(AppRadius.lg)),
+              ),
+            ),
+            Padding(
+              padding: const EdgeInsets.all(AppSpacing.lg),
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Row(
+                    children: [
+                      Container(
+                        padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
+                        decoration: BoxDecoration(
+                          color: typeColor.withAlpha((0.1 * 255).round()),
+                          borderRadius: BorderRadius.circular(AppRadius.md),
+                          border: Border.all(color: typeColor.withAlpha((0.2 * 255).round())),
+                        ),
+                        child: Text(
+                          test.type,
+                          style: AppTextStyles.labelSmall.copyWith(color: typeColor, fontWeight: FontWeight.bold),
+                        ),
+                      ),
+                      const Spacer(),
+                      if (onDelete != null)
+                        IconButton(
+                          icon: const Icon(Icons.delete_outline_rounded, color: AppColors.error, size: 18),
+                          onPressed: onDelete,
+                          padding: EdgeInsets.zero,
+                          constraints: const BoxConstraints(),
+                        ),
+                    ],
+                  ),
+                  const SizedBox(height: AppSpacing.md),
+                  Text(test.title, style: AppTextStyles.labelLarge),
+                  const SizedBox(height: AppSpacing.sm),
+                  Row(
+                    children: [
+                      _TestMeta(icon: Icons.subject_rounded, label: test.subject),
+                      if (batchName != null) ...[
+                        const SizedBox(width: AppSpacing.lg),
+                        _TestMeta(icon: Icons.class_outlined, label: batchName!),
+                      ],
+                    ],
+                  ),
+                  const Divider(height: AppSpacing.xl),
+                  Row(
+                    children: [
+                      _TestMeta(icon: Icons.calendar_today_outlined, label: "${test.scheduledDate.day}/${test.scheduledDate.month}"),
+                      const SizedBox(width: AppSpacing.lg),
+                      _TestMeta(icon: Icons.timer_outlined, label: "${test.durationMinutes}m"),
+                      const SizedBox(width: AppSpacing.lg),
+                      _TestMeta(icon: Icons.assignment_outlined, label: "${test.questions.length} Qs"),
+                      const Spacer(),
+                      if (onStart != null && isUpcoming)
+                        SizedBox(
+                          height: 32,
+                          child: ElevatedButton(
+                            onPressed: onStart,
+                            style: ElevatedButton.styleFrom(
+                              backgroundColor: typeColor,
+                              foregroundColor: Colors.white,
+                              elevation: 0,
+                              padding: const EdgeInsets.symmetric(horizontal: AppSpacing.md),
+                              shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(AppRadius.md)),
+                            ),
+                            child: const Text("Start", style: TextStyle(fontSize: 12, fontWeight: FontWeight.bold)),
+                          ),
+                        ),
+                    ],
+                  ),
+                ],
+              ),
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+}
+
+class _TestMeta extends StatelessWidget {
+  final IconData icon;
+  final String label;
+  const _TestMeta({required this.icon, required this.label});
+
+  @override
+  Widget build(BuildContext context) {
+    return Row(
+      children: [
+        Icon(icon, size: 14, color: AppColors.textHint),
+        const SizedBox(width: AppSpacing.xs),
+        Text(label, style: AppTextStyles.caption.copyWith(color: AppColors.textSecondary)),
+      ],
+    );
+  }
+}
+
+// ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+// ResultCard
+// ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+class ResultCard extends StatelessWidget {
+  final TestResult result;
+  final VoidCallback onTap;
+
+  const ResultCard({super.key, required this.result, required this.onTap});
+
+  @override
+  Widget build(BuildContext context) {
+    final hasPassed = result.isPassed;
+    final color = hasPassed ? AppColors.success : AppColors.error;
+    final bgColor = hasPassed ? AppColors.successSurface : AppColors.errorSurface;
+
+    return GestureDetector(
+      onTap: onTap,
+      child: Container(
+        margin: const EdgeInsets.only(bottom: AppSpacing.md),
+        padding: const EdgeInsets.all(AppSpacing.lg),
+        decoration: BoxDecoration(
+          color: Colors.white,
+          borderRadius: AppRadius.cardRadius,
+          boxShadow: AppShadows.subtle,
+        ),
+        child: Row(
+          children: [
+            Container(
+              width: 50,
+              height: 50,
+              decoration: BoxDecoration(
+                color: bgColor,
+                borderRadius: BorderRadius.circular(12),
+              ),
+              alignment: Alignment.center,
+              child: Text(
+                result.grade,
+                style: AppTextStyles.headingSmall.copyWith(color: color, fontWeight: FontWeight.bold),
+              ),
+            ),
+            const SizedBox(width: AppSpacing.lg),
+            Expanded(
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Text(result.testTitle, style: AppTextStyles.labelLarge),
+                  const SizedBox(height: 2),
+                  Text(
+                    "Score: ${result.score.toInt()}/${result.totalMarks.toInt()} (${result.percentage.toStringAsFixed(1)}%)",
+                    style: AppTextStyles.caption.copyWith(color: AppColors.textSecondary),
+                  ),
+                ],
+              ),
+            ),
+            Icon(Icons.chevron_right_rounded, color: AppColors.textHint.withAlpha(100)),
+          ],
+        ),
+      ),
+    );
+  }
+}
+
+// ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+// FeeCard
+// ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+class FeeCard extends StatelessWidget {
+  final FeeRecord record;
+  final VoidCallback onTap;
+
+  const FeeCard({super.key, required this.record, required this.onTap});
+
+  @override
+  Widget build(BuildContext context) {
+    final pending = record.totalFees - record.paidAmount;
+    final isFullyPaid = pending <= 0;
+
+    return GestureDetector(
+      onTap: onTap,
+      child: Container(
+        margin: const EdgeInsets.only(bottom: AppSpacing.md),
+        padding: const EdgeInsets.all(AppSpacing.lg),
+        decoration: BoxDecoration(
+          color: Colors.white,
+          borderRadius: BorderRadius.circular(AppRadius.lg),
+          boxShadow: AppShadows.subtle,
+        ),
+        child: Row(
+          children: [
+            Container(
+              width: 44,
+              height: 44,
+              decoration: BoxDecoration(
+                color: (isFullyPaid ? AppColors.success : AppColors.warning).withAlpha((0.1 * 255).round()),
+                shape: BoxShape.circle,
+              ),
+              child: Icon(
+                isFullyPaid ? Icons.verified_rounded : Icons.hourglass_top_rounded,
+                color: isFullyPaid ? AppColors.success : AppColors.warning,
+                size: 20,
+              ),
+            ),
+            const SizedBox(width: AppSpacing.lg),
+            Expanded(
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Text(record.studentName, style: AppTextStyles.labelLarge),
+                  Text(
+                    isFullyPaid ? "Fully Cleared" : "₹${pending.toInt()} outstanding",
+                    style: AppTextStyles.caption.copyWith(
+                      color: isFullyPaid ? AppColors.success : AppColors.error,
+                      fontWeight: isFullyPaid ? FontWeight.bold : FontWeight.normal,
+                    ),
+                  ),
+                ],
+              ),
+            ),
+            Column(
+              crossAxisAlignment: CrossAxisAlignment.end,
+              children: [
+                Text("₹${record.totalFees.toInt()}", style: AppTextStyles.labelMedium),
+                const Icon(Icons.chevron_right_rounded, color: AppColors.textHint, size: 16),
+              ],
+            ),
+          ],
+        ),
       ),
     );
   }

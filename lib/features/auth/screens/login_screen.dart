@@ -99,6 +99,15 @@ class _LoginScreenState extends State<LoginScreen> {
                           ),
                         ),
                         const SizedBox(width: AppSpacing.lg),
+                        Container(
+                          padding: const EdgeInsets.all(AppSpacing.xs),
+                          decoration: BoxDecoration(
+                            color: Colors.white.withAlpha((0.2 * 255).round()),
+                            shape: BoxShape.circle,
+                          ),
+                          child: Icon(roleIcon, color: Colors.white, size: 22),
+                        ),
+                        const SizedBox(width: AppSpacing.md),
                         Column(
                           crossAxisAlignment: CrossAxisAlignment.start,
                           children: [
@@ -147,7 +156,7 @@ class _LoginScreenState extends State<LoginScreen> {
                           const SizedBox(width: 10),
                           Expanded(
                             child: Text(
-                              "Demo: Use any email & password 123456",
+                              "Demo Accounts: aditya@example.com, rahul@example.com (PW: 123456)",
                               style: AppTextStyles.bodySmall.copyWith(color: AppColors.oceanBlue),
                             ),
                           ),

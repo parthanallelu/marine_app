@@ -5,8 +5,6 @@ import 'package:intl/intl.dart';
 import '../../../core/theme/app_theme.dart';
 import '../../../core/constants/app_constants.dart';
 import '../../../core/common_widgets/common_widgets.dart';
-import '../../../core/common_widgets/batch_card.dart';
-import '../../../core/common_widgets/student_tile.dart';
 import '../../../models/app_models.dart';
 import '../../../models/dummy_data.dart';
 import '../../../providers/auth_provider.dart';
@@ -225,13 +223,9 @@ class _ProfessorHomeScreenState extends State<ProfessorHomeScreen> {
           ..._todaysClasses.map((batch) => Padding(
                 padding: const EdgeInsets.only(bottom: AppSpacing.md),
                 child: BatchCard(
-                  name: batch.name,
-                  courseType: batch.courseType,
-                  timing: batch.timing,
-                  branch: batch.branch,
+                  batch: batch,
                   studentCount: _batchStudentCounts[batch.id] ?? 0,
-                  actionLabel: 'Mark Attendance',
-                  onAction: () => context.pushNamed(AppRoutes.professorAttendanceName),
+                  onManage: () => context.pushNamed(AppRoutes.professorAttendanceName),
                 ),
               )),
       ],
@@ -261,16 +255,9 @@ class _ProfessorHomeScreenState extends State<ProfessorHomeScreen> {
               return Padding(
                 padding: const EdgeInsets.only(bottom: AppSpacing.md),
                 child: BatchCard(
-                  name: batch.name,
-                  courseType: batch.courseType,
-                  timing: batch.timing,
-                  branch: batch.branch,
+                  batch: batch,
                   studentCount: _batchStudentCounts[batch.id] ?? 0,
-                  actionLabel: 'Mark Attendance',
-                  onAction: () => context.pushNamed(AppRoutes.professorAttendanceName),
-                  onTap: () {
-                    // Future: Batch details screen
-                  },
+                  onManage: () => context.pushNamed(AppRoutes.professorAttendanceName),
                 ),
               );
             },
@@ -321,12 +308,11 @@ class _ProfessorHomeScreenState extends State<ProfessorHomeScreen> {
                   itemBuilder: (context, index) {
 
                     final student = students[index];
-                    return StudentTile(
-                      name: student.name,
-                      rollNumber: student.rollNumber,
-                      batchName: student.batchName,
+                    return StudentCard(
+                      student: student,
+                      onEdit: () {},
+                      onDelete: () {},
                       trailing: const Icon(Icons.phone_outlined, size: 20, color: AppColors.oceanBlue),
-                      onTap: () {},
                     );
                   },
                 ),

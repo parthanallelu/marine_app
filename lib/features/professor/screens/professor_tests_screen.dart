@@ -121,9 +121,9 @@ class _ProfessorTestsScreenState extends State<ProfessorTestsScreen> {
                     itemCount: _filteredTestsResults.length,
                     itemBuilder: (context, index) {
                       final test = _filteredTestsResults[index];
-                      return _ProfessorTestCard(
+                      return TestCard(
                         test: test,
-                        batch: _testBatches[test.id],
+                        batchName: _testBatches[test.id]?.name,
                         onDelete: () => _confirmDeleteTest(test),
                       );
                     },
@@ -141,33 +141,20 @@ class _ProfessorTestsScreenState extends State<ProfessorTestsScreen> {
   }
 
   void _confirmDeleteTest(TestModel test) {
-    showDialog(
-      context: context,
-      builder: (context) => AlertDialog(
-        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(AppRadius.lg)),
-        title: const Text("Delete Test?"),
-        content: Text("Are you sure you want to delete \"${test.title}\"? This will also remove all student attempts and results."),
-        actions: [
-          TextButton(
-            onPressed: () => Navigator.pop(context),
-            child: const Text("Cancel"),
-          ),
-          ElevatedButton(
-            style: ElevatedButton.styleFrom(backgroundColor: AppColors.error),
-            onPressed: () {
-              setState(() {
-                _allTests.remove(test);
-                DummyData.tests.remove(test);
-                _processTests();
-              });
-              Navigator.pop(context);
-              AppSnackBar.showSuccess(context, "Assessment deleted successfully");
-            },
-            child: Text("Delete", style: AppTextStyles.labelLarge.copyWith(color: Colors.white)),
-          ),
-
-        ],
-      ),
+    GenericConfirmationDialog.show(
+      context,
+      title: "Delete Assessment?",
+      content: "Are you sure you want to delete \"${test.title}\"? This will also remove all student attempts and results. This action cannot be undone.",
+      confirmLabel: "Delete",
+      isDestructive: true,
+      onConfirm: () {
+        setState(() {
+          _allTests.remove(test);
+          DummyData.tests.remove(test);
+          _processTests();
+        });
+        AppSnackBar.showSuccess(context, "Assessment deleted successfully");
+      },
     );
   }
 
@@ -323,8 +310,8 @@ class _ProfessorTestsScreenState extends State<ProfessorTestsScreen> {
                                 DummyData.tests.insert(0, newTest);
                                 _processTests();
                               });
-                              
                               _setSubmitting(false);
+                              if (!context.mounted) return;
                               Navigator.pop(context);
                               AppSnackBar.showSuccess(context, "Test scheduled successfully");
                             } else {
@@ -347,98 +334,3 @@ class _ProfessorTestsScreenState extends State<ProfessorTestsScreen> {
   }
 }
 
-class _ProfessorTestCard extends StatelessWidget {
-  final TestModel test;
-  final BatchModel? batch;
-  final VoidCallback onDelete;
-
-  const _ProfessorTestCard({required this.test, this.batch, required this.onDelete});
-
-  @override
-  Widget build(BuildContext context) {
-    final batch = this.batch ?? DummyData.batches[0];
-    final isUpcoming = test.scheduledDate.isAfter(DateTime.now());
-
-    return Container(
-      margin: EdgeInsets.only(bottom: AppSpacing.lg),
-      padding: EdgeInsets.all(AppSpacing.lg),
-      decoration: BoxDecoration(
-        color: Colors.white,
-        borderRadius: BorderRadius.circular(AppRadius.lg),
-        boxShadow: AppShadows.subtle,
-      ),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          Row(
-            children: [
-              Container(
-                padding: EdgeInsets.symmetric(horizontal: AppSpacing.md, vertical: AppSpacing.xs),
-                decoration: BoxDecoration(
-                  color: (isUpcoming ? AppColors.success : AppColors.textHint).withAlpha((0.1 * 255).round()),
-                  borderRadius: BorderRadius.circular(AppRadius.sm),
-                ),
-                child: Text(
-                  isUpcoming ? "UPCOMING" : "COMPLETED",
-                  style: AppTextStyles.caption.copyWith(
-                    color: isUpcoming ? AppColors.success : AppColors.textHint,
-                    fontWeight: FontWeight.bold,
-                  ),
-                ),
-              ),
-              const Spacer(),
-              IconButton(
-                icon: const Icon(Icons.delete_outline_rounded, color: AppColors.error, size: 20),
-                onPressed: onDelete,
-                padding: EdgeInsets.zero,
-                constraints: const BoxConstraints(),
-              ),
-            ],
-          ),
-          SizedBox(height: AppSpacing.md),
-          Text(test.title, style: AppTextStyles.labelLarge),
-          SizedBox(height: AppSpacing.xxs),
-          Row(
-            children: [
-              const Icon(Icons.subject_rounded, size: 14, color: AppColors.textHint),
-              SizedBox(width: AppSpacing.xs),
-              Text(test.subject, style: AppTextStyles.caption),
-              SizedBox(width: AppSpacing.lg),
-              const Icon(Icons.class_outlined, size: 14, color: AppColors.textHint),
-              SizedBox(width: AppSpacing.xs),
-              Text(batch.name, style: AppTextStyles.caption),
-            ],
-          ),
-          Divider(height: AppSpacing.xxl),
-          Row(
-            children: [
-              _TestMeta(icon: Icons.calendar_today_outlined, label: "${test.scheduledDate.day}/${test.scheduledDate.month}"),
-              SizedBox(width: AppSpacing.lg),
-              _TestMeta(icon: Icons.timer_outlined, label: "${test.durationMinutes}m"),
-              SizedBox(width: AppSpacing.lg),
-              _TestMeta(icon: Icons.score_outlined, label: "${test.totalMarks} Marks"),
-            ],
-          ),
-        ],
-      ),
-    );
-  }
-}
-
-class _TestMeta extends StatelessWidget {
-  final IconData icon;
-  final String label;
-
-  const _TestMeta({required this.icon, required this.label});
-
-  @override
-  Widget build(BuildContext context) {
-    return Row(
-      children: [
-        Icon(icon, size: 14, color: AppColors.navyBlueBase),
-        SizedBox(width: AppSpacing.xs),
-        Text(label, style: AppTextStyles.caption.copyWith(color: AppColors.textSecondary)),
-      ],
-    );
-  }
-}

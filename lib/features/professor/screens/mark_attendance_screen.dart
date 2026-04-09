@@ -5,7 +5,6 @@ import 'package:provider/provider.dart';
 import '../../../core/theme/app_theme.dart';
 import '../../../core/constants/app_constants.dart';
 import '../../../core/common_widgets/common_widgets.dart';
-import '../../../core/common_widgets/student_tile.dart';
 import '../../../models/app_models.dart';
 import '../../../models/dummy_data.dart';
 import '../../../providers/auth_provider.dart';

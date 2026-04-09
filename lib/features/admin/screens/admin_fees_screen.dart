@@ -165,7 +165,7 @@ class _AdminFeesScreenState extends State<AdminFeesScreen> {
                     itemCount: filteredRecords.length,
                     itemBuilder: (context, index) {
                       final record = filteredRecords[index];
-                      return _AdminFeeTile(
+                      return FeeCard(
                         record: record,
                         onTap: () => _showFeeDetailSheet(record),
                       );
@@ -308,6 +308,7 @@ class _AdminFeesScreenState extends State<AdminFeesScreen> {
                                   
                                   _setSubmitting(false);
                                   setModalState(() {});
+                                  if (!context.mounted) return;
                                   AppSnackBar.showSuccess(context, "Payment of ₹${inst.amount.toInt()} recorded");
                                 },
                                 child: _isSubmitting 
@@ -408,67 +409,3 @@ class _SheetStat extends StatelessWidget {
   }
 }
 
-class _AdminFeeTile extends StatelessWidget {
-  final FeeRecord record;
-  final VoidCallback onTap;
-  const _AdminFeeTile({required this.record, required this.onTap});
-
-  @override
-  Widget build(BuildContext context) {
-    final pending = record.totalFees - record.paidAmount;
-    final isFullyPaid = pending <= 0;
-
-    return GestureDetector(
-      onTap: onTap,
-      child: Container(
-        margin: EdgeInsets.only(bottom: AppSpacing.md),
-        padding: EdgeInsets.all(AppSpacing.lg),
-        decoration: BoxDecoration(
-          color: Colors.white,
-          borderRadius: BorderRadius.circular(AppRadius.lg),
-          boxShadow: AppShadows.subtle,
-        ),
-        child: Row(
-          children: [
-            Container(
-              width: 44,
-              height: 44,
-              decoration: BoxDecoration(
-                color: (isFullyPaid ? AppColors.success : AppColors.warning).withAlpha((0.1 * 255).round()),
-                shape: BoxShape.circle,
-              ),
-              child: Icon(
-                isFullyPaid ? Icons.verified_rounded : Icons.hourglass_top_rounded,
-                color: isFullyPaid ? AppColors.success : AppColors.warning,
-                size: 20,
-              ),
-            ),
-            SizedBox(width: AppSpacing.lg),
-            Expanded(
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  Text(record.studentName, style: AppTextStyles.labelLarge),
-                  Text(
-                    isFullyPaid ? "Fully Cleared" : "₹${pending.toInt()} outstanding",
-                    style: AppTextStyles.caption.copyWith(
-                      color: isFullyPaid ? AppColors.success : AppColors.error,
-                      fontWeight: isFullyPaid ? FontWeight.bold : FontWeight.normal,
-                    ),
-                  ),
-                ],
-              ),
-            ),
-            Column(
-              crossAxisAlignment: CrossAxisAlignment.end,
-              children: [
-                Text("₹${record.totalFees.toInt()}", style: AppTextStyles.labelMedium),
-                const Icon(Icons.arrow_forward_ios_rounded, color: AppColors.textHint, size: 12),
-              ],
-            ),
-          ],
-        ),
-      ),
-    );
-  }
-}

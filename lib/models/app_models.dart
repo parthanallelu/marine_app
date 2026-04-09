@@ -1340,6 +1340,13 @@ class AnnouncementModel extends Equatable implements BaseModel {
     this.isPinned = false,
   });
 
+  int get daysAgo {
+    final now = DateTime.now().toUtc();
+    return now.difference(createdAt).inDays;
+  }
+
+  String? get branch => targetBranches.length == 1 ? targetBranches.first : null;
+
   Color get priorityColor {
     switch (priority.toLowerCase()) {
       case 'high':
