@@ -7,7 +7,7 @@ class DummyData {
     StudentModel(
       id: 'stu_001',
       name: 'Aditya Shinde',
-      email: 'aditya@example.com',
+      email: 'student@gmail.com',
       phone: '9876543210',
       role: AppConstants.roleStudent,
       branch: AppConstants.branches[0],
@@ -103,7 +103,7 @@ class DummyData {
     ProfessorModel(
       id: 'prof_001',
       name: 'Capt. Suresh Iyer',
-      email: 'suresh@academy.com',
+      email: 'teacher@gmail.com',
       phone: '9988776655',
       role: AppConstants.roleProfessor,
       branch: AppConstants.branches[0],

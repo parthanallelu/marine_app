@@ -45,11 +45,11 @@ class AuthProvider extends ChangeNotifier {
         if (professor == null) throw Exception('User not found');
         _currentUser = professor;
       } else if (_selectedRole == AppConstants.roleAdmin) {
-        if (email == 'admin@academy.com') {
+        if (email == 'admin@gmail.com') {
           _currentUser = UserModel(
             id: 'admin_001',
             name: 'Capt. Manaal',
-            email: 'admin@academy.com',
+            email: 'admin@gmail.com',
             phone: '9988776655',
             role: AppConstants.roleAdmin,
             branch: AppConstants.branches[0],

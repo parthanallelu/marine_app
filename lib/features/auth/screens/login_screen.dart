@@ -156,7 +156,7 @@ class _LoginScreenState extends State<LoginScreen> {
                           const SizedBox(width: 10),
                           Expanded(
                             child: Text(
-                              "Demo Accounts: aditya@example.com, rahul@example.com (PW: 123456)",
+                              "Demos: student@gmail.com, teacher@gmail.com, admin@gmail.com (PW: 123456)",
                               style: AppTextStyles.bodySmall.copyWith(color: AppColors.oceanBlue),
                             ),
                           ),
