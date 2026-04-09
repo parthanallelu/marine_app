@@ -95,13 +95,11 @@ class StudentStatCard extends StatelessWidget {
     this.statusColor,
   });
 
-  @override
-  Widget build(BuildContext context) {
     return Container(
-      padding: const EdgeInsets.symmetric(vertical: 14, horizontal: 10),
+      padding: const EdgeInsets.symmetric(vertical: 10, horizontal: 8), // Reduced padding
       decoration: BoxDecoration(
         color: Colors.white,
-        borderRadius: BorderRadius.circular(14),
+        borderRadius: BorderRadius.circular(12),
         border: Border.all(color: AppColors.textHint.withAlpha((0.2 * 255).round()), width: 0.5),
         boxShadow: [
           BoxShadow(
@@ -122,24 +120,24 @@ class StudentStatCard extends StatelessWidget {
             ),
             child: Icon(icon, color: valueColor, size: 18),
           ),
-          const SizedBox(height: 10),
+          const SizedBox(height: 6), // Reduced from 10
           FittedBox(
             fit: BoxFit.scaleDown,
             child: Text(
               value,
               style: AppTextStyles.headingLarge.copyWith(
-                fontSize: 20,
-                fontWeight: FontWeight.w500,
+                fontSize: 18, // Reduced from 20
+                fontWeight: FontWeight.w600,
                 color: valueColor,
               ),
             ),
           ),
-          const SizedBox(height: 2),
+          const SizedBox(height: 1), // Reduced from 2
           Text(
             label,
             style: AppTextStyles.bodySmall.copyWith(
               color: AppColors.textSecondary,
-              fontSize: 11,
+              fontSize: 10, // Reduced from 11
             ),
             textAlign: TextAlign.center,
             maxLines: 1,
@@ -317,25 +315,28 @@ class QuickActionTile extends StatelessWidget {
               mainAxisAlignment: MainAxisAlignment.center,
               children: [
                 Container(
-                  width: 40,
-                  height: 40,
+                  width: 34, // Reduced from 40
+                  height: 34,
                   decoration: BoxDecoration(
                     color: color.withAlpha((0.12 * 255).round()),
-                    borderRadius: BorderRadius.circular(11),
+                    borderRadius: BorderRadius.circular(10),
                   ),
-                  child: Icon(icon, color: color, size: 20),
+                  child: Icon(icon, color: color, size: 18), // Reduced from 20
                 ),
-                const SizedBox(height: 10),
+                const SizedBox(height: 6), // Reduced from 10
                 Expanded(
-                  child: Text(
-                    label,
-                    style: AppTextStyles.labelMedium.copyWith(
-                      fontSize: 10,
-                      color: AppColors.textSecondary,
+                  child: Center(
+                    child: Text(
+                      label,
+                      style: AppTextStyles.labelMedium.copyWith(
+                        fontSize: 9, // Reduced from 10
+                        color: AppColors.textSecondary,
+                        height: 1.1,
+                      ),
+                      textAlign: TextAlign.center,
+                      maxLines: 2,
+                      overflow: TextOverflow.ellipsis,
                     ),
-                    textAlign: TextAlign.center,
-                    maxLines: 2,
-                    overflow: TextOverflow.ellipsis,
                   ),
                 ),
               ],

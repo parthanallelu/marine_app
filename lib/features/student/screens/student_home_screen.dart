@@ -203,7 +203,7 @@ class _StudentHomeScreenState extends State<StudentHomeScreen> {
               mainAxisSpacing: 12,
               shrinkWrap: true,
               physics: const NeverScrollableScrollPhysics(),
-              childAspectRatio: 0.85,
+              childAspectRatio: 0.9, // Slightly shorter for better fit
               children: [
                 QuickActionTile(
                   label: "Attendance",

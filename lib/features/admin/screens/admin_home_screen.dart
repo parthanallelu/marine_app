@@ -123,7 +123,7 @@ class _AdminHomeScreenState extends State<AdminHomeScreen> {
             mainAxisSpacing: 10,
             shrinkWrap: true,
             physics: const NeverScrollableScrollPhysics(),
-            childAspectRatio: 1.3,
+            childAspectRatio: 1.1, // Reduced from 1.3 to provide more height
             children: [
               _StatCard(
                 label: "Total Students",
@@ -607,7 +607,7 @@ class _StatCard extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Container(
-      padding: const EdgeInsets.all(16),
+      padding: const EdgeInsets.all(12), // Reduced from 16
       decoration: BoxDecoration(
         color: Colors.white,
         borderRadius: BorderRadius.circular(16),
@@ -632,14 +632,25 @@ class _StatCard extends StatelessWidget {
               ),
             ],
           ),
-          const SizedBox(height: 10),
+          const SizedBox(height: 6), // Reduced from 10
           FittedBox(
             fit: BoxFit.scaleDown,
             alignment: Alignment.centerLeft,
-            child: Text(value, style: AppTextStyles.headingLarge.copyWith(fontSize: 26, fontWeight: FontWeight.w500, color: valueColor)),
+            child: Text(value, style: AppTextStyles.headingLarge.copyWith(fontSize: 22, fontWeight: FontWeight.w600, color: valueColor)), // Reduced from 26
           ),
-          Text(label, style: AppTextStyles.bodySmall.copyWith(color: AppColors.textSecondary, fontSize: 12), overflow: TextOverflow.ellipsis),
-          Text(subLabel, style: AppTextStyles.caption.copyWith(color: valueColor ?? AppColors.textSecondary, fontSize: 10), overflow: TextOverflow.ellipsis),
+          const SizedBox(height: 2),
+          Text(
+            label, 
+            style: AppTextStyles.bodySmall.copyWith(color: AppColors.textSecondary, fontSize: 11, fontWeight: FontWeight.w500), 
+            overflow: TextOverflow.ellipsis,
+            maxLines: 1,
+          ),
+          Text(
+            subLabel, 
+            style: AppTextStyles.caption.copyWith(color: valueColor ?? AppColors.textSecondary, fontSize: 9), 
+            overflow: TextOverflow.ellipsis,
+            maxLines: 1,
+          ),
         ],
       ),
     );
