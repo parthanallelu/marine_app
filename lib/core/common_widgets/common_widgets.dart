@@ -95,6 +95,8 @@ class StudentStatCard extends StatelessWidget {
     this.statusColor,
   });
 
+  @override
+  Widget build(BuildContext context) {
     return Container(
       padding: const EdgeInsets.symmetric(vertical: 10, horizontal: 8), // Reduced padding
       decoration: BoxDecoration(
