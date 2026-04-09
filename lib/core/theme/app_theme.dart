@@ -2,9 +2,6 @@ import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 
 class AppColors {
-  static const Color navyBlue = Color(0x0A2A66FF); // Correcting: 0xFF0A2A66
-  // Wait, wait, I should use the hex provided. #0A2A66 -> 0xFF0A2A66
-  
   static const Color navyBlueBase = Color(0xFF0A2A66);
   static const Color navyBlueDark = Color(0xFF071C47);
   static const Color navyBlueLight = Color(0xFF1A3D80);

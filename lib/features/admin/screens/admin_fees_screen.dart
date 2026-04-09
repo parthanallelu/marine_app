@@ -14,7 +14,7 @@ class AdminFeesScreen extends StatefulWidget {
 }
 
 class _AdminFeesScreenState extends State<AdminFeesScreen> {
-  late List<FeeRecord> _allFeeRecords;
+  List<FeeRecord> _allFeeRecords = [];
   String _selectedBranch = "All";
   String _searchQuery = "";
   bool _isSubmitting = false;
@@ -23,12 +23,14 @@ class _AdminFeesScreenState extends State<AdminFeesScreen> {
     if (mounted) setState(() => _isSubmitting = value);
   }
 
-
-
   @override
   void initState() {
     super.initState();
-    _allFeeRecords = List.from(DummyData.feeRecords);
+    try {
+      _allFeeRecords = List.from(DummyData.feeRecords);
+    } catch (e) {
+      debugPrint("Error loading fee records: $e");
+    }
   }
 
   @override

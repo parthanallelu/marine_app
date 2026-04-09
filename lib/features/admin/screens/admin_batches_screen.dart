@@ -15,10 +15,10 @@ class AdminBatchesScreen extends StatefulWidget {
 }
 
 class _AdminBatchesScreenState extends State<AdminBatchesScreen> {
-  late List<BatchModel> _allBatches;
-  late List<BatchModel> _filteredBatches;
-  late Map<String, List<BatchModel>> _groupedByBranch;
-  late Map<String, int> _batchStudentCounts;
+  List<BatchModel> _allBatches = [];
+  List<BatchModel> _filteredBatches = [];
+  Map<String, List<BatchModel>> _groupedByBranch = {};
+  Map<String, int> _batchStudentCounts = {};
   String _searchQuery = "";
   bool _isSubmitting = false;
 
@@ -26,13 +26,15 @@ class _AdminBatchesScreenState extends State<AdminBatchesScreen> {
   final _nameController = TextEditingController();
   final _timingController = TextEditingController();
 
-
-
   @override
   void initState() {
     super.initState();
-    _allBatches = List.from(DummyData.batches);
-    _processBatches();
+    try {
+      _allBatches = List.from(DummyData.batches);
+      _processBatches();
+    } catch (e) {
+      debugPrint("Error loading batches: $e");
+    }
   }
 
   @override

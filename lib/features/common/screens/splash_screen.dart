@@ -20,23 +20,30 @@ class _SplashScreenState extends State<SplashScreen> {
   }
 
   Future<void> _handleRedirect() async {
-    // 800ms delay for splash
-    await Future.delayed(const Duration(milliseconds: 800));
-    if (!mounted) return;
+    try {
+      // 800ms delay for splash
+      await Future.delayed(const Duration(milliseconds: 800));
+      if (!mounted) return;
 
-    final authProvider = context.read<AuthProvider>();
-    final isLoggedIn = authProvider.isLoggedIn;
+      final authProvider = context.read<AuthProvider>();
+      final isLoggedIn = authProvider.isLoggedIn;
 
-    if (!isLoggedIn) {
-      context.go(AppRoutes.roleSelection);
-    } else {
-      if (authProvider.isStudent) {
-        context.go(AppRoutes.studentHome);
-      } else if (authProvider.isProfessor) {
-        context.go(AppRoutes.professorHome);
-      } else if (authProvider.isAdmin) {
-        context.go(AppRoutes.adminHome);
+      if (!isLoggedIn) {
+        context.go(AppRoutes.roleSelection);
       } else {
+        if (authProvider.isStudent) {
+          context.go(AppRoutes.studentHome);
+        } else if (authProvider.isProfessor) {
+          context.go(AppRoutes.professorHome);
+        } else if (authProvider.isAdmin) {
+          context.go(AppRoutes.adminHome);
+        } else {
+          context.go(AppRoutes.roleSelection);
+        }
+      }
+    } catch (e) {
+      debugPrint("Splash redirect error: $e");
+      if (mounted) {
         context.go(AppRoutes.roleSelection);
       }
     }

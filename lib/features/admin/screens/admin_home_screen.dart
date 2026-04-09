@@ -14,18 +14,17 @@ class AdminHomeScreen extends StatefulWidget {
 }
 
 class _AdminHomeScreenState extends State<AdminHomeScreen> {
-  late int totalStudents;
-  late int totalProfessors;
-  late int activeBatches;
-  late double totalFeesPending;
-  late double totalCollected;
-  late double totalFees;
-  late double collectedPct;
-  late Map<String, int> branchCounts;
-  late Map<String, int> courseCounts;
-  // Dynamic Alerts
-  late List<dynamic> feeAlerts;
-  late List<Map<String, dynamic>> attendanceAlerts;
+  int totalStudents = 0;
+  int totalProfessors = 0;
+  int activeBatches = 0;
+  double totalFeesPending = 0.0;
+  double totalCollected = 0.0;
+  double totalFees = 0.0;
+  double collectedPct = 0.0;
+  Map<String, int> branchCounts = {};
+  Map<String, int> courseCounts = {};
+  List<dynamic> feeAlerts = [];
+  List<Map<String, dynamic>> attendanceAlerts = [];
 
   @override
   void initState() {
@@ -34,55 +33,61 @@ class _AdminHomeScreenState extends State<AdminHomeScreen> {
   }
 
   void _computeData() {
-    final now = DateTime.now();
-    
-    totalStudents = DummyData.students.length;
-    totalProfessors = DummyData.professors.length;
-    activeBatches = DummyData.batches.where((b) => b.isActive).length;
+    try {
+      final now = DateTime.now();
+      
+      totalStudents = DummyData.students.length;
+      totalProfessors = DummyData.professors.length;
+      activeBatches = DummyData.batches.where((b) => b.isActive).length;
 
-    // Fees computation
-    totalFeesPending = DummyData.feeRecords.fold<double>(0.0, (sum, r) => sum + r.pendingAmount);
-    totalCollected = DummyData.feeRecords.fold<double>(0.0, (sum, r) => sum + r.paidAmount);
-    totalFees = totalCollected + totalFeesPending;
-    collectedPct = totalFees > 0 ? (totalCollected / totalFees) : 0.0;
+      // Fees computation
+      totalFeesPending = DummyData.feeRecords.fold<double>(0.0, (sum, r) => sum + r.pendingAmount);
+      totalCollected = DummyData.feeRecords.fold<double>(0.0, (sum, r) => sum + r.paidAmount);
+      totalFees = totalCollected + totalFeesPending;
+      collectedPct = totalFees > 0 ? (totalCollected / totalFees) : 0.0;
 
-    // Alerts logic
-    feeAlerts = [];
-    for (var record in DummyData.feeRecords) {
-      for (var inst in record.installments) {
-        if (inst.status == FeeStatus.overdue || 
-           (inst.status == FeeStatus.pending && inst.dueDate.isBefore(now))) {
-          feeAlerts.add({
-            'studentName': record.studentName,
-            'amount': inst.amount,
-            'title': inst.title,
-            'daysLate': now.difference(inst.dueDate).inDays,
+      // Alerts logic
+      feeAlerts = [];
+      for (var record in DummyData.feeRecords) {
+        for (var inst in record.installments) {
+          if (inst.status == FeeStatus.overdue || 
+             (inst.status == FeeStatus.pending && inst.dueDate.isBefore(now))) {
+            feeAlerts.add({
+              'studentName': record.studentName,
+              'amount': inst.amount,
+              'title': inst.title,
+              'daysLate': now.difference(inst.dueDate).inDays,
+            });
+          }
+        }
+      }
+
+      attendanceAlerts = [];
+      for (var s in DummyData.students) {
+        final summary = DummyData.attendanceSummaryFor(s.id, DummyData.generateAttendanceForStudent(s.id, s.name, s.batchId));
+        if (summary.percentage < 75) {
+          attendanceAlerts.add({
+            'student': s,
+            'percentageLabel': summary.percentageLabel,
           });
         }
       }
-    }
 
-    attendanceAlerts = [];
-    for (var s in DummyData.students) {
-      final summary = DummyData.attendanceSummaryFor(s.id, DummyData.generateAttendanceForStudent(s.id, s.name, s.batchId));
-      if (summary.percentage < 75) {
-        attendanceAlerts.add({
-          'student': s,
-          'percentageLabel': summary.percentageLabel,
-        });
+      // Branch counts
+      branchCounts = {};
+      for (var branch in AppConstants.branches) {
+        branchCounts[branch] = DummyData.students.where((s) => s.branch == branch).length;
       }
-    }
 
-    // Branch counts
-    branchCounts = {};
-    for (var branch in AppConstants.branches) {
-      branchCounts[branch] = DummyData.students.where((s) => s.branch == branch).length;
-    }
-
-    // Course counts
-    courseCounts = {};
-    for (var course in AppConstants.courseTypes) {
-      courseCounts[course] = DummyData.students.where((s) => s.courseType == course).length;
+      // Course counts
+      courseCounts = {};
+      for (var course in AppConstants.courseTypes) {
+        courseCounts[course] = DummyData.students.where((s) => s.courseType == course).length;
+      }
+    } catch (e) {
+      if (mounted) {
+        AppSnackBar.showError(context, "Error computing admin statistics: $e");
+      }
     }
   }
 

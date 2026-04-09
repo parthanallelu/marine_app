@@ -14,8 +14,8 @@ class AdminStudentsScreen extends StatefulWidget {
 }
 
 class _AdminStudentsScreenState extends State<AdminStudentsScreen> {
-  late List<StudentModel> _allStudents;
-  late List<StudentModel> _filteredStudents;
+  List<StudentModel> _allStudents = [];
+  List<StudentModel> _filteredStudents = [];
   String _selectedCourse = "All";
   String _selectedBranch = "All";
   String _searchQuery = "";
@@ -33,8 +33,12 @@ class _AdminStudentsScreenState extends State<AdminStudentsScreen> {
   @override
   void initState() {
     super.initState();
-    _allStudents = List.from(DummyData.students);
-    _applyFilters();
+    try {
+      _allStudents = List.from(DummyData.students);
+      _applyFilters();
+    } catch (e) {
+      debugPrint("Error loading students: $e");
+    }
   }
 
   @override
@@ -589,26 +593,18 @@ class _AdminStudentsScreenState extends State<AdminStudentsScreen> {
             child: Text("Filter by Branch", style: AppTextStyles.headingSmall),
           ),
 
-          ...["All", ...AppConstants.branches].map((branch) => ListTile(
+          ...["All", ...AppConstants.branches].map((branch) => RadioListTile<String>.adaptive(
                 title: Text(branch),
-                leading: Radio<String>.adaptive(
-                  value: branch,
-                  groupValue: _selectedBranch,
-                  onChanged: (val) {
-                    setState(() {
-                      _selectedBranch = val!;
-                      _applyFilters();
-                    });
-                    Navigator.pop(context);
-                  },
-                ),
-                onTap: () {
+                value: branch,
+                groupValue: _selectedBranch,
+                onChanged: (val) {
                   setState(() {
-                    _selectedBranch = branch;
+                    _selectedBranch = val!;
                     _applyFilters();
                   });
                   Navigator.pop(context);
                 },
+                contentPadding: const EdgeInsets.symmetric(horizontal: AppSpacing.xl),
               )),
         ],
       ),
@@ -628,26 +624,18 @@ class _AdminStudentsScreenState extends State<AdminStudentsScreen> {
             child: Text("Filter by Course", style: AppTextStyles.headingSmall),
           ),
 
-          ...["All", ...AppConstants.courseTypes].map((course) => ListTile(
+          ...["All", ...AppConstants.courseTypes].map((course) => RadioListTile<String>.adaptive(
                 title: Text(course),
-                leading: Radio<String>.adaptive(
-                  value: course,
-                  groupValue: _selectedCourse,
-                  onChanged: (val) {
-                    setState(() {
-                      _selectedCourse = val!;
-                      _applyFilters();
-                    });
-                    Navigator.pop(context);
-                  },
-                ),
-                onTap: () {
+                value: course,
+                groupValue: _selectedCourse,
+                onChanged: (val) {
                   setState(() {
-                    _selectedCourse = course;
+                    _selectedCourse = val!;
                     _applyFilters();
                   });
                   Navigator.pop(context);
                 },
+                padding: const EdgeInsets.symmetric(horizontal: AppSpacing.xl),
               )),
         ],
       ),

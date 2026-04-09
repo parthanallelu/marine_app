@@ -32,43 +32,48 @@ class _StudentHomeScreenState extends State<StudentHomeScreen> {
   void _calculateDashboardData() {
     setState(() => _isLoading = true);
     
-    // TODO: Replace DummyData with Firestore query:
-    // final studentData = await studentRepository.getStudentDashboard(studentId);
-    
-    final authProvider = context.read<AuthProvider>();
-    final student = authProvider.currentUser as StudentModel;
-    final now = DateTime.now().toUtc();
+    try {
+      final authProvider = context.read<AuthProvider>();
+      final student = authProvider.currentUser as StudentModel;
+      final now = DateTime.now().toUtc();
 
-    // Compute attendance
-    final records = DummyData.generateAttendanceForStudent(student.id, student.name, student.batchId);
-    _attendanceSummary = DummyData.attendanceSummaryFor(student.id, records);
-    
-    // Compute test stats
-    final results = DummyData.testResults.where((r) => r.studentId == student.id).toList();
-    _avgScore = results.isEmpty
-        ? 0.0
-        : results.map((r) => r.percentage).reduce((a, b) => a + b) / results.length;
-    
-    // Compute fee status
-    _feeRecord = DummyData.feeRecords.firstWhere(
-      (f) => f.studentId == student.id,
-      orElse: () => DummyData.feeRecords.first,
-    );
+      // Compute attendance
+      final records = DummyData.generateAttendanceForStudent(student.id, student.name, student.batchId);
+      _attendanceSummary = DummyData.attendanceSummaryFor(student.id, records);
+      
+      // Compute test stats
+      final results = DummyData.testResults.where((r) => r.studentId == student.id).toList();
+      _avgScore = results.isEmpty
+          ? 0.0
+          : results.map((r) => r.percentage).reduce((a, b) => a + b) / results.length;
+      
+      // Compute fee status
+      _feeRecord = DummyData.feeRecords.firstWhere(
+        (f) => f.studentId == student.id,
+        orElse: () => DummyData.feeRecords.first,
+      );
 
-    // Compute announcements
-    _announcements = DummyData.announcements.where((a) {
-      final courseMatch = a.targetCourses.contains(student.courseType);
-      final branchMatch = a.targetBranches.contains(student.branch) || a.targetBranches.length >= 4;
-      return courseMatch && branchMatch;
-    }).toList();
+      // Compute announcements
+      _announcements = DummyData.announcements.where((a) {
+        final courseMatch = a.targetCourses.contains(student.courseType);
+        final branchMatch = a.targetBranches.contains(student.branch) || a.targetBranches.length >= 4;
+        return courseMatch && branchMatch;
+      }).toList();
 
-    // Compute upcoming tests
-    _upcomingTests = DummyData.tests
-        .where((t) => t.scheduledDate.isAfter(now))
-        .toList()
-      ..sort((a, b) => a.scheduledDate.compareTo(b.scheduledDate));
-
-    setState(() => _isLoading = false);
+      // Compute upcoming tests
+      _upcomingTests = DummyData.tests
+          .where((t) => t.scheduledDate.isAfter(now))
+          .toList()
+        ..sort((a, b) => a.scheduledDate.compareTo(b.scheduledDate));
+    } catch (e) {
+      if (mounted) {
+        AppSnackBar.showError(context, "Error loading dashboard: $e");
+      }
+    } finally {
+      if (mounted) {
+        setState(() => _isLoading = false);
+      }
+    }
   }
 
   @override

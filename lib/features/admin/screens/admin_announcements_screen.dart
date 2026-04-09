@@ -14,7 +14,7 @@ class AdminAnnouncementsScreen extends StatefulWidget {
 }
 
 class _AdminAnnouncementsScreenState extends State<AdminAnnouncementsScreen> {
-  late List<AnnouncementModel> _allAnnouncements;
+  List<AnnouncementModel> _allAnnouncements = [];
   String _selectedBranch = "All";
   bool _isSubmitting = false;
 
@@ -22,12 +22,14 @@ class _AdminAnnouncementsScreenState extends State<AdminAnnouncementsScreen> {
     if (mounted) setState(() => _isSubmitting = value);
   }
 
-
-
   @override
   void initState() {
     super.initState();
-    _allAnnouncements = List.from(DummyData.announcements);
+    try {
+      _allAnnouncements = List.from(DummyData.announcements);
+    } catch (e) {
+      debugPrint("Error loading announcements: $e");
+    }
   }
 
   @override

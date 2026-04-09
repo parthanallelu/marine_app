@@ -15,9 +15,9 @@ class ProfessorTestsScreen extends StatefulWidget {
 }
 
 class _ProfessorTestsScreenState extends State<ProfessorTestsScreen> {
-  late List<TestModel> _allTests;
-  late List<TestModel> _filteredTestsResults;
-  late Map<String, BatchModel> _testBatches;
+  List<TestModel> _allTests = [];
+  List<TestModel> _filteredTestsResults = [];
+  Map<String, BatchModel> _testBatches = {};
   String _searchQuery = "";
   bool _isLoading = true;
   bool _isSubmitting = false;
@@ -35,7 +35,14 @@ class _ProfessorTestsScreenState extends State<ProfessorTestsScreen> {
   @override
   void initState() {
     super.initState();
-    _loadTests();
+    try {
+      _loadTests();
+    } catch (e) {
+      debugPrint("Error initializing tests screen: $e");
+      if (mounted) {
+        setState(() => _isLoading = false);
+      }
+    }
   }
 
   @override

@@ -35,47 +35,55 @@ class _ProfessorHomeScreenState extends State<ProfessorHomeScreen> {
   Future<void> _loadDashboardData() async {
     setState(() => _isLoading = true);
     
-    // Simulate async network delay for future-readiness
-    await Future.delayed(const Duration(milliseconds: 600));
+    try {
+      // Simulate async network delay for future-readiness
+      await Future.delayed(const Duration(milliseconds: 600));
 
-    if (!mounted) return;
+      if (!mounted) return;
 
-    final authProvider = Provider.of<AuthProvider>(context, listen: false);
-    final professor = authProvider.currentUser as ProfessorModel?;
+      final authProvider = Provider.of<AuthProvider>(context, listen: false);
+      final professor = authProvider.currentUser as ProfessorModel?;
 
-    if (professor == null) {
-      setState(() {
-        _assignedBatches = [];
-        _todaysClasses = [];
-        _totalStudents = 0;
-        _isLoading = false;
-      });
-      return;
+      if (professor == null) {
+        setState(() {
+          _assignedBatches = [];
+          _todaysClasses = [];
+          _totalStudents = 0;
+          _isLoading = false;
+        });
+        return;
+      }
+
+      // Filter batches assigned to this professor
+      _assignedBatches = DummyData.batches
+          .where((b) => b.professorId == professor.id && b.isActive)
+          .toList();
+
+      // Calculate total students across all assigned batches
+      _totalStudents = 0;
+      _batchStudentCounts = {};
+      
+      // Efficiently count students for assigned batches
+      for (var batch in _assignedBatches) {
+        final count = DummyData.students.where((s) => s.batchId == batch.id).length;
+        _batchStudentCounts[batch.id] = count;
+        _totalStudents += count;
+      }
+
+      // Filter today's classes
+      final today = DateFormat('EEEE').format(DateTime.now()); // e.g., "Monday"
+      _todaysClasses = _assignedBatches
+          .where((b) => b.days.contains(today))
+          .toList();
+    } catch (e) {
+      if (mounted) {
+        AppSnackBar.showError(context, "Error loading professor dashboard: $e");
+      }
+    } finally {
+      if (mounted) {
+        setState(() => _isLoading = false);
+      }
     }
-
-    // Filter batches assigned to this professor
-    _assignedBatches = DummyData.batches
-        .where((b) => b.professorId == professor.id && b.isActive)
-        .toList();
-
-    // Calculate total students across all assigned batches
-    _totalStudents = 0;
-    _batchStudentCounts = {};
-    
-    // Efficiently count students for assigned batches
-    for (var batch in _assignedBatches) {
-      final count = DummyData.students.where((s) => s.batchId == batch.id).length;
-      _batchStudentCounts[batch.id] = count;
-      _totalStudents += count;
-    }
-
-    // Filter today's classes
-    final today = DateFormat('EEEE').format(DateTime.now()); // e.g., "Monday"
-    _todaysClasses = _assignedBatches
-        .where((b) => b.days.contains(today))
-        .toList();
-
-    setState(() => _isLoading = false);
   }
 
   @override
