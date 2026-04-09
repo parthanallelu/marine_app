@@ -33,71 +33,45 @@ class _AdminFeesScreenState extends State<AdminFeesScreen> {
     }
   }
 
-  @override
-  Widget build(BuildContext context) {
-    // Filter records by branch and search (name/roll)
-    final filteredRecords = _allFeeRecords.where((f) {
-      final matchesBranch = _selectedBranch == "All" || f.batchId.toLowerCase().contains(_selectedBranch.toLowerCase());
-      final matchesSearch = f.studentName.toLowerCase().contains(_searchQuery.toLowerCase()) ||
-                            f.studentId.toLowerCase().contains(_searchQuery.toLowerCase());
-      return matchesBranch && matchesSearch;
-    }).toList();
-
-    // Financial calculations
-    final totalCollected = filteredRecords.fold<double>(0, (sum, f) => sum + f.paidAmount);
-    final totalPlanned = filteredRecords.fold<double>(0, (sum, f) => sum + f.totalFees);
-    final totalPending = totalPlanned - totalCollected;
-    final collectionPercent = totalPlanned > 0 ? totalCollected / totalPlanned : 0.0;
-
-    return Scaffold(
-      backgroundColor: AppColors.background,
-      appBar: AppBar(
-        title: Text("Financial Portal", style: AppTextStyles.headingMedium),
-        backgroundColor: Colors.white,
-        elevation: 0,
-        foregroundColor: AppColors.navyBlueBase,
-      ),
+    return AppPageShell(
+      title: "Financial Portal",
+      subtitle: "Fee Management",
+      showBackButton: true,
+      headerWidgets: [
+        CustomTextField(
+          hintText: "Search student name...",
+          prefixIcon: Icons.search_rounded,
+          onChanged: (val) => setState(() => _searchQuery = val),
+        ),
+        const SizedBox(height: AppSpacing.md),
+        SizedBox(
+          height: 36,
+          child: ListView(
+            scrollDirection: Axis.horizontal,
+            children: [
+              _Chip(
+                label: "Global Records",
+                isSelected: _selectedBranch == "All",
+                onTap: () => setState(() => _selectedBranch = "All"),
+                isLight: true,
+              ),
+              ...AppConstants.branches.map((branch) => _Chip(
+                    label: branch,
+                    isSelected: _selectedBranch == branch,
+                    onTap: () => setState(() => _selectedBranch = branch),
+                    isLight: true,
+                  )),
+            ],
+          ),
+        ),
+      ],
       body: Column(
         children: [
-          // SEARCH & BRANCH SELECTOR
-          Container(
-            padding: EdgeInsets.fromLTRB(AppSpacing.lg, AppSpacing.sm, AppSpacing.lg, AppSpacing.lg),
-            color: Colors.white,
-            child: Column(
-              children: [
-                CustomTextField(
-                  hintText: "Search student name...",
-                  prefixIcon: Icons.search_rounded,
-                  onChanged: (val) => setState(() => _searchQuery = val),
-                ),
-                SizedBox(height: AppSpacing.md),
-                SizedBox(
-                  height: 36,
-                  child: ListView(
-                    scrollDirection: Axis.horizontal,
-                    children: [
-                      _Chip(
-                        label: "Global Records",
-                        isSelected: _selectedBranch == "All",
-                        onTap: () => setState(() => _selectedBranch = "All"),
-                      ),
-                      ...AppConstants.branches.map((branch) => _Chip(
-                            label: branch,
-                            isSelected: _selectedBranch == branch,
-                            onTap: () => setState(() => _selectedBranch = branch),
-                          )),
-                    ],
-                  ),
-                ),
-              ],
-            ),
-          ),
-
           // FINANCIAL OVERVIEW CARD
           Padding(
-            padding: EdgeInsets.all(AppSpacing.lg),
+            padding: const EdgeInsets.all(AppSpacing.lg),
             child: Container(
-              padding: EdgeInsets.all(AppSpacing.xl),
+              padding: const EdgeInsets.all(AppSpacing.xl),
               decoration: BoxDecoration(
                 gradient: const LinearGradient(
                   colors: [AppColors.navyBlueDark, AppColors.navyBlueBase],
@@ -116,7 +90,7 @@ class _AdminFeesScreenState extends State<AdminFeesScreen> {
                         crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
                           Text("Collection Performance", style: AppTextStyles.bodyMedium.copyWith(color: Colors.white.withAlpha((0.7 * 255).round()))),
-                          SizedBox(height: AppSpacing.xs),
+                          const SizedBox(height: AppSpacing.xs),
                           Text(
                             "₹${totalCollected.toInt()}",
                             style: AppTextStyles.headingLarge.copyWith(color: Colors.white, fontSize: 32),
@@ -137,13 +111,13 @@ class _AdminFeesScreenState extends State<AdminFeesScreen> {
                       ),
                     ],
                   ),
-                  SizedBox(height: AppSpacing.xl),
+                  const SizedBox(height: AppSpacing.xl),
                   Divider(color: Colors.white.withAlpha((0.24 * 255).round()), height: 1),
-                  SizedBox(height: AppSpacing.lg),
+                  const SizedBox(height: AppSpacing.lg),
                   Row(
                     children: [
                       _CompactStat(label: "Pending", value: "₹${totalPending.toInt()}", color: AppColors.error),
-                      SizedBox(width: AppSpacing.xxl * 1.5),
+                      const SizedBox(width: AppSpacing.xxl * 1.5),
                       _CompactStat(label: "Total Target", value: "₹${totalPlanned.toInt()}", color: AppColors.gold),
                       const Spacer(),
                       _CompactStat(label: "Records", value: filteredRecords.length.toString(), color: Colors.white),
@@ -155,28 +129,36 @@ class _AdminFeesScreenState extends State<AdminFeesScreen> {
           ),
 
           // RECORDS LIST
-          Expanded(
-            child: filteredRecords.isEmpty
-                ? const EmptyState(
-                    icon: Icons.payments_outlined,
-                    title: "No Invoices Found",
-                    subtitle: "Try adjusting filters or search criteria.",
-                  )
-                : ListView.builder(
-                    padding: EdgeInsets.symmetric(horizontal: AppSpacing.lg),
-                    itemCount: filteredRecords.length,
-                    itemBuilder: (context, index) {
-                      final record = filteredRecords[index];
-                      return FeeCard(
-                        record: record,
-                        onTap: () => _showFeeDetailSheet(record),
-                      );
-                    },
-                  ),
-          ),
+          filteredRecords.isEmpty
+              ? const Column(
+                  children: [
+                    SizedBox(height: 60),
+                    EmptyState(
+                      icon: Icons.payments_outlined,
+                      title: "No Invoices Found",
+                      subtitle: "Try adjusting filters or search criteria.",
+                    ),
+                  ],
+                )
+              : ListView.builder(
+                  shrinkWrap: true,
+                  physics: const NeverScrollableScrollPhysics(),
+                  padding: const EdgeInsets.symmetric(horizontal: AppSpacing.lg, vertical: AppSpacing.sm),
+                  itemCount: filteredRecords.length,
+                  itemBuilder: (context, index) {
+                    final record = filteredRecords[index];
+                    return FeeCard(
+                      record: record,
+                      onTap: () => _showFeeDetailSheet(record),
+                    );
+                  },
+                ),
+          const SizedBox(height: 80),
         ],
       ),
     );
+  }
+;
   }
 
   void _showFeeDetailSheet(FeeRecord initialRecord) {
@@ -344,28 +326,44 @@ class _Chip extends StatelessWidget {
   final String label;
   final bool isSelected;
   final VoidCallback onTap;
+  final bool isLight;
 
-  const _Chip({required this.label, required this.isSelected, required this.onTap});
+  const _Chip({
+    required this.label, 
+    required this.isSelected, 
+    required this.onTap,
+    this.isLight = false,
+  });
 
   @override
   Widget build(BuildContext context) {
     return Padding(
-      padding: EdgeInsets.only(right: AppSpacing.sm),
+      padding: const EdgeInsets.only(right: AppSpacing.sm),
       child: GestureDetector(
         onTap: onTap,
         child: Container(
-          padding: EdgeInsets.symmetric(horizontal: AppSpacing.lg, vertical: AppSpacing.xs),
+          padding: const EdgeInsets.symmetric(horizontal: AppSpacing.lg, vertical: AppSpacing.xs),
           decoration: BoxDecoration(
-            color: isSelected ? AppColors.navyBlueBase : AppColors.background,
+            color: isSelected 
+                ? (isLight ? Colors.white : AppColors.navyBlueBase) 
+                : (isLight ? Colors.white.withAlpha((0.1 * 255).round()) : AppColors.background),
             borderRadius: BorderRadius.circular(AppRadius.xxl),
-            border: Border.all(color: isSelected ? AppColors.navyBlueBase : AppColors.divider),
+            border: Border.all(
+              color: isSelected 
+                  ? (isLight ? Colors.white : AppColors.navyBlueBase) 
+                  : (isLight ? Colors.white.withAlpha((0.2 * 255).round()) : AppColors.divider),
+            ),
           ),
-          child: Text(
-            label,
-            style: AppTextStyles.caption.copyWith(
-              color: isSelected ? Colors.white : AppColors.textPrimary,
-              fontSize: 11,
-              fontWeight: isSelected ? FontWeight.bold : FontWeight.normal,
+          child: Center(
+            child: Text(
+              label,
+              style: AppTextStyles.caption.copyWith(
+                color: isSelected 
+                    ? (isLight ? AppColors.navyBlueBase : Colors.white) 
+                    : (isLight ? Colors.white : AppColors.textPrimary),
+                fontSize: 11,
+                fontWeight: isSelected ? FontWeight.bold : FontWeight.normal,
+              ),
             ),
           ),
         ),

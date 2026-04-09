@@ -88,99 +88,91 @@ class _BatchStudentsScreenState extends State<BatchStudentsScreen> {
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      backgroundColor: AppColors.background,
-      appBar: AppBar(
-        title: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            Text("${widget.batch.name} Students", style: AppTextStyles.headingMedium),
-            Text("${_batchStudents.length} students assigned", style: AppTextStyles.caption.copyWith(color: AppColors.textHint)),
-          ],
-        ),
-        backgroundColor: Colors.white,
-        elevation: 0,
-        foregroundColor: AppColors.navyBlueBase,
+    return AppPageShell(
+      title: widget.batch.name,
+      subtitle: "Student Management",
+      showBackButton: true,
+      floatingActionButton: FloatingActionButton.extended(
+        onPressed: _showAddStudentsSheet,
+        backgroundColor: AppColors.navyBlueBase,
+        icon: const Icon(Icons.person_add_rounded, color: Colors.white),
+        label: Text("Assign Students", style: AppTextStyles.labelLarge.copyWith(color: Colors.white)),
       ),
-      body: Column(
-        children: [
-          Expanded(
-            child: _batchStudents.isEmpty
-                ? const EmptyState(
-                    icon: Icons.group_outlined,
-                    title: "No students assigned",
-                    subtitle: "Assign students to this batch",
-                  )
-                : ListView.builder(
-                    padding: const EdgeInsets.all(AppSpacing.lg),
-                    itemCount: _batchStudents.length,
-                    itemBuilder: (context, index) {
-
-                      final student = _batchStudents[index];
-                      return Container(
-                        margin: const EdgeInsets.only(bottom: AppSpacing.sm),
-                        padding: const EdgeInsets.all(AppSpacing.md),
-                        decoration: BoxDecoration(
-
-                          color: Colors.white,
-                          borderRadius: BorderRadius.circular(AppRadius.md),
-                          boxShadow: AppShadows.subtle,
+      headerWidgets: [
+        Container(
+          padding: const EdgeInsets.symmetric(horizontal: AppSpacing.md, vertical: AppSpacing.xs),
+          decoration: BoxDecoration(
+            color: Colors.white.withAlpha((0.15 * 255).round()),
+            borderRadius: BorderRadius.circular(AppRadius.md),
+          ),
+          child: Text(
+            "${_batchStudents.length} Students Assigned",
+            style: AppTextStyles.caption.copyWith(color: Colors.white, fontWeight: FontWeight.bold),
+          ),
+        ),
+      ],
+      body: _batchStudents.isEmpty
+          ? const Column(
+              children: [
+                SizedBox(height: 100),
+                EmptyState(
+                  icon: Icons.group_outlined,
+                  title: "No students assigned",
+                  subtitle: "Assign students to this batch",
+                ),
+              ],
+            )
+          : ListView.builder(
+              shrinkWrap: true,
+              physics: const NeverScrollableScrollPhysics(),
+              padding: const EdgeInsets.fromLTRB(AppSpacing.lg, AppSpacing.md, AppSpacing.lg, 80),
+              itemCount: _batchStudents.length,
+              itemBuilder: (context, index) {
+                final student = _batchStudents[index];
+                return Container(
+                  margin: const EdgeInsets.only(bottom: AppSpacing.sm),
+                  padding: const EdgeInsets.all(AppSpacing.md),
+                  decoration: BoxDecoration(
+                    color: Colors.white,
+                    borderRadius: BorderRadius.circular(AppRadius.md),
+                    boxShadow: AppShadows.subtle,
+                  ),
+                  child: Row(
+                    children: [
+                      CircleAvatar(
+                        backgroundColor: AppColors.navyBlueSurface,
+                        child: Text(
+                          student.name[0].toUpperCase(),
+                          style: const TextStyle(fontWeight: FontWeight.bold, color: AppColors.navyBlueBase),
                         ),
-                        child: Row(
+                      ),
+                      const SizedBox(width: AppSpacing.lg),
+                      Expanded(
+                        child: Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
                           children: [
-                            CircleAvatar(
-                              backgroundColor: AppColors.navyBlueSurface,
-                              child: Text(
-                                student.name[0].toUpperCase(),
-                                style: const TextStyle(fontWeight: FontWeight.bold, color: AppColors.navyBlueBase),
-                              ),
-                             ),
-                            const SizedBox(width: AppSpacing.lg),
-                            Expanded(
-
-                              child: Column(
-                                crossAxisAlignment: CrossAxisAlignment.start,
-                                children: [
-                                  Text(student.name, style: AppTextStyles.labelLarge),
-                                  Text(student.rollNumber.isEmpty ? 'No roll number' : student.rollNumber, style: AppTextStyles.caption),
-                                  const SizedBox(height: AppSpacing.xs),
-                                  Row(
-                                    children: [
-                                      CourseBadge(courseType: student.courseType),
-                                      const SizedBox(width: AppSpacing.sm),
-                                      BranchBadge(branch: student.branch),
-                                    ],
-                                  ),
-
-                                ],
-                              ),
-                            ),
-                            IconButton(
-                              icon: const Icon(Icons.remove_circle_outline, color: AppColors.error),
-                              onPressed: () => _confirmRemove(student),
+                            Text(student.name, style: AppTextStyles.labelLarge),
+                            Text(student.rollNumber.isEmpty ? 'No roll number' : student.rollNumber, style: AppTextStyles.caption),
+                            const SizedBox(height: AppSpacing.xs),
+                            Row(
+                              children: [
+                                CourseBadge(courseType: student.courseType),
+                                const SizedBox(width: AppSpacing.sm),
+                                BranchBadge(branch: student.branch),
+                              ],
                             ),
                           ],
                         ),
-                      );
-                    },
+                      ),
+                      IconButton(
+                        icon: const Icon(Icons.remove_circle_outline, color: AppColors.error),
+                        onPressed: () => _confirmRemove(student),
+                      ),
+                    ],
                   ),
-          ),
-          Container(
-            padding: const EdgeInsets.all(AppSpacing.lg),
-            decoration: const BoxDecoration(
-              color: Colors.white,
-
-              boxShadow: [BoxShadow(color: Colors.black12, blurRadius: 10, offset: Offset(0, -2))],
+                );
+              },
             ),
-            child: CustomButton(
-              label: "Assign Students",
-              icon: Icons.person_add,
-              width: double.infinity,
-              onPressed: _showAddStudentsSheet,
-            ),
-          ),
-        ],
-      ),
     );
   }
 }

@@ -76,180 +76,134 @@ class _ProfessorProfileScreenState extends State<ProfessorProfileScreen> {
       );
     }
 
-    return Scaffold(
-      backgroundColor: AppColors.background,
-      body: CustomScrollView(
-        slivers: [
-          // Profile Header
-          SliverToBoxAdapter(
-            child: Container(
-              width: double.infinity,
-              decoration: const BoxDecoration(
-                gradient: LinearGradient(
-                  colors: [AppColors.navyBlueDark, AppColors.navyBlueBase],
-                  begin: Alignment.topLeft,
-                  end: Alignment.bottomRight,
+    return AppPageShell(
+      title: 'My Profile',
+      subtitle: 'Professor Account',
+      showBackButton: false,
+      headerWidgets: [
+        Center(
+          child: Column(
+            children: [
+              CircleAvatar(
+                radius: 40,
+                backgroundColor: AppColors.gold.withAlpha((0.2 * 255).round()),
+                child: Text(
+                  prof.name.isNotEmpty ? prof.name[0] : '?',
+                  style: AppTextStyles.headingLarge.copyWith(color: AppColors.gold, fontSize: 32),
                 ),
               ),
-              child: SafeArea(
-                bottom: false,
-                child: Padding(
-                  padding: EdgeInsets.fromLTRB(AppSpacing.xl, AppSpacing.lg, AppSpacing.xl, AppSpacing.xxl),
-                  child: Column(
-                    children: [
-                      CircleAvatar(
-                        radius: 45,
-                        backgroundColor: AppColors.gold.withAlpha((0.2 * 255).round()),
-                        child: Text(
-                          prof.name.isNotEmpty ? prof.name[0] : '?',
-                          style: AppTextStyles.headingLarge.copyWith(color: AppColors.gold, fontSize: 36),
-                        ),
-                      ),
-                      SizedBox(height: AppSpacing.lg),
-                      Text(
-                        prof.name,
-                        style: AppTextStyles.headingMedium.copyWith(color: Colors.white),
-                        textAlign: TextAlign.center,
-                      ),
-                      SizedBox(height: AppSpacing.xs),
-                      Text(
-                        prof.qualification,
-                        style: AppTextStyles.bodyMedium.copyWith(color: Colors.white70),
-                      ),
-                      SizedBox(height: AppSpacing.md),
-                      Row(
-                        mainAxisAlignment: MainAxisAlignment.center,
-                        children: [
-                          _buildHeaderChip(Icons.work_history_rounded, '${prof.experienceYears} Years Exp'),
-                          SizedBox(width: AppSpacing.sm),
-                          BranchBadge(branch: prof.branch),
-                        ],
-                      ),
-                    ],
-                  ),
-                ),
+              const SizedBox(height: AppSpacing.md),
+              Text(
+                prof.name,
+                style: AppTextStyles.headingMedium.copyWith(color: Colors.white),
+                textAlign: TextAlign.center,
               ),
-            ),
+              const SizedBox(height: AppSpacing.xs),
+              Text(
+                prof.qualification,
+                style: AppTextStyles.bodyMedium.copyWith(color: Colors.white70),
+              ),
+              const SizedBox(height: AppSpacing.md),
+              Row(
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: [
+                  _buildHeaderChip(Icons.work_history_rounded, '${prof.experienceYears} Years Exp'),
+                  const SizedBox(width: AppSpacing.sm),
+                  BranchBadge(branch: prof.branch),
+                ],
+              ),
+            ],
           ),
-
-          // Academic Summary Card
-          SliverToBoxAdapter(
-            child: Transform.translate(
-              offset: const Offset(0, -16),
-              child: Padding(
-                padding: EdgeInsets.symmetric(horizontal: AppSpacing.xl),
-                child: Container(
-                  padding: EdgeInsets.all(AppSpacing.lg),
-                  decoration: BoxDecoration(
-                    color: Colors.white,
-                    borderRadius: AppRadius.cardRadius,
-                    boxShadow: AppShadows.elevated,
-                  ),
-                  child: IntrinsicHeight(
-                    child: Row(
-                      mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-                      children: [
-                        _summaryItem("Batches", _myBatches.length.toString(), Icons.groups_rounded, AppColors.oceanBlue),
-                        VerticalDivider(width: AppSpacing.xxl),
-                        _summaryItem("Subjects", prof.subjects.length.toString(), Icons.book_rounded, AppColors.success),
-                        VerticalDivider(width: AppSpacing.xxl),
-                        _summaryItem("Specialty", "Expert", Icons.grade_rounded, AppColors.gold),
-                      ],
-                    ),
-                  ),
-                ),
+        ),
+      ],
+      body: Padding(
+        padding: const EdgeInsets.symmetric(horizontal: AppSpacing.xl),
+        child: Column(
+          children: [
+            const SizedBox(height: AppSpacing.lg),
+            // Academic Summary Card
+            Container(
+              padding: const EdgeInsets.all(AppSpacing.lg),
+              decoration: BoxDecoration(
+                color: Colors.white,
+                borderRadius: AppRadius.cardRadius,
+                boxShadow: AppShadows.elevated,
               ),
-            ),
-          ),
-
-          // Contact & Professional Info
-          SliverToBoxAdapter(
-            child: Padding(
-              padding: EdgeInsets.symmetric(horizontal: AppSpacing.xl),
-              child: DashboardCard(
-                title: "Professional Information",
-                child: Column(
+              child: IntrinsicHeight(
+                child: Row(
+                  mainAxisAlignment: MainAxisAlignment.spaceEvenly,
                   children: [
-                    InfoRow(icon: Icons.email_outlined, label: "Email", value: prof.email),
-                    const Divider(height: 1),
-                    InfoRow(icon: Icons.phone_outlined, label: "Phone", value: prof.phone),
-                    const Divider(height: 1),
-                    InfoRow(icon: Icons.psychology_outlined, label: "Specialization", value: prof.specialization),
-                    const Divider(height: 1),
-                    InfoRow(icon: Icons.calendar_month_outlined, label: "Faculty Since", value: prof.createdAt.year.toString()),
+                    _summaryItem("Batches", _myBatches.length.toString(), Icons.groups_rounded, AppColors.oceanBlue),
+                    const VerticalDivider(width: AppSpacing.xxl),
+                    _summaryItem("Subjects", prof.subjects.length.toString(), Icons.book_rounded, AppColors.success),
+                    const VerticalDivider(width: AppSpacing.xxl),
+                    _summaryItem("Specialty", "Expert", Icons.grade_rounded, AppColors.gold),
                   ],
                 ),
               ),
             ),
-          ),
-
-          SizedBox(height: AppSpacing.xl).toSliver,
-
-          // Subjects Section
-          SliverToBoxAdapter(
-            child: Padding(
-              padding: EdgeInsets.symmetric(horizontal: AppSpacing.xl),
-              child: _buildSubjects(prof),
-            ),
-          ),
-
-          SizedBox(height: AppSpacing.xl).toSliver,
-
-          // My Batches Section
-          SliverPadding(
-            padding: EdgeInsets.symmetric(horizontal: AppSpacing.xl),
-            sliver: SliverToBoxAdapter(
-              child: Text("My Assigned Batches", style: AppTextStyles.headingSmall),
-            ),
-          ),
-          SizedBox(height: AppSpacing.md).toSliver,
-          
-          if (_myBatches.isEmpty)
-            const SliverToBoxAdapter(
-              child: Padding(
-                padding: EdgeInsets.all(AppSpacing.xl),
-                child: EmptyState(
-                  icon: Icons.class_outlined,
-                  title: "No Batches",
-                  subtitle: "You don't have any assigned batches.",
-                ),
-              ),
-            )
-          else
-            SliverPadding(
-              padding: EdgeInsets.symmetric(horizontal: AppSpacing.xl),
-              sliver: SliverList(
-                delegate: SliverChildBuilderDelegate(
-                  (context, index) {
-                    final batch = _myBatches[index];
-                    return DashboardCard(
-                      title: batch.name,
-                      subtitle: batch.courseType,
-                      leading: const Icon(Icons.group_rounded, color: AppColors.navyBlueBase),
-                      trailing: Text('${batch.studentIds.length} Studs', style: AppTextStyles.caption),
-                      child: const SizedBox.shrink(),
-                      onTap: () {},
-                    );
-                  },
-                  childCount: _myBatches.length,
-                ),
+            const SizedBox(height: AppSpacing.xl),
+            // Contact & Professional Info
+            DashboardCard(
+              title: "Professional Information",
+              child: Column(
+                children: [
+                  InfoRow(icon: Icons.email_outlined, label: "Email", value: prof.email),
+                  const Divider(height: 1),
+                  InfoRow(icon: Icons.phone_outlined, label: "Phone", value: prof.phone),
+                  const Divider(height: 1),
+                  InfoRow(icon: Icons.psychology_outlined, label: "Specialization", value: prof.specialization),
+                  const Divider(height: 1),
+                  InfoRow(icon: Icons.calendar_month_outlined, label: "Faculty Since", value: prof.createdAt.year.toString()),
+                ],
               ),
             ),
-
-          // Logout Button
-          SliverToBoxAdapter(
-            child: Padding(
-              padding: EdgeInsets.fromLTRB(AppSpacing.xl, AppSpacing.xxl, AppSpacing.xl, 60),
-              child: CustomButton(
-                label: "Logout",
-                isOutlined: true,
-                color: AppColors.error,
-                icon: Icons.logout_rounded,
-                onPressed: () => _confirmLogout(context),
-              ),
+            const SizedBox(height: AppSpacing.xl),
+            // Subjects Section
+            _buildSubjects(prof),
+            const SizedBox(height: AppSpacing.xl),
+            // My Batches Section
+            Row(
+              children: [
+                Text("My Assigned Batches", style: AppTextStyles.headingSmall),
+              ],
             ),
-          ),
-        ],
+            const SizedBox(height: AppSpacing.md),
+            if (_myBatches.isEmpty)
+              const EmptyState(
+                icon: Icons.class_outlined,
+                title: "No Batches",
+                subtitle: "You don't have any assigned batches.",
+              )
+            else
+              ListView.builder(
+                shrinkWrap: true,
+                physics: const NeverScrollableScrollPhysics(),
+                itemCount: _myBatches.length,
+                itemBuilder: (context, index) {
+                  final batch = _myBatches[index];
+                  return DashboardCard(
+                    title: batch.name,
+                    subtitle: batch.courseType,
+                    leading: const Icon(Icons.group_rounded, color: AppColors.navyBlueBase),
+                    trailing: Text('${batch.studentIds.length} Studs', style: AppTextStyles.caption),
+                    child: const SizedBox.shrink(),
+                    onTap: () {},
+                  );
+                },
+              ),
+            const SizedBox(height: AppSpacing.xxl),
+            // Logout Button
+            CustomButton(
+              label: "Logout",
+              isOutlined: true,
+              color: AppColors.error,
+              icon: Icons.logout_rounded,
+              onPressed: () => _confirmLogout(context),
+            ),
+            const SizedBox(height: 60),
+          ],
+        ),
       ),
     );
   }

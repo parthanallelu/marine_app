@@ -32,76 +32,63 @@ class _AdminAnnouncementsScreenState extends State<AdminAnnouncementsScreen> {
     }
   }
 
-  @override
-  Widget build(BuildContext context) {
-    final announcements = _allAnnouncements.where((a) {
-      if (_selectedBranch == "All") return true;
-      return a.targetBranches.contains(_selectedBranch);
-    }).toList();
-
-    return Scaffold(
-      backgroundColor: AppColors.background,
-      appBar: AppBar(
-        title: Text("Notice Board", style: AppTextStyles.headingMedium),
-        backgroundColor: Colors.white,
-        elevation: 0,
-        foregroundColor: AppColors.navyBlueBase,
-      ),
-      body: Column(
-        children: [
-          // BRANCH FILTER
-          Container(
-            padding: EdgeInsets.fromLTRB(AppSpacing.lg, 0, AppSpacing.lg, AppSpacing.lg),
-            color: Colors.white,
-            child: SizedBox(
-              height: 40,
-              child: ListView(
-                scrollDirection: Axis.horizontal,
-                children: [
-                  _BranchChip(
-                    label: "Academy Wide",
-                    isSelected: _selectedBranch == "All",
-                    onTap: () => setState(() => _selectedBranch = "All"),
-                  ),
-                  ...AppConstants.branches.map((branch) => _BranchChip(
-                        label: branch,
-                        isSelected: _selectedBranch == branch,
-                        onTap: () => setState(() => _selectedBranch = branch),
-                      )),
-                ],
-              ),
-            ),
-          ),
-
-          // ANNOUNCEMENT LIST
-          Expanded(
-            child: announcements.isEmpty
-                ? const EmptyState(
-                    icon: Icons.campaign_outlined,
-                    title: "No Announcements",
-                    subtitle: "Create a notice to broadcast to the academy.",
-                  )
-                : ListView.builder(
-                    padding: EdgeInsets.fromLTRB(AppSpacing.lg, AppSpacing.md, AppSpacing.lg, 80),
-                    itemCount: announcements.length,
-                    itemBuilder: (context, index) {
-                      final announcement = announcements[index];
-                      return AnnouncementTile(
-                        announcement: announcement,
-                        onTap: () {}, // Detail view could be added here
-                        onDelete: () => _confirmDeleteAnnouncement(announcement),
-                      );
-                    },
-                  ),
-          ),
-        ],
-      ),
+    return AppPageShell(
+      title: "Notice Board",
+      subtitle: "Academy Broadcasts",
+      showBackButton: true,
       floatingActionButton: FloatingActionButton.extended(
         onPressed: () => _showCreateAnnouncementSheet(),
         backgroundColor: AppColors.navyBlueBase,
         icon: const Icon(Icons.campaign_rounded, color: Colors.white),
         label: Text("Post Notice", style: AppTextStyles.labelLarge.copyWith(color: Colors.white)),
       ),
+      headerWidgets: [
+        SizedBox(
+          height: 40,
+          child: ListView(
+            scrollDirection: Axis.horizontal,
+            children: [
+              _BranchChip(
+                label: "Academy Wide",
+                isSelected: _selectedBranch == "All",
+                onTap: () => setState(() => _selectedBranch = "All"),
+                isLight: true,
+              ),
+              ...AppConstants.branches.map((branch) => _BranchChip(
+                    label: branch,
+                    isSelected: _selectedBranch == branch,
+                    onTap: () => setState(() => _selectedBranch = branch),
+                    isLight: true,
+                  )),
+            ],
+          ),
+        ),
+      ],
+      body: announcements.isEmpty
+          ? const Column(
+              children: [
+                SizedBox(height: 100),
+                EmptyState(
+                  icon: Icons.campaign_outlined,
+                  title: "No Announcements",
+                  subtitle: "Create a notice to broadcast to the academy.",
+                ),
+              ],
+            )
+          : ListView.builder(
+              shrinkWrap: true,
+              physics: const NeverScrollableScrollPhysics(),
+              padding: const EdgeInsets.fromLTRB(AppSpacing.lg, AppSpacing.md, AppSpacing.lg, 80),
+              itemCount: announcements.length,
+              itemBuilder: (context, index) {
+                final announcement = announcements[index];
+                return AnnouncementTile(
+                  announcement: announcement,
+                  onTap: () {}, // Detail view could be added here
+                  onDelete: () => _confirmDeleteAnnouncement(announcement),
+                );
+              },
+            ),
     );
   }
 
@@ -291,28 +278,44 @@ class _BranchChip extends StatelessWidget {
   final String label;
   final bool isSelected;
   final VoidCallback onTap;
+  final bool isLight;
 
-  const _BranchChip({required this.label, required this.isSelected, required this.onTap});
+  const _BranchChip({
+    required this.label, 
+    required this.isSelected, 
+    required this.onTap,
+    this.isLight = false,
+  });
 
   @override
   Widget build(BuildContext context) {
     return Padding(
-      padding: EdgeInsets.only(right: AppSpacing.sm),
+      padding: const EdgeInsets.only(right: AppSpacing.sm),
       child: GestureDetector(
         onTap: onTap,
         child: Container(
-          padding: EdgeInsets.symmetric(horizontal: AppSpacing.lg, vertical: AppSpacing.xs),
+          padding: const EdgeInsets.symmetric(horizontal: AppSpacing.lg, vertical: AppSpacing.xs),
           decoration: BoxDecoration(
-            color: isSelected ? AppColors.navyBlueBase : AppColors.background,
+            color: isSelected 
+                ? (isLight ? Colors.white : AppColors.navyBlueBase) 
+                : (isLight ? Colors.white.withAlpha((0.1 * 255).round()) : AppColors.background),
             borderRadius: BorderRadius.circular(AppRadius.xxl),
-            border: Border.all(color: isSelected ? AppColors.navyBlueBase : AppColors.divider),
+            border: Border.all(
+              color: isSelected 
+                  ? (isLight ? Colors.white : AppColors.navyBlueBase) 
+                  : (isLight ? Colors.white.withAlpha((0.2 * 255).round()) : AppColors.divider),
+            ),
           ),
-          child: Text(
-            label,
-            style: AppTextStyles.caption.copyWith(
-              color: isSelected ? Colors.white : AppColors.textPrimary,
-              fontSize: 11,
-              fontWeight: isSelected ? FontWeight.bold : FontWeight.normal,
+          child: Center(
+            child: Text(
+              label,
+              style: AppTextStyles.caption.copyWith(
+                color: isSelected 
+                    ? (isLight ? AppColors.navyBlueBase : Colors.white) 
+                    : (isLight ? Colors.white : AppColors.textPrimary),
+                fontSize: 11,
+                fontWeight: isSelected ? FontWeight.bold : FontWeight.normal,
+              ),
             ),
           ),
         ),

@@ -89,66 +89,55 @@ class _AdminStudentsScreenState extends State<AdminStudentsScreen> {
   }
 
 
-  @override
-  Widget build(BuildContext context) {
-
-    return Scaffold(
-      backgroundColor: AppColors.background,
-      appBar: AppBar(
-        title: Text("Student Directory", style: AppTextStyles.headingMedium),
-        backgroundColor: Colors.white,
-        elevation: 0,
-        foregroundColor: AppColors.navyBlueBase,
+    return AppPageShell(
+      title: "Student Directory",
+      subtitle: "Management Panel",
+      showBackButton: true,
+      floatingActionButton: FloatingActionButton.extended(
+        onPressed: () => _showAddStudentSheet(),
+        backgroundColor: AppColors.navyBlueBase,
+        icon: const Icon(Icons.person_add_alt_1_rounded, color: Colors.white),
+        label: Text("Add Student", style: AppTextStyles.labelLarge.copyWith(color: Colors.white)),
       ),
+      headerWidgets: [
+        CustomTextField(
+          hintText: "Search by name, roll no, email, batch...",
+          prefixIcon: Icons.search_rounded,
+          onChanged: (val) => setState(() {
+            _searchQuery = val;
+            _applyFilters();
+          }),
+        ),
+        const SizedBox(height: AppSpacing.md),
+        Row(
+          children: [
+            Expanded(
+              child: _FilterButton(
+                label: _selectedBranch,
+                icon: Icons.location_on_rounded,
+                onTap: () => _showBranchSelector(),
+                isLight: true,
+              ),
+            ),
+            const SizedBox(width: AppSpacing.md),
+            Expanded(
+              child: _FilterButton(
+                label: _selectedCourse,
+                icon: Icons.school_rounded,
+                onTap: () => _showCourseSelector(),
+                isLight: true,
+              ),
+            ),
+          ],
+        ),
+      ],
       body: Column(
         children: [
-          // SEARCH & FILTER BAR
-          Container(
-            padding: const EdgeInsets.fromLTRB(AppSpacing.lg, AppSpacing.sm, AppSpacing.lg, AppSpacing.lg),
-            color: Colors.white,
-            child: Column(
-
-              children: [
-                CustomTextField(
-                  hintText: "Search by name, roll no, email, batch...",
-                  prefixIcon: Icons.search_rounded,
-                  onChanged: (val) => setState(() {
-                    _searchQuery = val;
-                    _applyFilters();
-                  }),
-                ),
-                const SizedBox(height: AppSpacing.md),
-                Row(
-                  children: [
-
-                    Expanded(
-                      child: _FilterButton(
-                        label: _selectedBranch,
-                        icon: Icons.location_on_rounded,
-                        onTap: () => _showBranchSelector(),
-                      ),
-                    ),
-                    const SizedBox(width: AppSpacing.md),
-                    Expanded(
-                      child: _FilterButton(
-                        label: _selectedCourse,
-
-                        icon: Icons.school_rounded,
-                        onTap: () => _showCourseSelector(),
-                      ),
-                    ),
-                  ],
-                ),
-              ],
-            ),
-          ),
-
           // STUDENT COUNT
           Padding(
             padding: const EdgeInsets.symmetric(horizontal: AppSpacing.lg, vertical: AppSpacing.md),
             child: Row(
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
-
               children: [
                 Text(
                   "Found ${_filteredStudents.length} Students",
@@ -169,35 +158,33 @@ class _AdminStudentsScreenState extends State<AdminStudentsScreen> {
           ),
 
           // STUDENT LIST
-          Expanded(
-            child: _filteredStudents.isEmpty
-                ? const EmptyState(
-                    icon: Icons.school_outlined,
-                    title: "No Students Found",
-                    subtitle: "Add students to get started or adjust your filters.",
-                  )
-                : ListView.builder(
-                    padding: const EdgeInsets.fromLTRB(AppSpacing.lg, 0, AppSpacing.lg, 80),
-                    itemCount: _filteredStudents.length,
-                    itemBuilder: (context, index) {
-
-                      final student = _filteredStudents[index];
-                      return StudentCard(
-                        student: student,
-                        onEdit: () => _showEditStudentSheet(student),
-                        onDelete: () => _confirmDeleteStudent(student),
-                        onAssignBatch: () => _showBatchSelectorForStudent(student),
-                      );
-                    },
-                  ),
-          ),
+          _filteredStudents.isEmpty
+              ? const Column(
+                  children: [
+                    SizedBox(height: 60),
+                    EmptyState(
+                      icon: Icons.school_outlined,
+                      title: "No Students Found",
+                      subtitle: "Add students to get started or adjust your filters.",
+                    ),
+                  ],
+                )
+              : ListView.builder(
+                  shrinkWrap: true,
+                  physics: const NeverScrollableScrollPhysics(),
+                  padding: const EdgeInsets.fromLTRB(AppSpacing.lg, 0, AppSpacing.lg, 80),
+                  itemCount: _filteredStudents.length,
+                  itemBuilder: (context, index) {
+                    final student = _filteredStudents[index];
+                    return StudentCard(
+                      student: student,
+                      onEdit: () => _showEditStudentSheet(student),
+                      onDelete: () => _confirmDeleteStudent(student),
+                      onAssignBatch: () => _showBatchSelectorForStudent(student),
+                    );
+                  },
+                ),
         ],
-      ),
-      floatingActionButton: FloatingActionButton.extended(
-        onPressed: () => _showAddStudentSheet(),
-        backgroundColor: AppColors.navyBlueBase,
-        icon: const Icon(Icons.person_add_alt_1_rounded, color: Colors.white),
-        label: Text("Add Student", style: AppTextStyles.labelLarge.copyWith(color: Colors.white)),
       ),
     );
   }
@@ -698,8 +685,14 @@ class _FilterButton extends StatelessWidget {
   final String label;
   final IconData icon;
   final VoidCallback onTap;
+  final bool isLight;
 
-  const _FilterButton({required this.label, required this.icon, required this.onTap});
+  const _FilterButton({
+    required this.label, 
+    required this.icon, 
+    required this.onTap,
+    this.isLight = false,
+  });
 
   @override
   Widget build(BuildContext context) {
@@ -708,22 +701,30 @@ class _FilterButton extends StatelessWidget {
       child: Container(
         padding: const EdgeInsets.symmetric(horizontal: AppSpacing.lg, vertical: 10),
         decoration: BoxDecoration(
-          color: AppColors.background,
+          color: isLight 
+              ? Colors.white.withAlpha((0.1 * 255).round()) 
+              : AppColors.background,
           borderRadius: BorderRadius.circular(AppRadius.md),
-          border: Border.all(color: AppColors.divider),
+          border: Border.all(
+            color: isLight 
+                ? Colors.white.withAlpha((0.2 * 255).round()) 
+                : AppColors.divider,
+          ),
         ),
         child: Row(
           children: [
-            Icon(icon, size: 16, color: AppColors.navyBlueBase),
+            Icon(icon, size: 16, color: isLight ? Colors.white : AppColors.navyBlueBase),
             const SizedBox(width: AppSpacing.sm),
             Expanded(
               child: Text(
                 label,
-                style: AppTextStyles.labelSmall,
+                style: AppTextStyles.labelSmall.copyWith(
+                  color: isLight ? Colors.white : AppColors.textPrimary,
+                ),
                 overflow: TextOverflow.ellipsis,
               ),
             ),
-            const Icon(Icons.arrow_drop_down, size: 18, color: AppColors.textHint),
+            Icon(Icons.arrow_drop_down, size: 18, color: isLight ? Colors.white70 : AppColors.textHint),
           ],
         ),
       ),

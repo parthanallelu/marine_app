@@ -758,6 +758,130 @@ class NavyHeader extends StatelessWidget {
 }
 
 // ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+// AppPageShell
+// ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+class AppPageShell extends StatelessWidget {
+  final String title;
+  final String? subtitle;
+  final List<Widget>? actions;
+  final List<Widget>? headerWidgets;
+  final Widget body;
+  final Widget? floatingActionButton;
+  final Color? backgroundColor;
+  final bool isScrollable;
+  final bool showBackButton;
+
+  const AppPageShell({
+    super.key,
+    required this.title,
+    this.subtitle,
+    this.actions,
+    this.headerWidgets,
+    required this.body,
+    this.floatingActionButton,
+    this.backgroundColor,
+    this.isScrollable = true,
+    this.showBackButton = true,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    return Scaffold(
+      backgroundColor: AppColors.navyBlueBase,
+      body: Column(
+        children: [
+          _buildHeader(context),
+          Expanded(
+            child: Container(
+              width: double.infinity,
+              decoration: const BoxDecoration(
+                color: AppColors.background,
+                borderRadius: BorderRadius.only(
+                  topLeft: Radius.circular(AppRadius.extraLarge),
+                  topRight: Radius.circular(AppRadius.extraLarge),
+                ),
+              ),
+              clipBehavior: Clip.antiAlias,
+              child: isScrollable
+                  ? SingleChildScrollView(
+                      padding: const EdgeInsets.only(bottom: 24),
+                      child: body,
+                    )
+                  : body,
+            ),
+          ),
+        ],
+      ),
+      floatingActionButton: floatingActionButton,
+    );
+  }
+
+  Widget _buildHeader(BuildContext context) {
+    return Container(
+      width: double.infinity,
+      decoration: const BoxDecoration(
+        gradient: LinearGradient(
+          colors: [AppColors.navyBlueDark, AppColors.navyBlueBase],
+          begin: Alignment.topLeft,
+          end: Alignment.bottomRight,
+        ),
+      ),
+      child: SafeArea(
+        bottom: false,
+        child: Padding(
+          padding: const EdgeInsets.fromLTRB(20, 16, 20, 24),
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Row(
+                children: [
+                  if (showBackButton && Navigator.of(context).canPop()) ...[
+                    IconButton(
+                      icon: const Icon(Icons.arrow_back_ios_new_rounded, color: Colors.white, size: 20),
+                      onPressed: () => Navigator.of(context).pop(),
+                      padding: EdgeInsets.zero,
+                      constraints: const BoxConstraints(),
+                    ),
+                    const SizedBox(width: 16),
+                  ],
+                  Expanded(
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        Text(
+                          title,
+                          style: AppTextStyles.headingLarge.copyWith(color: Colors.white, fontSize: 22, fontWeight: FontWeight.w600),
+                        ),
+                        if (subtitle != null) ...[
+                          const SizedBox(height: 2),
+                          Text(
+                            subtitle!,
+                            style: AppTextStyles.bodySmall.copyWith(color: Colors.white.withAlpha((0.65 * 255).round()), fontSize: 13),
+                          ),
+                        ],
+                      ],
+                    ),
+                  ),
+                  if (actions != null) ...[
+                    const SizedBox(width: 12),
+                    ...actions!,
+                  ],
+                ],
+              ),
+              if (headerWidgets != null && headerWidgets!.isNotEmpty) ...[
+                const SizedBox(height: 20),
+                ...headerWidgets!,
+              ],
+            ],
+          ),
+        ),
+      ),
+    );
+  }
+}
+
+// ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 // PriorityTag
 // ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 

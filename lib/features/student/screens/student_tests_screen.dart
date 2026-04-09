@@ -70,64 +70,43 @@ class _StudentTestsScreenState extends State<StudentTestsScreen> with SingleTick
       );
     }
 
-    return Scaffold(
-      backgroundColor: AppColors.background,
-      body: Column(
-        children: [
-          // Header
-          Container(
-            width: double.infinity,
-            decoration: const BoxDecoration(
-              gradient: LinearGradient(
-                colors: [AppColors.navyBlueDark, AppColors.navyBlueBase],
-                begin: Alignment.topLeft,
-                end: Alignment.bottomRight,
-              ),
-            ),
-            child: SafeArea(
-              bottom: false,
-              child: Column(
-                children: [
-                  Padding(
-                    padding: const EdgeInsets.fromLTRB(AppSpacing.lg, AppSpacing.md, AppSpacing.lg, AppSpacing.sm),
-                    child: Row(
-                      children: [
-                        Text(
-                          "Mock Tests",
-                          style: AppTextStyles.headingLarge.copyWith(color: Colors.white),
-                        ),
-                      ],
-                    ),
-                  ),
-
-                  TabBar(
-                    controller: _tabController,
-                    indicatorColor: AppColors.gold,
-                    labelColor: Colors.white,
-                    unselectedLabelColor: Colors.white54,
-                    tabs: [
-                      Tab(text: "Upcoming (${_upcomingTests.length})"),
-                      Tab(text: "Past (${_pastTests.length})"),
-                      Tab(text: "Results (${_results.length})"),
-                    ],
-                  ),
-                ],
-              ),
-            ),
-          ),
-
-          // TabBarView
-          Expanded(
-            child: TabBarView(
-              controller: _tabController,
-              children: [
-                _TestList(tests: _upcomingTests, isUpcoming: true),
-                _TestList(tests: _pastTests, isUpcoming: false),
-                _ResultList(results: _results),
-              ],
-            ),
-          ),
-        ],
+    return AppPageShell(
+      title: "Mock Tests",
+      subtitle: "Performance Center",
+      showBackButton: false,
+      headerWidgets: [
+        TabBar(
+          controller: _tabController,
+          indicatorColor: AppColors.gold,
+          indicatorWeight: 3,
+          labelColor: Colors.white,
+          unselectedLabelColor: Colors.white70,
+          labelStyle: AppTextStyles.labelMedium.copyWith(fontWeight: FontWeight.bold),
+          unselectedLabelStyle: AppTextStyles.labelMedium,
+          tabs: [
+            Tab(text: "Upcoming (${_upcomingTests.length})"),
+            Tab(text: "Past (${_pastTests.length})"),
+            Tab(text: "Results (${_results.length})"),
+          ],
+        ),
+      ],
+      // Since TabBarView needs to be Expanded or have a fixed height, 
+      // and AppPageShell's body is inside a Column, we need to handle this.
+      // However, the standard AppPageShell wraps body in a Column.
+      // Let's use a SizedBox with calculated height or just a Column with Fixed height for the TabBarView.
+      // Better: AppPageShell should probably support TabBarView or we use a different structure.
+      // For now, let's use a SizedBox with a large enough height to avoid layout issues, or refactor AppPageShell if needed.
+      // Actually, let's use a Column in body and give TabBarView a height.
+      body: SizedBox(
+        height: MediaQuery.of(context).size.height - 250, // Approximate height
+        child: TabBarView(
+          controller: _tabController,
+          children: [
+            _TestList(tests: _upcomingTests, isUpcoming: true),
+            _TestList(tests: _pastTests, isUpcoming: false),
+            _ResultList(results: _results),
+          ],
+        ),
       ),
     );
   }

@@ -91,58 +91,52 @@ class _ProfessorTestsScreenState extends State<ProfessorTestsScreen> {
       return const Scaffold(body: Center(child: CircularProgressIndicator()));
     }
 
-    return Scaffold(
-      backgroundColor: AppColors.background,
-      appBar: AppBar(
-        title: Text("Test Management", style: AppTextStyles.headingMedium),
-        backgroundColor: Colors.white,
-        elevation: 0,
-        foregroundColor: AppColors.navyBlueBase,
-      ),
-      body: Column(
-        children: [
-          // SEARCH BAR
-          Container(
-            padding: EdgeInsets.fromLTRB(AppSpacing.lg, AppSpacing.sm, AppSpacing.lg, AppSpacing.lg),
-            color: Colors.white,
-            child: CustomTextField(
-              hintText: "Search by title, subject, or batch...",
-              prefixIcon: Icons.search_rounded,
-              onChanged: (val) => setState(() {
-                _searchQuery = val;
-                _processTests();
-              }),
-            ),
-          ),
-
-          // TEST LIST
-          Expanded(
-            child: _filteredTestsResults.isEmpty
-                ? const EmptyState(
-                    icon: Icons.assignment_outlined,
-                    title: "No Tests Found",
-                    subtitle: "Create a test to assess your students or adjust your search.",
-                  )
-                : ListView.builder(
-                    padding: EdgeInsets.fromLTRB(AppSpacing.lg, AppSpacing.md, AppSpacing.lg, 80),
-                    itemCount: _filteredTestsResults.length,
-                    itemBuilder: (context, index) {
-                      final test = _filteredTestsResults[index];
-                      return TestCard(
-                        test: test,
-                        batchName: _testBatches[test.id]?.name,
-                        onDelete: () => _confirmDeleteTest(test),
-                      );
-                    },
-                  ),
-          ),
-        ],
-      ),
+    return AppPageShell(
+      title: "Test Management",
+      showBackButton: true,
       floatingActionButton: FloatingActionButton.extended(
         onPressed: () => _showCreateTestSheet(),
         backgroundColor: AppColors.navyBlueBase,
         icon: const Icon(Icons.add_rounded, color: Colors.white),
         label: Text("Create Test", style: AppTextStyles.labelLarge.copyWith(color: Colors.white)),
+      ),
+      headerWidgets: [
+        CustomTextField(
+          hintText: "Search by title, subject, or batch...",
+          prefixIcon: Icons.search_rounded,
+          onChanged: (val) => setState(() {
+            _searchQuery = val;
+            _processTests();
+          }),
+        ),
+      ],
+      body: Padding(
+        padding: const EdgeInsets.symmetric(horizontal: AppSpacing.lg, vertical: AppSpacing.md),
+        child: _filteredTestsResults.isEmpty
+            ? const Column(
+                children: [
+                  SizedBox(height: 60),
+                  EmptyState(
+                    icon: Icons.assignment_outlined,
+                    title: "No Tests Found",
+                    subtitle: "Create a test to assess your students or adjust your search.",
+                  ),
+                ],
+              )
+            : ListView.builder(
+                shrinkWrap: true,
+                physics: const NeverScrollableScrollPhysics(),
+                padding: const EdgeInsets.only(bottom: 80),
+                itemCount: _filteredTestsResults.length,
+                itemBuilder: (context, index) {
+                  final test = _filteredTestsResults[index];
+                  return TestCard(
+                    test: test,
+                    batchName: _testBatches[test.id]?.name,
+                    onDelete: () => _confirmDeleteTest(test),
+                  );
+                },
+              ),
       ),
     );
   }

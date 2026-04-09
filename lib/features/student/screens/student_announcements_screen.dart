@@ -62,22 +62,24 @@ class _AnnouncementsScreenState extends State<AnnouncementsScreen> {
       );
     }
 
-    return Scaffold(
-      backgroundColor: AppColors.background,
-      appBar: AppBar(
-        title: Text("Notice Board", style: AppTextStyles.headingMedium),
-        backgroundColor: Colors.white,
-        elevation: 0,
-        foregroundColor: AppColors.navyBlueBase,
-      ),
-
+    return AppPageShell(
+      title: "Notice Board",
+      subtitle: "Academy Broadcasts",
+      showBackButton: false,
       body: _announcements.isEmpty
-          ? const EmptyState(
-              icon: Icons.campaign_rounded,
-              title: "No Announcements",
-              subtitle: "All important notices will appear here.",
+          ? const Column(
+              children: [
+                SizedBox(height: 100),
+                EmptyState(
+                  icon: Icons.campaign_rounded,
+                  title: "No Announcements",
+                  subtitle: "All important notices will appear here.",
+                ),
+              ],
             )
           : ListView.builder(
+              shrinkWrap: true,
+              physics: const NeverScrollableScrollPhysics(),
               padding: const EdgeInsets.all(AppSpacing.lg),
               itemCount: _announcements.length,
               itemBuilder: (context, index) {
@@ -95,7 +97,6 @@ class _AnnouncementsScreenState extends State<AnnouncementsScreen> {
                     borderRadius: AppRadius.cardRadius,
                     boxShadow: AppShadows.card,
                   ),
-
                   child: Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
@@ -113,7 +114,6 @@ class _AnnouncementsScreenState extends State<AnnouncementsScreen> {
                               size: 20,
                             ),
                           ),
-
                           const SizedBox(width: AppSpacing.md),
                           Expanded(
                             child: Column(

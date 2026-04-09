@@ -77,105 +77,97 @@ class _AdminBatchesScreenState extends State<AdminBatchesScreen> {
   }
 
 
-  @override
-  Widget build(BuildContext context) {
-
-    return Scaffold(
-      backgroundColor: AppColors.background,
-      appBar: AppBar(
-        title: Text("Batch Management", style: AppTextStyles.headingMedium),
-        backgroundColor: Colors.white,
-        elevation: 0,
-        foregroundColor: AppColors.navyBlueBase,
-      ),
-      body: Column(
-        children: [
-          // SEARCH BAR
-          Container(
-            padding: EdgeInsets.fromLTRB(AppSpacing.lg, AppSpacing.sm, AppSpacing.lg, AppSpacing.lg),
-            color: Colors.white,
-            child: CustomTextField(
-              hintText: "Search by batch, professor, branch...",
-              prefixIcon: Icons.search_rounded,
-              onChanged: (val) => setState(() {
-                _searchQuery = val;
-                _processBatches();
-              }),
-            ),
-          ),
-          // BATCH LIST
-          Expanded(
-            child: _filteredBatches.isEmpty
-                ? const EmptyState(
-                    icon: Icons.class_outlined,
-                    title: "No Batches Created",
-                    subtitle: "Create a batch to get started.",
-                  )
-                : ListView(
-                    padding: EdgeInsets.fromLTRB(AppSpacing.lg, AppSpacing.sm, AppSpacing.lg, 80),
-                    children: _groupedByBranch.entries.map((entry) {
-                      final branch = entry.key;
-                      final batchesInBranch = entry.value;
-                      return Column(
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        children: [
-                          Padding(
-                            padding: EdgeInsets.symmetric(horizontal: AppSpacing.xs, vertical: AppSpacing.md),
-                            child: Row(
-                              children: [
-                                const Icon(Icons.location_on_rounded, color: AppColors.navyBlueBase, size: 20),
-                                SizedBox(width: AppSpacing.sm),
-                                Text(
-                                  "$branch Branch",
-                                  style: AppTextStyles.headingSmall.copyWith(color: AppColors.navyBlueBase),
-                                ),
-                                const Spacer(),
-                                Container(
-                                  padding: EdgeInsets.symmetric(horizontal: AppSpacing.sm, vertical: 2),
-                                  decoration: BoxDecoration(
-                                    color: AppColors.navyBlueSurface,
-                                    borderRadius: BorderRadius.circular(AppRadius.md),
-                                  ),
-                                  child: Text(
-                                    "${batchesInBranch.length} Active",
-                                    style: AppTextStyles.labelSmall.copyWith(color: AppColors.navyBlueBase, fontWeight: FontWeight.bold),
-                                  ),
-                                ),
-                              ],
-                            ),
-                          ),
-                          ...batchesInBranch.map((batch) => BatchCard(
-                                batch: batch,
-                                studentCount: _batchStudentCounts[batch.id] ?? 0,
-                                onManage: () {
-                                  Navigator.push(
-                                    context,
-                                    MaterialPageRoute(builder: (_) => BatchStudentsScreen(batch: batch)),
-                                  ).then((_) {
-                                    if (context.mounted) {
-                                      setState(() {
-                                        _processBatches();
-                                      });
-                                    }
-                                  });
-                                },
-                                onEdit: () => _showEditBatchSheet(batch),
-                                onDelete: () => _confirmDeleteBatch(batch),
-                              )),
-                          const SizedBox(height: 12),
-                        ],
-                      );
-                    }).toList(),
-                  ),
-          ),
-        ],
-      ),
+    return AppPageShell(
+      title: "Batch Management",
+      subtitle: "Academy Schedule",
+      showBackButton: true,
       floatingActionButton: FloatingActionButton.extended(
         onPressed: () => _showCreateBatchSheet(),
         backgroundColor: AppColors.navyBlueBase,
         icon: const Icon(Icons.add_rounded, color: Colors.white),
         label: Text("Create Batch", style: AppTextStyles.labelLarge.copyWith(color: Colors.white)),
       ),
+      headerWidgets: [
+        CustomTextField(
+          hintText: "Search by batch, professor, branch...",
+          prefixIcon: Icons.search_rounded,
+          onChanged: (val) => setState(() {
+            _searchQuery = val;
+            _processBatches();
+          }),
+        ),
+      ],
+      body: _filteredBatches.isEmpty
+          ? const Column(
+              children: [
+                SizedBox(height: 100),
+                EmptyState(
+                  icon: Icons.class_outlined,
+                  title: "No Batches Created",
+                  subtitle: "Create a batch to get started.",
+                ),
+              ],
+            )
+          : ListView.builder(
+              shrinkWrap: true,
+              physics: const NeverScrollableScrollPhysics(),
+              padding: const EdgeInsets.fromLTRB(AppSpacing.lg, AppSpacing.sm, AppSpacing.lg, 80),
+              itemCount: _groupedByBranch.length,
+              itemBuilder: (context, index) {
+                final entry = _groupedByBranch.entries.elementAt(index);
+                final branch = entry.key;
+                final batchesInBranch = entry.value;
+                return Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Padding(
+                      padding: const EdgeInsets.symmetric(horizontal: AppSpacing.xs, vertical: AppSpacing.md),
+                      child: Row(
+                        children: [
+                          const Icon(Icons.location_on_rounded, color: AppColors.navyBlueBase, size: 20),
+                          const SizedBox(width: AppSpacing.sm),
+                          Text(
+                            "$branch Branch",
+                            style: AppTextStyles.headingSmall.copyWith(color: AppColors.navyBlueBase),
+                          ),
+                          const Spacer(),
+                          Container(
+                            padding: const EdgeInsets.symmetric(horizontal: AppSpacing.sm, vertical: 2),
+                            decoration: BoxDecoration(
+                              color: AppColors.navyBlueSurface,
+                              borderRadius: BorderRadius.circular(AppRadius.md),
+                            ),
+                            child: Text(
+                              "${batchesInBranch.length} Active",
+                              style: AppTextStyles.labelSmall.copyWith(color: AppColors.navyBlueBase, fontWeight: FontWeight.bold),
+                            ),
+                          ),
+                        ],
+                      ),
+                    ),
+                    ...batchesInBranch.map((batch) => BatchCard(
+                          batch: batch,
+                          studentCount: _batchStudentCounts[batch.id] ?? 0,
+                          onManage: () {
+                            Navigator.push(
+                              context,
+                              MaterialPageRoute(builder: (_) => BatchStudentsScreen(batch: batch)),
+                            ).then((_) {
+                              if (context.mounted) {
+                                setState(() {
+                                  _processBatches();
+                                });
+                              }
+                            });
+                          },
+                          onEdit: () => _showEditBatchSheet(batch),
+                          onDelete: () => _confirmDeleteBatch(batch),
+                        )),
+                    const SizedBox(height: 12),
+                  ],
+                );
+              },
+            ),
     );
   }
 

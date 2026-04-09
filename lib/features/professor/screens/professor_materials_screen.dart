@@ -241,29 +241,40 @@ class _ProfessorMaterialsScreenState extends State<ProfessorMaterialsScreen> {
       return const Scaffold(body: Center(child: CircularProgressIndicator()));
     }
 
-    return Scaffold(
-      backgroundColor: AppColors.background,
-      appBar: AppBar(
-        title: Text('Study Materials', style: AppTextStyles.headingSmall.copyWith(color: Colors.white)),
+    return AppPageShell(
+      title: 'Study Materials',
+      subtitle: 'Shared Resources',
+      showBackButton: true,
+      floatingActionButton: FloatingActionButton(
+        onPressed: _showUploadBottomSheet,
         backgroundColor: AppColors.navyBlueBase,
-        elevation: 0,
-        iconTheme: const IconThemeData(color: Colors.white),
+        child: const Icon(Icons.add, color: Colors.white),
       ),
       body: _isLoading
-          ? const Center(child: CircularProgressIndicator())
+          ? const SizedBox(
+              height: 300,
+              child: Center(child: CircularProgressIndicator()),
+            )
           : _materials.isEmpty
-              ? const EmptyState(
-                  icon: Icons.menu_book_rounded,
-                  title: 'No Materials',
-                  subtitle: 'Upload your first study material to get started.',
+              ? const Column(
+                  children: [
+                    SizedBox(height: 100),
+                    EmptyState(
+                      icon: Icons.menu_book_rounded,
+                      title: 'No Materials',
+                      subtitle: 'Upload your first study material to get started.',
+                    ),
+                  ],
                 )
               : ListView.builder(
-                  padding: EdgeInsets.all(AppSpacing.lg),
+                  shrinkWrap: true,
+                  physics: const NeverScrollableScrollPhysics(),
+                  padding: const EdgeInsets.all(AppSpacing.lg),
                   itemCount: _materials.length,
                   itemBuilder: (context, index) {
                     final material = _materials[index];
                     return Padding(
-                      padding: EdgeInsets.only(bottom: AppSpacing.md),
+                      padding: const EdgeInsets.only(bottom: AppSpacing.md),
                       child: DashboardCard(
                         title: material.title,
                         subtitle: material.subject,
@@ -288,11 +299,6 @@ class _ProfessorMaterialsScreenState extends State<ProfessorMaterialsScreen> {
                     );
                   },
                 ),
-      floatingActionButton: FloatingActionButton(
-        onPressed: _showUploadBottomSheet,
-        backgroundColor: AppColors.navyBlueBase,
-        child: const Icon(Icons.add, color: Colors.white),
-      ),
     );
   }
 }

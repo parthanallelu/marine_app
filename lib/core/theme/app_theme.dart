@@ -77,6 +77,7 @@ class AppRadius {
   static const double lg = 16.0;
   static const double xl = 20.0;
   static const double xxl = 24.0;
+  static const double extraLarge = 28.0;
   static const double circle = 100.0;
   
   static const BorderRadius cardRadius = BorderRadius.all(Radius.circular(16.0));

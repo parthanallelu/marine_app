@@ -76,110 +76,82 @@ class _StudentMaterialsScreenState extends State<StudentMaterialsScreen> {
     final filteredMaterials = _getFilteredMaterials();
     final categories = ['All'] + AppConstants.materialCategories;
 
-    return Scaffold(
-      backgroundColor: AppColors.background,
-      body: Column(
-        children: [
-          NavyHeader(
-            title: "Study Materials",
-            subtitle: "${_allMaterials.length} resources available",
-          ),
-          
-          // Search Field
-          Padding(
-            padding: const EdgeInsets.fromLTRB(AppSpacing.lg, AppSpacing.lg, AppSpacing.lg, AppSpacing.sm),
-            child: TextField(
-
-              controller: _searchController,
-              onChanged: (val) => setState(() => _searchQuery = val),
-              decoration: InputDecoration(
-                hintText: "Search by title or category...",
-                prefixIcon: const Icon(Icons.search_rounded),
-                suffixIcon: _searchQuery.isNotEmpty 
-                  ? IconButton(
-                      icon: const Icon(Icons.clear), 
-                      onPressed: () {
-                        _searchController.clear();
-                        setState(() => _searchQuery = '');
-                      }) 
-                  : null,
-                filled: true,
-                fillColor: Colors.white,
-                border: OutlineInputBorder(
-                  borderRadius: BorderRadius.circular(AppRadius.md),
-                  borderSide: BorderSide.none,
-                ),
-              ),
-            ),
-          ),
-
-          // Horizontal category filter
-          SizedBox(
-            height: 44,
-            child: ListView.builder(
-              scrollDirection: Axis.horizontal,
-              padding: const EdgeInsets.symmetric(horizontal: AppSpacing.lg),
-              itemCount: categories.length,
-              itemBuilder: (context, index) {
-                final category = categories[index];
-                final isSelected = _selectedCategory == category;
-                return Padding(
-                  padding: const EdgeInsets.symmetric(horizontal: AppSpacing.xs),
-                  child: ChoiceChip(
-
-                    label: Text(category),
-                    selected: isSelected,
-                    onSelected: (selected) {
-                      if (selected) setState(() => _selectedCategory = category);
-                    },
-                    selectedColor: AppColors.navyBlueBase,
-                    labelStyle: TextStyle(
-                      color: isSelected ? Colors.white : AppColors.navyBlueBase,
-                      fontWeight: isSelected ? FontWeight.bold : FontWeight.normal,
-                    ),
-                    backgroundColor: Colors.white,
-                    shape: RoundedRectangleBorder(
-                      borderRadius: BorderRadius.circular(AppRadius.xxl),
-                      side: BorderSide(
-                        color: isSelected ? AppColors.navyBlueBase : AppColors.navyBlueSurface,
-                      ),
+    return AppPageShell(
+      title: "Study Materials",
+      subtitle: "${_allMaterials.length} resources available",
+      showBackButton: false,
+      headerWidgets: [
+        CustomTextField(
+          controller: _searchController,
+          hintText: "Search by title or category...",
+          prefixIcon: Icons.search_rounded,
+          onChanged: (val) => setState(() => _searchQuery = val),
+        ),
+        const SizedBox(height: AppSpacing.md),
+        SizedBox(
+          height: 40,
+          child: ListView.builder(
+            scrollDirection: Axis.horizontal,
+            itemCount: categories.length,
+            itemBuilder: (context, index) {
+              final category = categories[index];
+              final isSelected = _selectedCategory == category;
+              return Padding(
+                padding: const EdgeInsets.only(right: AppSpacing.sm),
+                child: ChoiceChip(
+                  label: Text(category),
+                  selected: isSelected,
+                  onSelected: (selected) {
+                    if (selected) setState(() => _selectedCategory = category);
+                  },
+                  selectedColor: Colors.white,
+                  labelStyle: TextStyle(
+                    color: isSelected ? AppColors.navyBlueBase : Colors.white,
+                    fontWeight: isSelected ? FontWeight.bold : FontWeight.normal,
+                    fontSize: 12,
+                  ),
+                  backgroundColor: Colors.white.withAlpha((0.15 * 255).round()),
+                  shape: RoundedRectangleBorder(
+                    borderRadius: BorderRadius.circular(AppRadius.xxl),
+                    side: BorderSide(
+                      color: isSelected ? Colors.white : Colors.white24,
                     ),
                   ),
+                  showCheckmark: false,
+                ),
+              );
+            },
+          ),
+        ),
+      ],
+      body: filteredMaterials.isEmpty
+          ? const Column(
+              children: [
+                SizedBox(height: 100),
+                EmptyState(
+                  icon: Icons.menu_book_rounded,
+                  title: "No Materials Found",
+                  subtitle: "Try adjusting your filters or search query.",
+                ),
+              ],
+            )
+          : ListView.builder(
+              shrinkWrap: true,
+              physics: const NeverScrollableScrollPhysics(),
+              padding: const EdgeInsets.all(AppSpacing.lg),
+              itemCount: filteredMaterials.length,
+              itemBuilder: (context, index) {
+                final material = filteredMaterials[index];
+                return MaterialCard(
+                  material: material,
+                  onDownload: () {
+                    ScaffoldMessenger.of(context).showSnackBar(
+                      SnackBar(content: Text("Downloading: ${material.title}")),
+                    );
+                  },
                 );
               },
             ),
-          ),
-
-          const SizedBox(height: AppSpacing.md),
-
-          // LIST PERFORMANCE: Using ListView.builder for dynamic lists
-          Expanded(
-            child: filteredMaterials.isEmpty
-                ? const EmptyState(
-                    icon: Icons.menu_book_rounded,
-                    title: "No Materials Found",
-                    subtitle: "Try adjusting your filters or search query.",
-                  )
-                : ListView.builder(
-                    padding: const EdgeInsets.all(AppSpacing.lg),
-                    itemCount: filteredMaterials.length,
-                    itemBuilder: (context, index) {
-
-                      final material = filteredMaterials[index];
-                      // REUSABLE COMPONENT: Using MaterialCard
-                      return MaterialCard(
-                        material: material,
-                        onDownload: () {
-                          ScaffoldMessenger.of(context).showSnackBar(
-                            SnackBar(content: Text("Downloading: ${material.title}")),
-                          );
-                        },
-                      );
-                    },
-                  ),
-          ),
-        ],
-      ),
     );
   }
 }

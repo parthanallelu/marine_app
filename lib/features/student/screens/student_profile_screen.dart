@@ -72,211 +72,161 @@ class _StudentProfileScreenState extends State<StudentProfileScreen> {
 
     final student = authProvider.currentUser as StudentModel;
 
-    return Scaffold(
-      backgroundColor: AppColors.background,
-      body: CustomScrollView(
-        slivers: [
-          _buildProfileHeader(student),
-          _buildStatsCard(),
-          _buildPersonalInfo(student),
-          _buildQuickLinks(context),
-          _buildLogoutButton(context, authProvider),
-        ],
-      ),
-    );
-  }
-
-  Widget _buildProfileHeader(StudentModel student) {
-    return SliverToBoxAdapter(
-      child: Container(
-        width: double.infinity,
-        decoration: const BoxDecoration(
-          gradient: LinearGradient(
-            colors: [AppColors.navyBlueDark, AppColors.navyBlueBase],
-            begin: Alignment.topLeft,
-            end: Alignment.bottomRight,
-          ),
-        ),
-        child: SafeArea(
-          child: Padding(
-            padding: const EdgeInsets.fromLTRB(AppSpacing.xl, AppSpacing.lg, AppSpacing.xl, AppSpacing.xxl),
-            child: Column(
+    return AppPageShell(
+      title: "My Profile",
+      subtitle: "Student Center",
+      showBackButton: false,
+      headerWidgets: [
+        Column(
+          children: [
+            CircleAvatar(
+              radius: 40,
+              backgroundColor: Colors.white.withAlpha((0.2 * 255).round()),
+              child: Text(
+                student.name[0],
+                style: AppTextStyles.headingLarge.copyWith(color: Colors.white, fontSize: 32),
+              ),
+            ),
+            const SizedBox(height: AppSpacing.md),
+            Text(
+              student.name,
+              style: AppTextStyles.headingMedium.copyWith(color: Colors.white),
+              textAlign: TextAlign.center,
+            ),
+            Text(
+              "Roll No: ${student.rollNumber}",
+              style: AppTextStyles.bodySmall.copyWith(color: Colors.white70),
+            ),
+            const SizedBox(height: AppSpacing.md),
+            Row(
+              mainAxisAlignment: MainAxisAlignment.center,
               children: [
-                CircleAvatar(
-                  radius: 40,
-                  backgroundColor: AppColors.gold.withAlpha((0.25 * 255).round()),
-                  child: Text(
-                    student.name[0],
-                    style: AppTextStyles.headingLarge.copyWith(color: AppColors.gold, fontSize: 32),
-                  ),
-                ),
-                const SizedBox(height: AppSpacing.md),
-                Text(
-                  student.name,
-                  style: AppTextStyles.headingMedium.copyWith(color: Colors.white),
-                  textAlign: TextAlign.center,
-                ),
-                Text(
-                  "Roll No: ${student.rollNumber}",
-                  style: AppTextStyles.bodySmall.copyWith(color: Colors.white54),
-                ),
-                const SizedBox(height: AppSpacing.md),
-                Row(
-                  mainAxisAlignment: MainAxisAlignment.center,
-                  children: [
-                    CourseBadge(courseType: student.courseType),
-                    const SizedBox(width: AppSpacing.sm),
-                    BranchBadge(branch: student.branch),
-                  ],
-                ),
+                CourseBadge(courseType: student.courseType),
+                const SizedBox(width: AppSpacing.sm),
+                BranchBadge(branch: student.branch),
               ],
             ),
-          ),
-        ),
-      ),
-    );
-  }
-
-  Widget _buildStatsCard() {
-    return SliverToBoxAdapter(
-      child: Transform.translate(
-        offset: const Offset(0, -16),
-        child: Padding(
-          padding: const EdgeInsets.symmetric(horizontal: AppSpacing.xl),
-          child: Container(
-            padding: const EdgeInsets.all(AppSpacing.lg),
-            decoration: BoxDecoration(
-              color: Colors.white,
-              borderRadius: AppRadius.cardRadius,
-              boxShadow: AppShadows.elevated,
-            ),
-            child: IntrinsicHeight(
+            const SizedBox(height: AppSpacing.xl),
+            // Stats Row
+            IntrinsicHeight(
               child: Row(
                 children: [
                   _ProfileStat(
                     label: "Attendance",
                     value: _attendance.percentageLabel,
                     icon: Icons.calendar_today,
-                    color: AppColors.success,
+                    color: Colors.white,
+                    isLight: true,
                   ),
-                  const VerticalDivider(width: AppSpacing.xxxl),
+                  const VerticalDivider(width: AppSpacing.xl, color: Colors.white24),
                   _ProfileStat(
                     label: "Test Avg",
                     value: "${_avgScore.toStringAsFixed(0)}%",
                     icon: Icons.quiz_rounded,
-                    color: AppColors.oceanBlue,
+                    color: Colors.white,
+                    isLight: true,
                   ),
-                  const VerticalDivider(width: AppSpacing.xxxl),
+                  const VerticalDivider(width: AppSpacing.xl, color: Colors.white24),
                   _ProfileStat(
                     label: "Fees Paid",
                     value: "${_feeRecord.percentagePaid.toStringAsFixed(0)}%",
                     icon: Icons.receipt_rounded,
-                    color: _feeRecord.pendingAmount > 0 ? AppColors.warning : AppColors.success,
+                    color: Colors.white,
+                    isLight: true,
                   ),
                 ],
               ),
             ),
-          ),
+          ],
         ),
-      ),
-    );
-  }
-
-  Widget _buildPersonalInfo(StudentModel student) {
-    return SliverToBoxAdapter(
-      child: Padding(
-        padding: const EdgeInsets.fromLTRB(AppSpacing.xl, 0, AppSpacing.xl, AppSpacing.xxl),
-        child: DashboardCard(
-          title: "Personal Information",
-          child: Column(
-            children: [
-              InfoRow(icon: Icons.email_outlined, label: "Email", value: student.email),
-              const Divider(height: 1),
-              InfoRow(icon: Icons.phone_outlined, label: "Phone", value: student.phone),
-              const Divider(height: 1),
-              InfoRow(icon: Icons.family_restroom_outlined, label: "Parent Phone", value: student.parentPhone),
-              const Divider(height: 1),
-              InfoRow(icon: Icons.history_outlined, label: "Joined Date", value: student.createdAt.toString().split(' ')[0]),
-              const Divider(height: 1),
-              InfoRow(icon: Icons.group_outlined, label: "Batch", value: student.batchName),
-              if (student.targetCompany.isNotEmpty) ...[
-                const Divider(height: 1),
-                InfoRow(
-                  icon: Icons.stars_rounded, 
-                  label: "Target", 
-                  value: student.targetCompany,
-                  iconColor: AppColors.gold,
-                ),
-              ],
-            ],
-          ),
-        ),
-      ),
-    );
-  }
-
-  Widget _buildQuickLinks(BuildContext context) {
-    return SliverToBoxAdapter(
-      child: Padding(
-        padding: const EdgeInsets.fromLTRB(AppSpacing.xl, 0, AppSpacing.xl, AppSpacing.xxl),
-        child: DashboardCard(
-          title: "Quick Links",
-          padding: EdgeInsets.zero,
-          child: Column(
-            children: [
-              ListTile(
-                leading: Container(
-                  padding: const EdgeInsets.all(AppSpacing.sm),
-                  decoration: BoxDecoration(color: AppColors.gold.withAlpha((0.1 * 255).round()), borderRadius: BorderRadius.circular(AppRadius.sm)),
-                  child: const Icon(Icons.receipt_long_rounded, color: AppColors.gold, size: 20),
-                ),
-                title: Text("Fee Details", style: AppTextStyles.labelLarge),
-                trailing: const Icon(Icons.chevron_right_rounded),
-                onTap: () => context.pushNamed(AppRoutes.studentFeesName),
+      ],
+      body: Padding(
+        padding: const EdgeInsets.symmetric(horizontal: AppSpacing.xl),
+        child: Column(
+          children: [
+            const SizedBox(height: AppSpacing.lg),
+            DashboardCard(
+              title: "Personal Information",
+              child: Column(
+                children: [
+                  InfoRow(icon: Icons.email_outlined, label: "Email", value: student.email),
+                  const Divider(height: 1),
+                  InfoRow(icon: Icons.phone_outlined, label: "Phone", value: student.phone),
+                  const Divider(height: 1),
+                  InfoRow(icon: Icons.family_restroom_outlined, label: "Parent Phone", value: student.parentPhone),
+                  const Divider(height: 1),
+                  InfoRow(icon: Icons.history_outlined, label: "Joined Date", value: student.createdAt.toString().split(' ')[0]),
+                  const Divider(height: 1),
+                  InfoRow(icon: Icons.group_outlined, label: "Batch", value: student.batchName),
+                  if (student.targetCompany.isNotEmpty) ...[
+                    const Divider(height: 1),
+                    InfoRow(
+                      icon: Icons.stars_rounded, 
+                      label: "Target", 
+                      value: student.targetCompany,
+                      iconColor: AppColors.gold,
+                    ),
+                  ],
+                ],
               ),
-              const Divider(height: 1, indent: 52),
-              ListTile(
-                leading: Container(
-                  padding: const EdgeInsets.all(AppSpacing.sm),
-                  decoration: BoxDecoration(color: AppColors.warning.withAlpha((0.1 * 255).round()), borderRadius: BorderRadius.circular(AppRadius.sm)),
-                  child: const Icon(Icons.campaign_rounded, color: AppColors.warning, size: 20),
-                ),
-                title: Text("Announcements", style: AppTextStyles.labelLarge),
-                trailing: const Icon(Icons.chevron_right_rounded),
-                onTap: () => context.pushNamed(AppRoutes.studentAnnouncementsName),
+            ),
+            const SizedBox(height: AppSpacing.xxl),
+            DashboardCard(
+              title: "Quick Links",
+              padding: EdgeInsets.zero,
+              child: Column(
+                children: [
+                  ListTile(
+                    leading: Container(
+                      padding: const EdgeInsets.all(AppSpacing.sm),
+                      decoration: BoxDecoration(color: AppColors.gold.withAlpha((0.1 * 255).round()), borderRadius: BorderRadius.circular(AppRadius.sm)),
+                      child: const Icon(Icons.receipt_long_rounded, color: AppColors.gold, size: 20),
+                    ),
+                    title: Text("Fee Details", style: AppTextStyles.labelLarge),
+                    trailing: const Icon(Icons.chevron_right_rounded),
+                    onTap: () => context.pushNamed(AppRoutes.studentFeesName),
+                  ),
+                  const Divider(height: 1, indent: 52),
+                  ListTile(
+                    leading: Container(
+                      padding: const EdgeInsets.all(AppSpacing.sm),
+                      decoration: BoxDecoration(color: AppColors.warning.withAlpha((0.1 * 255).round()), borderRadius: BorderRadius.circular(AppRadius.sm)),
+                      child: const Icon(Icons.campaign_rounded, color: AppColors.warning, size: 20),
+                    ),
+                    title: Text("Announcements", style: AppTextStyles.labelLarge),
+                    trailing: const Icon(Icons.chevron_right_rounded),
+                    onTap: () => context.pushNamed(AppRoutes.studentAnnouncementsName),
+                  ),
+                ],
               ),
-            ],
-          ),
-        ),
-      ),
-    );
-  }
-
-  Widget _buildLogoutButton(BuildContext context, AuthProvider authProvider) {
-    return SliverToBoxAdapter(
-      child: Padding(
-        padding: const EdgeInsets.fromLTRB(AppSpacing.xl, 0, AppSpacing.xl, AppSpacing.xxxl),
-        child: CustomButton(
-          label: "Logout",
-          isOutlined: true,
-          color: AppColors.error,
-          icon: Icons.logout_rounded,
-          onPressed: () {
-            GenericConfirmationDialog.show(
-              context,
-              title: "Logout",
-              content: "Are you sure you want to log out from your student account?",
-              confirmLabel: "Logout",
-              isDestructive: true,
-              onConfirm: () {
-                authProvider.logout();
+            ),
+            const SizedBox(height: AppSpacing.xxxl),
+            CustomButton(
+              label: "Logout",
+              isOutlined: true,
+              color: AppColors.error,
+              icon: Icons.logout_rounded,
+              width: double.infinity,
+              onPressed: () {
+                GenericConfirmationDialog.show(
+                  context,
+                  title: "Logout",
+                  content: "Are you sure you want to log out from your student account?",
+                  confirmLabel: "Logout",
+                  isDestructive: true,
+                  onConfirm: () {
+                    authProvider.logout();
+                  },
+                );
               },
-            );
-          },
+            ),
+            const SizedBox(height: 80),
+          ],
         ),
       ),
     );
   }
+}
 
 }
 
@@ -285,12 +235,14 @@ class _ProfileStat extends StatelessWidget {
   final String value;
   final IconData icon;
   final Color color;
+  final bool isLight;
 
   const _ProfileStat({
     required this.label,
     required this.value,
     required this.icon,
     required this.color,
+    this.isLight = false,
   });
 
   @override
@@ -298,16 +250,22 @@ class _ProfileStat extends StatelessWidget {
     return Expanded(
       child: Column(
         children: [
-          Icon(icon, color: color, size: 20),
+          Icon(icon, color: isLight ? Colors.white : color, size: 20),
           const SizedBox(height: AppSpacing.xs),
           Text(
             value,
-            style: AppTextStyles.headingSmall.copyWith(color: color, fontSize: 18),
+            style: AppTextStyles.headingSmall.copyWith(
+              color: isLight ? Colors.white : color, 
+              fontSize: 18,
+            ),
           ),
-          SizedBox(height: AppSpacing.xxs),
+          const SizedBox(height: AppSpacing.xxs),
           Text(
             label,
-            style: AppTextStyles.caption.copyWith(fontSize: 10),
+            style: AppTextStyles.caption.copyWith(
+              color: isLight ? Colors.white70 : AppColors.textSecondary,
+              fontSize: 10,
+            ),
             textAlign: TextAlign.center,
           ),
         ],
@@ -371,58 +329,12 @@ class _StudentFeesScreenState extends State<StudentFeesScreen> {
       );
     }
 
-    return Scaffold(
-      backgroundColor: AppColors.background,
-      appBar: AppBar(
-        title: Text("Fee Details", style: AppTextStyles.headingSmall),
-        backgroundColor: Colors.white,
-        elevation: 0,
-        foregroundColor: AppColors.navyBlueBase,
-      ),
-      body: CustomScrollView(
-        slivers: [
-          _buildFeeSummaryCard(),
-
-          // SLIVER 2 — Installments heading
-          const SliverPadding(
-            padding: EdgeInsets.symmetric(horizontal: AppSpacing.xl),
-            sliver: SliverToBoxAdapter(
-              child: SectionHeader(title: "Payment History"),
-            ),
-          ),
-          
-          SliverPadding(
-            padding: const EdgeInsets.all(AppSpacing.xl),
-            sliver: SliverList(
-              delegate: SliverChildBuilderDelegate(
-                (context, index) {
-                  return _InstallmentTile(installment: _feeRecord.installments[index]);
-                },
-                childCount: _feeRecord.installments.length,
-              ),
-            ),
-          ),
-          const SliverToBoxAdapter(child: SizedBox(height: AppSpacing.xxxl)),
-        ],
-      ),
-    );
-  }
-
-  Widget _buildFeeSummaryCard() {
-    return SliverToBoxAdapter(
-      child: Container(
-        margin: const EdgeInsets.all(AppSpacing.xl),
-        padding: const EdgeInsets.all(AppSpacing.xl),
-        decoration: BoxDecoration(
-          gradient: const LinearGradient(
-            colors: [AppColors.navyBlueDark, AppColors.navyBlueBase],
-            begin: Alignment.topLeft,
-            end: Alignment.bottomRight,
-          ),
-          borderRadius: AppRadius.cardRadius,
-          boxShadow: AppShadows.elevated,
-        ),
-        child: Column(
+    return AppPageShell(
+      title: "Fee Details",
+      subtitle: "Payment Summary",
+      showBackButton: true,
+      headerWidgets: [
+        Column(
           children: [
             Row(
               children: [
@@ -430,7 +342,7 @@ class _StudentFeesScreenState extends State<StudentFeesScreen> {
                 const SizedBox(width: AppSpacing.md),
                 Text(
                   "Fee Summary",
-                  style: AppTextStyles.headingSmall.copyWith(color: Colors.white),
+                  style: AppTextStyles.headingMedium.copyWith(color: Colors.white),
                 ),
               ],
             ),
@@ -457,8 +369,7 @@ class _StudentFeesScreenState extends State<StudentFeesScreen> {
                 valueColor: const AlwaysStoppedAnimation<Color>(AppColors.gold),
               ),
             ),
-            const SizedBox(height: AppSpacing.lg),
-            const SizedBox(height: AppSpacing.xxs),
+            const SizedBox(height: AppSpacing.sm),
             Align(
               alignment: Alignment.centerRight,
               child: Text(
@@ -466,6 +377,25 @@ class _StudentFeesScreenState extends State<StudentFeesScreen> {
                 style: AppTextStyles.caption.copyWith(color: Colors.white70),
               ),
             ),
+          ],
+        ),
+      ],
+      body: Padding(
+        padding: const EdgeInsets.symmetric(horizontal: AppSpacing.xl),
+        child: Column(
+          children: [
+            const SizedBox(height: AppSpacing.lg),
+            const SectionHeader(title: "Payment History"),
+            const SizedBox(height: AppSpacing.md),
+            ListView.builder(
+              shrinkWrap: true,
+              physics: const NeverScrollableScrollPhysics(),
+              itemCount: _feeRecord.installments.length,
+              itemBuilder: (context, index) {
+                return _InstallmentTile(installment: _feeRecord.installments[index]);
+              },
+            ),
+            const SizedBox(height: 80),
           ],
         ),
       ),

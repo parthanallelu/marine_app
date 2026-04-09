@@ -54,192 +54,111 @@ class _LoginScreenState extends State<LoginScreen> {
     final roleIcon = _getRoleIcon(auth.selectedRole);
     final roleLabel = _getRoleLabel(auth.selectedRole);
 
-    return Scaffold(
-      backgroundColor: AppColors.background,
-      body: Column(
-        children: [
-          // ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
-          // HEADER
-          // ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
-          Container(
-            width: double.infinity,
-            decoration: BoxDecoration(
-              gradient: LinearGradient(
-                colors: [AppColors.navyBlueDark, roleColor],
-                begin: Alignment.topLeft,
-                end: Alignment.bottomRight,
-              ),
-            ),
-            child: SafeArea(
-              bottom: false,
-              child: Padding(
-                padding: const EdgeInsets.fromLTRB(AppSpacing.lg, AppSpacing.md, AppSpacing.lg, AppSpacing.xxl),
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
+    return AppPageShell(
+      title: "$roleLabel Login",
+      subtitle: AppConstants.appName,
+      showBackButton: true,
+      body: Padding(
+        padding: const EdgeInsets.symmetric(horizontal: AppSpacing.xl),
+        child: Form(
+          key: _formKey,
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              const SizedBox(height: AppSpacing.lg),
+              // Info Banner
+              Container(
+                padding: const EdgeInsets.all(AppSpacing.md),
+                decoration: BoxDecoration(
+                  color: AppColors.oceanBlueSurface,
+                  borderRadius: BorderRadius.circular(AppRadius.md),
+                  border: Border.all(color: AppColors.oceanBlue.withAlpha((0.3 * 255).round())),
+                ),
+                child: Row(
                   children: [
-                    IconButton(
-                      onPressed: () => context.pop(),
-                      icon: const Icon(Icons.arrow_back_rounded, color: Colors.white),
-                      padding: EdgeInsets.zero,
-                      alignment: Alignment.centerLeft,
-                    ),
-                    const SizedBox(height: 16),
-                    Row(
-                      children: [
-                        Container(
-                          padding: const EdgeInsets.all(AppSpacing.xs),
-                          decoration: const BoxDecoration(
-                            color: Colors.white,
-                            shape: BoxShape.circle,
-                          ),
-                          child: CircleAvatar(
-                            radius: 20,
-                            backgroundColor: Colors.white,
-                            backgroundImage: AssetImage(AppConstants.logo),
-                          ),
-                        ),
-                        const SizedBox(width: AppSpacing.lg),
-                        Container(
-                          padding: const EdgeInsets.all(AppSpacing.xs),
-                          decoration: BoxDecoration(
-                            color: Colors.white.withAlpha((0.2 * 255).round()),
-                            shape: BoxShape.circle,
-                          ),
-                          child: Icon(roleIcon, color: Colors.white, size: 22),
-                        ),
-                        const SizedBox(width: AppSpacing.md),
-                        Column(
-                          crossAxisAlignment: CrossAxisAlignment.start,
-                          children: [
-                            Text(
-                              "$roleLabel Login",
-                              style: AppTextStyles.headingLarge.copyWith(color: Colors.white),
-                            ),
-                            Text(
-                              AppConstants.appName,
-                              style: AppTextStyles.bodySmall.copyWith(
-                                color: Colors.white.withAlpha((0.7 * 255).round()),
-                              ),
-                            ),
-                          ],
-                        ),
-                      ],
+                    const Icon(Icons.info_outline, color: AppColors.oceanBlue, size: 20),
+                    const SizedBox(width: 10),
+                    Expanded(
+                      child: Text(
+                        "Demos: student@gmail.com, teacher@gmail.com, admin@gmail.com (PW: 123456)",
+                        style: AppTextStyles.bodySmall.copyWith(color: AppColors.oceanBlue),
+                      ),
                     ),
                   ],
                 ),
               ),
-            ),
-          ),
+              const SizedBox(height: 24),
 
-          // ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
-          // BODY
-          // ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
-          Expanded(
-            child: SingleChildScrollView(
-              padding: const EdgeInsets.all(AppSpacing.xl),
-              child: Form(
-                key: _formKey,
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    // Info Banner
-                    Container(
-                      padding: const EdgeInsets.all(AppSpacing.md),
-                      decoration: BoxDecoration(
-                        color: AppColors.oceanBlueSurface,
-                        borderRadius: BorderRadius.circular(AppRadius.md),
-                        border: Border.all(color: AppColors.oceanBlue.withAlpha((0.3 * 255).round())),
-                      ),
-                      child: Row(
-                        children: [
-                          const Icon(Icons.info_outline, color: AppColors.oceanBlue, size: 20),
-                          const SizedBox(width: 10),
-                          Expanded(
-                            child: Text(
-                              "Demos: student@gmail.com, teacher@gmail.com, admin@gmail.com (PW: 123456)",
-                              style: AppTextStyles.bodySmall.copyWith(color: AppColors.oceanBlue),
-                            ),
-                          ),
-                        ],
-                      ),
-                    ),
-                    const SizedBox(height: 24),
-
-                    Text("Email or Phone", style: AppTextStyles.labelLarge),
-                    const SizedBox(height: AppSpacing.sm),
-                    TextFormField(
-                      controller: _emailController,
-                      keyboardType: TextInputType.emailAddress,
-                      decoration: const InputDecoration(
-                        prefixIcon: Icon(Icons.email_outlined),
-                        hintText: "Enter your email or phone",
-                      ),
-                      validator: (value) => value == null || value.isEmpty ? 'Please enter email' : null,
-                    ),
-
-                    const SizedBox(height: AppSpacing.lg),
-                    Text("Password", style: AppTextStyles.labelLarge),
-                    const SizedBox(height: AppSpacing.sm),
-                    TextFormField(
-                      controller: _passwordController,
-                      obscureText: !_isPasswordVisible,
-                      decoration: InputDecoration(
-                        prefixIcon: const Icon(Icons.lock_outlined),
-                        hintText: "Enter your password",
-                        suffixIcon: IconButton(
-                          onPressed: () => setState(() => _isPasswordVisible = !_isPasswordVisible),
-                          icon: Icon(
-                            _isPasswordVisible ? Icons.visibility_off : Icons.visibility,
-                            size: 20,
-                          ),
-                        ),
-                      ),
-                      validator: (value) =>
-                          value == null || value.length < 6 ? 'Password must be at least 6 characters' : null,
-                    ),
-
-                    const SizedBox(height: AppSpacing.xl),
-                    if (auth.errorMessage != null) ...[
-                      Text(
-                        auth.errorMessage!,
-                        style: const TextStyle(color: AppColors.error, fontSize: 13),
-                      ),
-                      const SizedBox(height: AppSpacing.md),
-                    ],
-
-                    CustomButton(
-                      label: "Login",
-                      width: double.infinity,
-                      isLoading: auth.isLoading,
-                      icon: Icons.login_rounded,
-                      color: roleColor,
-                      onPressed: () async {
-                        if (_formKey.currentState!.validate()) {
-                          final success = await auth.login(
-                            _emailController.text,
-                            _passwordController.text,
-                          );
-                          if (!success && mounted) {
-                            // Error is handled by provider and shown above
-                          }
-                        }
-                      },
-                    ),
-
-                    const SizedBox(height: AppSpacing.lg),
-                    CustomButton(
-                      label: "Back to Role Selection",
-                      width: double.infinity,
-                      isOutlined: true,
-                      color: roleColor,
-                      onPressed: () => context.pop(),
-                    ),
-                  ],
+              Text("Email or Phone", style: AppTextStyles.labelLarge),
+              const SizedBox(height: AppSpacing.sm),
+              TextFormField(
+                controller: _emailController,
+                keyboardType: TextInputType.emailAddress,
+                decoration: const InputDecoration(
+                  prefixIcon: Icon(Icons.email_outlined),
+                  hintText: "Enter your email or phone",
                 ),
+                validator: (value) => value == null || value.isEmpty ? 'Please enter email' : null,
               ),
-            ),
+
+              const SizedBox(height: AppSpacing.lg),
+              Text("Password", style: AppTextStyles.labelLarge),
+              const SizedBox(height: AppSpacing.sm),
+              TextFormField(
+                controller: _passwordController,
+                obscureText: !_isPasswordVisible,
+                decoration: InputDecoration(
+                  prefixIcon: const Icon(Icons.lock_outlined),
+                  hintText: "Enter your password",
+                  suffixIcon: IconButton(
+                    onPressed: () => setState(() => _isPasswordVisible = !_isPasswordVisible),
+                    icon: Icon(
+                      _isPasswordVisible ? Icons.visibility_off : Icons.visibility,
+                      size: 20,
+                    ),
+                  ),
+                ),
+                validator: (value) =>
+                    value == null || value.length < 6 ? 'Password must be at least 6 characters' : null,
+              ),
+
+              const SizedBox(height: AppSpacing.xl),
+              if (auth.errorMessage != null) ...[
+                Text(
+                  auth.errorMessage!,
+                  style: const TextStyle(color: AppColors.error, fontSize: 13),
+                ),
+                const SizedBox(height: AppSpacing.md),
+              ],
+
+              CustomButton(
+                label: "Login",
+                width: double.infinity,
+                isLoading: auth.isLoading,
+                icon: Icons.login_rounded,
+                color: roleColor,
+                onPressed: () async {
+                  if (_formKey.currentState!.validate()) {
+                    await auth.login(
+                      _emailController.text,
+                      _passwordController.text,
+                    );
+                  }
+                },
+              ),
+
+              const SizedBox(height: AppSpacing.lg),
+              CustomButton(
+                label: "Back to Role Selection",
+                width: double.infinity,
+                isOutlined: true,
+                color: roleColor,
+                onPressed: () => context.pop(),
+              ),
+              const SizedBox(height: 80),
+            ],
           ),
-        ],
+        ),
       ),
     );
   }

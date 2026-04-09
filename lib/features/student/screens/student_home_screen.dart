@@ -97,294 +97,297 @@ class _StudentHomeScreenState extends State<StudentHomeScreen> {
       );
     }
 
-    return Scaffold(
-      backgroundColor: Colors.white,
-      body: CustomScrollView(
-        slivers: [
-          // SLIVER 1 — Header
-          SliverToBoxAdapter(
-            child: _StudentHeader(student: student, announcementCount: _announcements.length),
+    return AppPageShell(
+      title: "Good afternoon,",
+      subtitle: student.name.split(' ')[0],
+      showBackButton: false,
+      headerWidgets: [
+        Row(
+          children: [
+            CourseBadge(courseType: student.courseType),
+            const SizedBox(width: 8),
+            BranchBadge(branch: student.branch),
+            const SizedBox(width: 8),
+            Container(
+              padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
+              decoration: BoxDecoration(
+                color: Colors.white.withAlpha((0.1 * 255).round()),
+                borderRadius: BorderRadius.circular(20),
+              ),
+              child: Text(
+                student.batchId,
+                style: AppTextStyles.labelSmall.copyWith(color: Colors.white),
+              ),
+            ),
+          ],
+        ),
+        const SizedBox(height: AppSpacing.md),
+        Text(
+          "Wednesday, 8 April 2026",
+          style: AppTextStyles.caption.copyWith(color: Colors.white70),
+        ),
+      ],
+      body: Column(
+        children: [
+          // Stats Row with overlap
+          Transform.translate(
+            offset: const Offset(0, -20),
+            child: Padding(
+              padding: const EdgeInsets.symmetric(horizontal: AppSpacing.lg),
+              child: _buildStatsRowContent(),
+            ),
           ),
-
-          // SLIVER 2 — Stats Row
-          _buildStatsRow(),
-
-          // SLIVER 3 — Quick Actions
-          _buildQuickActions(context),
-
-          // SLIVER 4 — Upcoming Tests
-          _buildUpcomingTests(context),
-
-          // SLIVER 5 — Announcements
-          if (_announcements.isNotEmpty) _buildAnnouncements(context),
-
-          // SLIVER 6 — Target Company card
-          _buildTargetCompany(context, student),
+          
+          _buildQuickActionsContent(context),
+          _buildUpcomingTestsContent(context),
+          if (_announcements.isNotEmpty) _buildAnnouncementsContent(context),
+          _buildTargetCompanyContent(context, student),
+          const SizedBox(height: 80),
         ],
       ),
     );
   }
 
-  Widget _buildStatsRow() {
-    // Attendance status logic
+  Widget _buildStatsRowContent() {
     final bool isLowAttendance = _attendanceSummary.percentage < 85;
     final String attendanceStatus = isLowAttendance ? "⚠ Below 85%" : "✓ Good";
     final Color attendanceStatusColor = isLowAttendance ? AppColors.error : AppColors.success;
 
-    // Fees status logic
     final bool hasDue = _feeRecord.pendingAmount > 0;
     final String feeStatus = hasDue ? "₹${(_feeRecord.pendingAmount / 1000).toStringAsFixed(1)}k due" : "✓ Cleared";
     final Color feeStatusColor = hasDue ? AppColors.error : AppColors.success;
 
-    return SliverToBoxAdapter(
-      child: Container(
-        margin: const EdgeInsets.symmetric(horizontal: 16),
-        child: Transform.translate(
-          offset: const Offset(0, -18),
-          child: Row(
+    return Row(
+      children: [
+        Expanded(
+          child: StudentStatCard(
+            label: "Attendance",
+            value: _attendanceSummary.percentageLabel,
+            icon: Icons.calendar_today_outlined,
+            valueColor: AppColors.success,
+            statusLabel: attendanceStatus,
+            statusColor: attendanceStatusColor,
+          ),
+        ),
+        const SizedBox(width: 10),
+        Expanded(
+          child: StudentStatCard(
+            label: "Test Avg",
+            value: "${_avgScore.toStringAsFixed(0)}%",
+            icon: Icons.bar_chart_rounded,
+            valueColor: AppColors.oceanBlue,
+            statusLabel: "✓ ${_upcomingTests.length} tests done",
+            statusColor: AppColors.success,
+          ),
+        ),
+        const SizedBox(width: 10),
+        Expanded(
+          child: StudentStatCard(
+            label: "Fees Paid",
+            value: "${_feeRecord.percentagePaid.toStringAsFixed(0)}%",
+            icon: Icons.receipt_long_outlined,
+            valueColor: AppColors.gold,
+            statusLabel: feeStatus,
+            statusColor: feeStatusColor,
+          ),
+        ),
+      ],
+    );
+  }
+
+  Widget _buildQuickActionsContent(BuildContext context) {
+    return Padding(
+      padding: const EdgeInsets.fromLTRB(20, 0, 20, 0),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Row(
             children: [
-              Expanded(
-                child: StudentStatCard(
-                  label: "Attendance",
-                  value: _attendanceSummary.percentageLabel,
-                  icon: Icons.calendar_today_outlined,
-                  valueColor: AppColors.success,
-                  statusLabel: attendanceStatus,
-                  statusColor: attendanceStatusColor,
-                ),
+              const Icon(Icons.bolt_rounded, size: 20, color: AppColors.warning),
+              const SizedBox(width: 8),
+              Text("Quick Actions", style: AppTextStyles.headingSmall.copyWith(fontSize: 16)),
+            ],
+          ),
+          const SizedBox(height: 16),
+          GridView.count(
+            crossAxisCount: 4,
+            crossAxisSpacing: 12,
+            mainAxisSpacing: 12,
+            shrinkWrap: true,
+            physics: const NeverScrollableScrollPhysics(),
+            childAspectRatio: 0.9,
+            children: [
+              QuickActionTile(
+                label: "Attendance",
+                icon: Icons.calendar_month_rounded,
+                color: Colors.blue.shade600,
+                onTap: () => context.goNamed(AppRoutes.studentAttendanceName),
               ),
-              const SizedBox(width: 10),
-              Expanded(
-                child: StudentStatCard(
-                  label: "Test Avg",
-                  value: "${_avgScore.toStringAsFixed(0)}%",
-                  icon: Icons.bar_chart_rounded,
-                  valueColor: AppColors.oceanBlue,
-                  statusLabel: "✓ ${_upcomingTests.length} tests done",
-                  statusColor: AppColors.success,
-                ),
+              QuickActionTile(
+                label: "Mock Tests",
+                icon: Icons.help_rounded,
+                color: Colors.deepPurple.shade400,
+                onTap: () => context.goNamed(AppRoutes.studentTestsName),
               ),
-              const SizedBox(width: 10),
-              Expanded(
-                child: StudentStatCard(
-                  label: "Fees Paid",
-                  value: "${_feeRecord.percentagePaid.toStringAsFixed(0)}%",
-                  icon: Icons.receipt_long_outlined,
-                  valueColor: AppColors.gold,
-                  statusLabel: feeStatus,
-                  statusColor: feeStatusColor,
-                ),
+              QuickActionTile(
+                label: "Materials",
+                icon: Icons.menu_book_rounded,
+                color: Colors.green.shade600,
+                onTap: () => context.goNamed(AppRoutes.studentMaterialsName),
+              ),
+              QuickActionTile(
+                label: "Interview",
+                icon: Icons.forum_rounded,
+                color: Colors.orange.shade700,
+                onTap: () => context.goNamed(AppRoutes.studentMaterialsName),
+              ),
+              QuickActionTile(
+                label: "Maritime GK",
+                icon: Icons.anchor_rounded,
+                color: Colors.blue.shade900,
+                onTap: () => context.goNamed(AppRoutes.studentMaterialsName),
+              ),
+              QuickActionTile(
+                label: "Fees",
+                icon: Icons.receipt_long_rounded,
+                color: Colors.purple.shade600,
+                onTap: () => context.pushNamed(AppRoutes.studentFeesName),
+              ),
+              QuickActionTile(
+                label: "Schedule",
+                icon: Icons.watch_later_rounded,
+                color: Colors.brown.shade400,
+                onTap: () => AppSnackBar.showInfo(context, "Schedule feature coming soon!"),
+              ),
+              QuickActionTile(
+                label: "Notices",
+                icon: Icons.notifications_rounded,
+                color: Colors.orange.shade800,
+                badgeCount: _announcements.length,
+                onTap: () => context.pushNamed(AppRoutes.studentAnnouncementsName),
               ),
             ],
           ),
+        ],
+      ),
+    );
+  }
+
+  Widget _buildUpcomingTestsContent(BuildContext context) {
+    return Padding(
+      padding: const EdgeInsets.fromLTRB(AppSpacing.xl, AppSpacing.xxl, AppSpacing.xl, 0),
+      child: DashboardCard(
+        title: "Upcoming Tests",
+        icon: Icons.quiz_rounded,
+        iconColor: AppColors.oceanBlue,
+        actionLabel: "All Tests",
+        onAction: () => context.goNamed(AppRoutes.studentTestsName),
+        child: _upcomingTests.isEmpty 
+            ? Padding(
+                padding: const EdgeInsets.symmetric(vertical: AppSpacing.xl),
+                child: Text("No upcoming tests scheduled", style: AppTextStyles.bodyMedium),
+              )
+            : Column(
+                children: _upcomingTests.take(3).map((t) => UpcomingTestTile(
+                  test: t, 
+                  onTap: () => context.pushNamed(AppRoutes.testAttemptName, pathParameters: {'testId': t.id}),
+                )).toList(),
+              ),
+      ),
+    );
+  }
+
+  Widget _buildAnnouncementsContent(BuildContext context) {
+    return Padding(
+      padding: const EdgeInsets.fromLTRB(AppSpacing.xl, AppSpacing.xxl, AppSpacing.xl, 0),
+      child: DashboardCard(
+        title: "Announcements",
+        icon: Icons.announcement_rounded,
+        iconColor: AppColors.warning,
+        actionLabel: "View All",
+        onAction: () => context.pushNamed(AppRoutes.studentAnnouncementsName),
+        child: Column(
+          children: _announcements.take(2).map((a) => AnnouncementTile(
+            announcement: a,
+            onTap: () => context.pushNamed(AppRoutes.studentAnnouncementsName),
+          )).toList(),
         ),
       ),
     );
   }
 
-  Widget _buildQuickActions(BuildContext context) {
-    return SliverPadding(
-      padding: const EdgeInsets.fromLTRB(20, 10, 20, 0),
-      sliver: SliverToBoxAdapter(
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            Row(
-              children: [
-                const Icon(Icons.bolt_rounded, size: 20, color: AppColors.warning),
-                const SizedBox(width: 8),
-                Text("Quick Actions", style: AppTextStyles.headingSmall.copyWith(fontSize: 16)),
-              ],
-            ),
-            const SizedBox(height: 16),
-            GridView.count(
-              crossAxisCount: 4,
-              crossAxisSpacing: 12,
-              mainAxisSpacing: 12,
-              shrinkWrap: true,
-              physics: const NeverScrollableScrollPhysics(),
-              childAspectRatio: 0.9, // Slightly shorter for better fit
-              children: [
-                QuickActionTile(
-                  label: "Attendance",
-                  icon: Icons.calendar_month_rounded,
-                  color: Colors.blue.shade600,
-                  onTap: () => context.goNamed(AppRoutes.studentAttendanceName),
-                ),
-                QuickActionTile(
-                  label: "Mock Tests",
-                  icon: Icons.help_rounded,
-                  color: Colors.deepPurple.shade400,
-                  onTap: () => context.goNamed(AppRoutes.studentTestsName),
-                ),
-                QuickActionTile(
-                  label: "Materials",
-                  icon: Icons.menu_book_rounded,
-                  color: Colors.green.shade600,
-                  onTap: () => context.goNamed(AppRoutes.studentMaterialsName),
-                ),
-                QuickActionTile(
-                  label: "Interview",
-                  icon: Icons.forum_rounded,
-                  color: Colors.orange.shade700,
-                  onTap: () => context.goNamed(AppRoutes.studentMaterialsName),
-                ),
-                QuickActionTile(
-                  label: "Maritime GK",
-                  icon: Icons.anchor_rounded,
-                  color: Colors.blue.shade900,
-                  onTap: () => context.goNamed(AppRoutes.studentMaterialsName),
-                ),
-                QuickActionTile(
-                  label: "Fees",
-                  icon: Icons.receipt_long_rounded,
-                  color: Colors.purple.shade600,
-                  onTap: () => context.pushNamed(AppRoutes.studentFeesName),
-                ),
-                QuickActionTile(
-                  label: "Schedule",
-                  icon: Icons.watch_later_rounded,
-                  color: Colors.brown.shade400,
-                  onTap: () => AppSnackBar.showInfo(context, "Schedule feature coming soon!"),
-                ),
-                QuickActionTile(
-                  label: "Notices",
-                  icon: Icons.notifications_rounded,
-                  color: Colors.orange.shade800,
-                  badgeCount: _announcements.length,
-                  onTap: () => context.pushNamed(AppRoutes.studentAnnouncementsName),
-                ),
-              ],
+  Widget _buildTargetCompanyContent(BuildContext context, StudentModel student) {
+    if (student.targetCompany.isEmpty) return const SizedBox(height: 32);
+    
+    return Padding(
+      padding: const EdgeInsets.fromLTRB(20, 24, 20, 32),
+      child: Container(
+        padding: const EdgeInsets.all(16),
+        decoration: BoxDecoration(
+          color: const Color(0xFF071C47),
+          borderRadius: BorderRadius.circular(16),
+          boxShadow: [
+            BoxShadow(
+              color: Colors.black.withAlpha((0.15 * 255).round()),
+              blurRadius: 15,
+              offset: const Offset(0, 6),
             ),
           ],
         ),
-      ),
-    );
-  }
-
-  Widget _buildUpcomingTests(BuildContext context) {
-    return SliverToBoxAdapter(
-      child: Padding(
-        padding: const EdgeInsets.fromLTRB(AppSpacing.xl, AppSpacing.xxl, AppSpacing.xl, 0),
-        child: DashboardCard(
-          title: "Upcoming Tests",
-          icon: Icons.quiz_rounded,
-          iconColor: AppColors.oceanBlue,
-          actionLabel: "All Tests",
-          onAction: () => context.goNamed(AppRoutes.studentTestsName),
-          child: _upcomingTests.isEmpty 
-              ? Padding(
-                  padding: const EdgeInsets.symmetric(vertical: AppSpacing.xl),
-                  child: Text("No upcoming tests scheduled", style: AppTextStyles.bodyMedium),
-                )
-              : Column(
-                  children: _upcomingTests.take(3).map((t) => UpcomingTestTile(
-                    test: t, 
-                    onTap: () => context.pushNamed(AppRoutes.testAttemptName, pathParameters: {'testId': t.id}),
-                  )).toList(),
-                ),
-        ),
-      ),
-    );
-  }
-
-  Widget _buildAnnouncements(BuildContext context) {
-    return SliverToBoxAdapter(
-      child: Padding(
-        padding: const EdgeInsets.fromLTRB(AppSpacing.xl, AppSpacing.xxl, AppSpacing.xl, 0),
-        child: DashboardCard(
-          title: "Announcements",
-          icon: Icons.announcement_rounded,
-          iconColor: AppColors.warning,
-          actionLabel: "View All",
-          onAction: () => context.pushNamed(AppRoutes.studentAnnouncementsName),
-          child: Column(
-            children: _announcements.take(2).map((a) => AnnouncementTile(
-              announcement: a,
-              onTap: () => context.pushNamed(AppRoutes.studentAnnouncementsName),
-            )).toList(),
-          ),
-        ),
-      ),
-    );
-  }
-
-  Widget _buildTargetCompany(BuildContext context, StudentModel student) {
-    if (student.targetCompany.isEmpty) {
-      return const SliverToBoxAdapter(child: SizedBox(height: 32));
-    }
-    
-    return SliverToBoxAdapter(
-      child: Padding(
-        padding: const EdgeInsets.fromLTRB(20, 24, 20, 32),
-        child: Container(
-          padding: const EdgeInsets.all(16),
-          decoration: BoxDecoration(
-            color: const Color(0xFF071C47),
-            borderRadius: BorderRadius.circular(16),
-            boxShadow: [
-              BoxShadow(
-                color: Colors.black.withAlpha((0.15 * 255).round()),
-                blurRadius: 15,
-                offset: const Offset(0, 6),
+        child: Row(
+          children: [
+            Container(
+              width: 48,
+              height: 48,
+              decoration: BoxDecoration(
+                color: AppColors.gold.withAlpha((0.2 * 255).round()),
+                borderRadius: BorderRadius.circular(12),
               ),
-            ],
-          ),
-          child: Row(
-            children: [
-              Container(
-                width: 48,
-                height: 48,
-                decoration: BoxDecoration(
-                  color: AppColors.gold.withAlpha((0.2 * 255).round()),
-                  borderRadius: BorderRadius.circular(12),
-                ),
-                child: const Icon(Icons.directions_boat_rounded, color: AppColors.gold, size: 28),
+              child: const Icon(Icons.directions_boat_rounded, color: AppColors.gold, size: 28),
+            ),
+            const SizedBox(width: 14),
+            Expanded(
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Text(
+                    "Target company",
+                    style: AppTextStyles.bodySmall.copyWith(color: Colors.white.withAlpha((0.5 * 255).round()), fontSize: 10),
+                  ),
+                  const SizedBox(height: 2),
+                  Text(
+                    student.targetCompany,
+                    style: AppTextStyles.headingMedium.copyWith(color: AppColors.gold, fontSize: 16, fontWeight: FontWeight.w500),
+                    maxLines: 1,
+                    overflow: TextOverflow.ellipsis,
+                  ),
+                  const SizedBox(height: 2),
+                  Text(
+                    "Company-specific prep available",
+                    style: AppTextStyles.bodySmall.copyWith(color: Colors.white.withAlpha((0.5 * 255).round()), fontSize: 11),
+                    maxLines: 1,
+                    overflow: TextOverflow.ellipsis,
+                  ),
+                ],
               ),
-              const SizedBox(width: 14),
-              Expanded(
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    Text(
-                      "Target company",
-                      style: AppTextStyles.bodySmall.copyWith(color: Colors.white.withAlpha((0.5 * 255).round()), fontSize: 10),
-                    ),
-                    const SizedBox(height: 2),
-                    Text(
-                      student.targetCompany,
-                      style: AppTextStyles.headingMedium.copyWith(color: AppColors.gold, fontSize: 16, fontWeight: FontWeight.w500),
-                      maxLines: 1,
-                      overflow: TextOverflow.ellipsis,
-                    ),
-                    const SizedBox(height: 2),
-                    Text(
-                      "Company-specific prep available",
-                      style: AppTextStyles.bodySmall.copyWith(color: Colors.white.withAlpha((0.5 * 255).round()), fontSize: 11),
-                      maxLines: 1,
-                      overflow: TextOverflow.ellipsis,
-                    ),
-                  ],
-                ),
-              ),
-              const SizedBox(width: 8),
-              Container(
+            ),
+            const SizedBox(width: 8),
+            GestureDetector(
+              onTap: () => context.goNamed(AppRoutes.studentTestsName),
+              child: Container(
                 padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
                 decoration: BoxDecoration(
                   color: AppColors.gold.withAlpha((0.2 * 255).round()),
                   borderRadius: BorderRadius.circular(10),
                   border: Border.all(color: AppColors.gold, width: 1.5),
                 ),
-                child: GestureDetector(
-                  onTap: () => context.goNamed(AppRoutes.studentTestsName),
-                  child: Text(
-                    "Practice",
-                    style: AppTextStyles.labelMedium.copyWith(color: AppColors.gold, fontWeight: FontWeight.bold),
-                  ),
+                child: Text(
+                  "Practice",
+                  style: AppTextStyles.labelMedium.copyWith(color: AppColors.gold, fontWeight: FontWeight.bold),
                 ),
               ),
-            ],
-          ),
+            ),
+          ],
         ),
       ),
     );

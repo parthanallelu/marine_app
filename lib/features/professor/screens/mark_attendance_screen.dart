@@ -84,142 +84,132 @@ class _MarkAttendanceScreenState extends State<MarkAttendanceScreen> {
       return const Scaffold(body: Center(child: CircularProgressIndicator()));
     }
 
-    return Scaffold(
-      backgroundColor: AppColors.navyBlueBase,
-      appBar: AppBar(
-        title: const Text('Mark Attendance'),
-        foregroundColor: Colors.white,
-        backgroundColor: Colors.transparent,
-        elevation: 0,
-      ),
-      body: Column(
-        children: [
-          _buildHeader(authProvider),
-          Expanded(
-            child: Container(
-              width: double.infinity,
-              decoration: const BoxDecoration(
-                color: AppColors.background,
-                borderRadius: BorderRadius.only(
-                  topLeft: Radius.circular(AppRadius.xxl),
-                  topRight: Radius.circular(AppRadius.xxl),
-                ),
-              ),
-              child: _isLoading
-                  ? const Center(child: CircularProgressIndicator())
-                  : _buildAttendanceList(),
-            ),
-          ),
-        ],
-      ),
+    return AppPageShell(
+      title: 'Mark Attendance',
+      showBackButton: true,
+      headerWidgets: [
+        _buildHeader(authProvider),
+      ],
+      body: _isLoading
+          ? const SizedBox(
+              height: 300,
+              child: Center(child: CircularProgressIndicator()),
+            )
+          : _buildAttendanceList(),
     );
   }
 
   Widget _buildHeader(AuthProvider authProvider) {
     final dateDisplay = DateFormat('EEEE, MMM d, yyyy').format(_selectedDate);
 
-    return Padding(
-      padding: const EdgeInsets.all(AppSpacing.lg),
-      child: Column(
-        children: [
-          // Batch Selector
-          Container(
-            padding: const EdgeInsets.symmetric(horizontal: AppSpacing.lg),
+    return Column(
+      children: [
+        // Batch Selector
+        Container(
+          padding: const EdgeInsets.symmetric(horizontal: AppSpacing.lg),
+          decoration: BoxDecoration(
+            color: Colors.white.withAlpha((0.1 * 255).round()),
+            borderRadius: BorderRadius.circular(AppRadius.md),
+            border: Border.all(color: Colors.white.withAlpha((0.2 * 255).round())),
+          ),
+          child: DropdownButtonHideUnderline(
+            child: DropdownButton<String>(
+              value: _selectedBatch,
+              hint: Text('Select Batch', style: AppTextStyles.bodyMedium.copyWith(color: Colors.white70)),
+              dropdownColor: AppColors.navyBlueBase,
+              icon: const Icon(Icons.keyboard_arrow_down_rounded, color: Colors.white),
+              isExpanded: true,
+              style: AppTextStyles.bodyMedium.copyWith(color: Colors.white),
+              items: DummyData.batches.where((b) => b.professorId == (authProvider.currentUser?.id ?? '')).map((batch) {
+                return DropdownMenuItem(
+                  value: batch.id,
+                  child: Text(batch.name),
+                );
+              }).toList(),
+              onChanged: _onBatchChanged,
+            ),
+          ),
+        ),
+        const SizedBox(height: AppSpacing.md),
+        // Date Selector
+        GestureDetector(
+          onTap: _selectDate,
+          child: Container(
+            padding: const EdgeInsets.all(AppSpacing.lg),
             decoration: BoxDecoration(
               color: Colors.white.withAlpha((0.1 * 255).round()),
               borderRadius: BorderRadius.circular(AppRadius.md),
-              border: Border.all(color: Colors.white.withAlpha((0.2 * 255).round())),
             ),
-            child: DropdownButtonHideUnderline(
-              child: DropdownButton<String>(
-                value: _selectedBatch,
-                hint: Text('Select Batch', style: AppTextStyles.bodyMedium.copyWith(color: Colors.white70)),
-                dropdownColor: AppColors.navyBlueBase,
-                icon: const Icon(Icons.keyboard_arrow_down_rounded, color: Colors.white),
-                isExpanded: true,
-                style: AppTextStyles.bodyMedium.copyWith(color: Colors.white),
-                items: DummyData.batches.where((b) => b.professorId == (authProvider.currentUser?.id ?? '')).map((batch) {
-                  return DropdownMenuItem(
-                    value: batch.id,
-                    child: Text(batch.name),
-                  );
-                }).toList(),
-                onChanged: _onBatchChanged,
-              ),
+            child: Row(
+              children: [
+                const Icon(Icons.calendar_today_rounded, color: Colors.white, size: 20),
+                const SizedBox(width: AppSpacing.md),
+                Text(
+                  dateDisplay,
+                  style: AppTextStyles.labelLarge.copyWith(color: Colors.white, fontWeight: FontWeight.w500),
+                ),
+                const Spacer(),
+                const Icon(Icons.edit_calendar_rounded, color: Colors.white70, size: 18),
+              ],
             ),
           ),
-          const SizedBox(height: AppSpacing.md),
-          // Date Selector
-          GestureDetector(
-            onTap: _selectDate,
-            child: Container(
-              padding: const EdgeInsets.all(AppSpacing.lg),
-              decoration: BoxDecoration(
-                color: Colors.white.withAlpha((0.1 * 255).round()),
-                borderRadius: BorderRadius.circular(AppRadius.md),
-              ),
-              child: Row(
-                children: [
-                  const Icon(Icons.calendar_today_rounded, color: Colors.white, size: 20),
-                  const SizedBox(width: AppSpacing.md),
-                  Text(
-                    dateDisplay,
-                    style: AppTextStyles.labelLarge.copyWith(color: Colors.white, fontWeight: FontWeight.w500),
-                  ),
-                  const Spacer(),
-                  const Icon(Icons.edit_calendar_rounded, color: Colors.white70, size: 18),
-                ],
-              ),
-            ),
-          ),
-        ],
-      ),
+        ),
+      ],
     );
   }
 
-
   Widget _buildAttendanceList() {
     if (_selectedBatch == null) {
-      return const EmptyState(
-        icon: Icons.touch_app_rounded,
-        title: 'Select a Batch',
-        subtitle: 'Please select a batch above to mark attendance.',
+      return const Column(
+        children: [
+          SizedBox(height: 100),
+          EmptyState(
+            icon: Icons.touch_app_rounded,
+            title: 'Select a Batch',
+            subtitle: 'Please select a batch above to mark attendance.',
+          ),
+        ],
       );
     }
 
     if (_students.isEmpty) {
-      return const EmptyState(
-        icon: Icons.group_off_rounded,
-        title: 'No Students',
-        subtitle: 'No students enrolled in this batch.',
+      return const Column(
+        children: [
+          SizedBox(height: 100),
+          EmptyState(
+            icon: Icons.group_off_rounded,
+            title: 'No Students',
+            subtitle: 'No students enrolled in this batch.',
+          ),
+        ],
       );
     }
 
     return Column(
       children: [
         _buildAttendanceListHeader(),
-        Expanded(
-          child: ListView.builder(
-            padding: const EdgeInsets.symmetric(horizontal: AppSpacing.lg),
-            itemCount: _students.length,
-            itemBuilder: (context, index) {
-              final student = _students[index];
-              final status = _attendance[student.id] ?? AttendanceStatus.present;
+        ListView.builder(
+          shrinkWrap: true,
+          physics: const NeverScrollableScrollPhysics(),
+          padding: const EdgeInsets.symmetric(horizontal: AppSpacing.lg),
+          itemCount: _students.length,
+          itemBuilder: (context, index) {
+            final student = _students[index];
+            final status = _attendance[student.id] ?? AttendanceStatus.present;
 
-              return StudentTile(
-                name: student.name,
-                rollNumber: student.rollNumber,
-                trailing: Row(
-                  mainAxisSize: MainAxisSize.min,
-                  children: [
-                    _statusToggle(student.id, AttendanceStatus.present, Icons.check_circle_rounded, AppColors.success, status == AttendanceStatus.present),
-                    const SizedBox(width: AppSpacing.md),
-                    _statusToggle(student.id, AttendanceStatus.absent, Icons.cancel_rounded, AppColors.absent, status == AttendanceStatus.absent),
-                  ],
-                ),
-              );
-            },
-          ),
+            return StudentTile(
+              name: student.name,
+              rollNumber: student.rollNumber,
+              trailing: Row(
+                mainAxisSize: MainAxisSize.min,
+                children: [
+                  _statusToggle(student.id, AttendanceStatus.present, Icons.check_circle_rounded, AppColors.success, status == AttendanceStatus.present),
+                  const SizedBox(width: AppSpacing.md),
+                  _statusToggle(student.id, AttendanceStatus.absent, Icons.cancel_rounded, AppColors.absent, status == AttendanceStatus.absent),
+                ],
+              ),
+            );
+          },
         ),
         _buildSubmitButton(),
       ],
