@@ -635,7 +635,7 @@ class _AdminStudentsScreenState extends State<AdminStudentsScreen> {
                   });
                   Navigator.pop(context);
                 },
-                padding: const EdgeInsets.symmetric(horizontal: AppSpacing.xl),
+                contentPadding: const EdgeInsets.symmetric(horizontal: AppSpacing.xl),
               )),
         ],
       ),
