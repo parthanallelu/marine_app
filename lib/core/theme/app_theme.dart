@@ -37,6 +37,16 @@ class AppColors {
   static const Color textHint = Color(0xFF64748B);
   static const Color divider = Color(0xFF334155);
   static const Color border = Color(0xFF334155);
+
+  // Semantic Colors (Restored for backwards compatibility)
+  static const Color present = Color(0xFF2E7D32);
+  static const Color absent = Color(0xFFC62828);
+  static const Color halfDay = Color(0xFFF57F17);
+  static const Color course11th = Color(0xFF1565C0);
+  static const Color course12th = Color(0xFF6A1B9A);
+  static const Color courseCrash = Color(0xFFBF360C);
+  static const Color testPassed = Color(0xFF1B5E20);
+  static const Color testFailed = Color(0xFF7F0000);
 }
 
 class AppTextStyles {
@@ -91,6 +101,30 @@ class AppShadows {
   static List<BoxShadow> get card => [
         BoxShadow(
           color: Colors.black.withAlpha((0.05 * 255).round()),
+          blurRadius: 16,
+          offset: const Offset(0, 4),
+        ),
+      ];
+
+  static List<BoxShadow> get subtle => [
+        BoxShadow(
+          color: Colors.black.withAlpha((0.03 * 255).round()),
+          blurRadius: 8,
+          offset: const Offset(0, 2),
+        ),
+      ];
+
+  static List<BoxShadow> get elevated => [
+        BoxShadow(
+          color: Colors.black.withAlpha((0.10 * 255).round()),
+          blurRadius: 24,
+          offset: const Offset(0, 8),
+        ),
+      ];
+
+  static List<BoxShadow> get goldGlow => [
+        BoxShadow(
+          color: AppColors.gold.withAlpha((0.20 * 255).round()),
           blurRadius: 16,
           offset: const Offset(0, 4),
         ),

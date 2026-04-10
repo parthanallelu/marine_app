@@ -5,6 +5,7 @@ import '../../../../core/theme/app_theme.dart';
 import '../../../../core/constants/app_constants.dart';
 import '../../../../core/common_widgets/common_widgets.dart';
 import '../../../../providers/auth_provider.dart';
+import '../../../../providers/theme_provider.dart';
 
 class StudentDrawer extends StatelessWidget {
   const StudentDrawer({super.key});
