@@ -63,31 +63,44 @@ class StudentInterviewScreen extends StatelessWidget {
         crossAxisCount: 2,
         crossAxisSpacing: AppSpacing.md,
         mainAxisSpacing: AppSpacing.md,
-        childAspectRatio: 1.1,
+        childAspectRatio: 1.3,
       ),
       itemCount: modules.length,
       itemBuilder: (context, index) {
         final module = modules[index];
-        return DashboardCard(
-          title: module['title'] as String,
-          padding: EdgeInsets.zero,
-          child: InkWell(
-            onTap: () {},
+        return Container(
+          decoration: BoxDecoration(
+            color: Theme.of(context).cardTheme.color,
             borderRadius: BorderRadius.circular(AppRadius.lg),
-            child: Column(
-              mainAxisAlignment: MainAxisAlignment.center,
-              children: [
-                Container(
-                  padding: const EdgeInsets.all(AppSpacing.md),
-                  decoration: BoxDecoration(
-                    color: (module['color'] as Color).withAlpha((0.1 * 255).round()),
-                    shape: BoxShape.circle,
+            border: Border.all(color: Theme.of(context).dividerColor.withAlpha((0.1 * 255).round())),
+            boxShadow: AppShadows.card,
+          ),
+          child: Material(
+            color: Colors.transparent,
+            child: InkWell(
+              onTap: () {},
+              borderRadius: BorderRadius.circular(AppRadius.lg),
+              child: Column(
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: [
+                  Container(
+                    width: 44,
+                    height: 44,
+                    alignment: Alignment.center,
+                    decoration: BoxDecoration(
+                      color: (module['color'] as Color).withAlpha((0.1 * 255).round()),
+                      shape: BoxShape.circle,
+                    ),
+                    child: Icon(module['icon'] as IconData, color: module['color'] as Color, size: 24),
                   ),
-                  child: Icon(module['icon'] as IconData, color: module['color'] as Color, size: 30),
-                ),
-                const SizedBox(height: AppSpacing.sm),
-                Text(module['title'] as String, style: AppTextStyles.labelLarge),
-              ],
+                  const SizedBox(height: 8),
+                  Text(
+                    module['title'] as String, 
+                    style: AppTextStyles.labelLarge.copyWith(fontSize: 13),
+                    textAlign: TextAlign.center,
+                  ),
+                ],
+              ),
             ),
           ),
         );

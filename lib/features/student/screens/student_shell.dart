@@ -43,9 +43,9 @@ class StudentShell extends StatelessWidget {
             label: 'Materials',
           ),
           NavigationDestination(
-            icon: Icon(Icons.person_outline_rounded, color: Theme.of(context).hintColor),
-            selectedIcon: Icon(Icons.person_rounded, color: Theme.of(context).colorScheme.primary),
-            label: 'Profile',
+            icon: Icon(Icons.forum_outlined, color: Theme.of(context).hintColor),
+            selectedIcon: Icon(Icons.forum_rounded, color: Theme.of(context).colorScheme.primary),
+            label: 'Interview',
           ),
         ],
       ),
