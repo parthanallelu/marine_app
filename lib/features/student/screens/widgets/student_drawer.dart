@@ -36,10 +36,14 @@ class StudentDrawer extends StatelessWidget {
                 _buildMenuItem(
                   icon: Icons.dark_mode_rounded,
                   title: "Dark Mode",
-                  trailing: Switch(
-                    value: true,
-                    onChanged: (val) {},
-                    activeColor: AppColors.oceanBlue,
+                  trailing: Consumer<ThemeProvider>(
+                    builder: (context, themeProvider, _) => Switch(
+                      value: themeProvider.isDarkMode,
+                      onChanged: (val) {
+                        themeProvider.toggleTheme();
+                      },
+                      activeColor: AppColors.gold,
+                    ),
                   ),
                 ),
                 _buildMenuItem(

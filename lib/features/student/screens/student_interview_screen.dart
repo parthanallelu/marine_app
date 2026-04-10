@@ -154,9 +154,9 @@ class _MockInterviewTile extends StatelessWidget {
       margin: const EdgeInsets.only(bottom: AppSpacing.md),
       padding: const EdgeInsets.all(AppSpacing.md),
       decoration: BoxDecoration(
-        color: AppColors.surface,
+        color: Theme.of(context).cardTheme.color,
         borderRadius: BorderRadius.circular(AppRadius.lg),
-        border: Border.all(color: AppColors.border),
+        border: Border.all(color: Theme.of(context).dividerColor.withAlpha((0.1 * 255).round())),
       ),
       child: Row(
         children: [

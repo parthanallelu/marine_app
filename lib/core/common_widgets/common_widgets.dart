@@ -34,7 +34,7 @@ class StatCard extends StatelessWidget {
       child: Container(
         padding: const EdgeInsets.all(AppSpacing.md),
         decoration: BoxDecoration(
-          color: Colors.white,
+          color: Theme.of(context).cardTheme.color,
           borderRadius: AppRadius.cardRadius,
           boxShadow: AppShadows.card,
         ),
@@ -100,9 +100,9 @@ class StudentStatCard extends StatelessWidget {
     return Container(
       padding: const EdgeInsets.symmetric(vertical: 10, horizontal: 8), // Reduced padding
       decoration: BoxDecoration(
-        color: Colors.white,
+        color: Theme.of(context).cardTheme.color,
         borderRadius: BorderRadius.circular(12),
-        border: Border.all(color: AppColors.textHint.withAlpha((0.2 * 255).round()), width: 0.5),
+        border: Border.all(color: Theme.of(context).dividerColor.withAlpha((0.2 * 255).round()), width: 0.5),
         boxShadow: [
           BoxShadow(
             color: Colors.black.withAlpha((0.04 * 255).round()),
@@ -215,7 +215,7 @@ class DashboardCard extends StatelessWidget {
       onTap: onTap,
       child: Container(
         decoration: BoxDecoration(
-          color: Colors.white,
+          color: Theme.of(context).cardTheme.color,
           borderRadius: AppRadius.cardRadius,
           boxShadow: AppShadows.card,
         ),
@@ -298,9 +298,9 @@ class QuickActionTile extends StatelessWidget {
       child: Container(
         padding: const EdgeInsets.symmetric(vertical: 12, horizontal: 6),
         decoration: BoxDecoration(
-          color: Colors.white,
+          color: Theme.of(context).cardTheme.color,
           borderRadius: BorderRadius.circular(12),
-          border: Border.all(color: AppColors.textHint.withAlpha((0.1 * 255).round())),
+          border: Border.all(color: Theme.of(context).dividerColor.withAlpha((0.1 * 255).round())),
           boxShadow: [
             BoxShadow(
               color: Colors.black.withAlpha((0.02 * 255).round()),
@@ -489,7 +489,7 @@ class BranchBadge extends StatelessWidget {
     return Container(
       padding: EdgeInsets.symmetric(horizontal: AppSpacing.sm, vertical: AppSpacing.xs),
       decoration: BoxDecoration(
-        color: AppColors.navyBlueSurface,
+        color: Theme.of(context).colorScheme.primary.withAlpha((0.1 * 255).round()),
         borderRadius: BorderRadius.circular(AppRadius.xxl),
       ),
       child: Row(
@@ -497,7 +497,7 @@ class BranchBadge extends StatelessWidget {
         children: [
           const Icon(Icons.location_on, size: 12, color: AppColors.navyBlueBase),
           const SizedBox(width: 4),
-          Text(branch, style: AppTextStyles.labelSmall.copyWith(color: AppColors.navyBlueBase)),
+          Text(branch, style: AppTextStyles.labelSmall.copyWith(color: Theme.of(context).colorScheme.primary)),
         ],
       ),
     );
@@ -1115,9 +1115,9 @@ class UpcomingTestTile extends StatelessWidget {
         margin: const EdgeInsets.only(bottom: 12),
         padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 12),
         decoration: BoxDecoration(
-          color: Colors.white,
+          color: Theme.of(context).cardTheme.color,
           borderRadius: BorderRadius.circular(12),
-          border: Border.all(color: AppColors.textHint.withAlpha((0.1 * 255).round())),
+          border: Border.all(color: Theme.of(context).dividerColor.withAlpha((0.1 * 255).round())),
           boxShadow: [
             BoxShadow(
               color: Colors.black.withAlpha((0.02 * 255).round()),
@@ -1208,9 +1208,9 @@ class AnnouncementTile extends StatelessWidget {
       child: Container(
         margin: const EdgeInsets.only(bottom: 12),
         decoration: BoxDecoration(
-          color: Colors.white,
+          color: Theme.of(context).cardTheme.color,
           borderRadius: BorderRadius.circular(12),
-          border: Border.all(color: AppColors.textHint.withAlpha((0.1 * 255).round())),
+          border: Border.all(color: Theme.of(context).dividerColor.withAlpha((0.1 * 255).round())),
           boxShadow: [
             BoxShadow(
               color: Colors.black.withAlpha((0.02 * 255).round()),
@@ -1326,7 +1326,7 @@ class MaterialCard extends StatelessWidget {
       margin: const EdgeInsets.only(bottom: 12),
       padding: const EdgeInsets.all(AppSpacing.md),
       decoration: BoxDecoration(
-        color: Colors.white,
+        color: Theme.of(context).cardTheme.color,
         borderRadius: BorderRadius.circular(16),
         boxShadow: AppShadows.subtle,
       ),
@@ -1363,7 +1363,7 @@ class MaterialCard extends StatelessWidget {
                     Container(
                       padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 2),
                       decoration: BoxDecoration(
-                        color: AppColors.background,
+                        color: Theme.of(context).colorScheme.primary.withAlpha((0.1 * 255).round()),
                         borderRadius: BorderRadius.circular(4),
                       ),
                       child: Text(
@@ -1498,7 +1498,7 @@ class StudentCard extends StatelessWidget {
       margin: const EdgeInsets.only(bottom: AppSpacing.md),
       padding: const EdgeInsets.all(AppSpacing.lg),
       decoration: BoxDecoration(
-        color: Colors.white,
+        color: Theme.of(context).cardTheme.color,
         borderRadius: BorderRadius.circular(AppRadius.lg),
         boxShadow: AppShadows.subtle,
       ),
@@ -1644,7 +1644,7 @@ class StudentTile extends StatelessWidget {
       margin: const EdgeInsets.only(bottom: AppSpacing.md),
       padding: const EdgeInsets.symmetric(horizontal: AppSpacing.lg, vertical: AppSpacing.md),
       decoration: BoxDecoration(
-        color: Colors.white,
+        color: Theme.of(context).cardTheme.color,
         borderRadius: BorderRadius.circular(AppRadius.md),
         boxShadow: AppShadows.subtle,
       ),
@@ -1697,7 +1697,7 @@ class BatchCard extends StatelessWidget {
       margin: const EdgeInsets.only(bottom: AppSpacing.md),
       padding: const EdgeInsets.all(AppSpacing.lg),
       decoration: BoxDecoration(
-        color: Colors.white,
+        color: Theme.of(context).cardTheme.color,
         borderRadius: BorderRadius.circular(AppRadius.lg),
         boxShadow: AppShadows.subtle,
       ),
@@ -1873,7 +1873,7 @@ class TestCard extends StatelessWidget {
       child: Container(
         margin: const EdgeInsets.only(bottom: AppSpacing.md),
         decoration: BoxDecoration(
-          color: Colors.white,
+          color: Theme.of(context).cardTheme.color,
           borderRadius: AppRadius.cardRadius,
           boxShadow: AppShadows.subtle,
         ),
@@ -2003,7 +2003,7 @@ class ResultCard extends StatelessWidget {
         margin: const EdgeInsets.only(bottom: AppSpacing.md),
         padding: const EdgeInsets.all(AppSpacing.lg),
         decoration: BoxDecoration(
-          color: Colors.white,
+          color: Theme.of(context).cardTheme.color,
           borderRadius: AppRadius.cardRadius,
           boxShadow: AppShadows.subtle,
         ),
@@ -2065,7 +2065,7 @@ class FeeCard extends StatelessWidget {
         margin: const EdgeInsets.only(bottom: AppSpacing.md),
         padding: const EdgeInsets.all(AppSpacing.lg),
         decoration: BoxDecoration(
-          color: Colors.white,
+          color: Theme.of(context).cardTheme.color,
           borderRadius: BorderRadius.circular(AppRadius.lg),
           boxShadow: AppShadows.subtle,
         ),
