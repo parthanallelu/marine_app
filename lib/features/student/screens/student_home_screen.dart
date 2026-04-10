@@ -132,6 +132,7 @@ class _StudentHomeScreenState extends State<StudentHomeScreen> {
       ],
       body: Column(
         children: [
+          const SizedBox(height: 2),
           Padding(
             padding: const EdgeInsets.symmetric(horizontal: AppSpacing.lg),
             child: _buildStatsRowContent(),
