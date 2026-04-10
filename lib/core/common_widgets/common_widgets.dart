@@ -695,9 +695,13 @@ class NavyHeader extends StatelessWidget {
       constraints: BoxConstraints(minHeight: minHeight),
       decoration: const BoxDecoration(
         gradient: LinearGradient(
-          colors: [AppColors.navyBlueDark, AppColors.navyBlueBase],
-          begin: Alignment.topLeft,
-          end: Alignment.bottomRight,
+          colors: [
+            AppColors.navyBlueDark,
+            AppColors.navyBlueLight,
+            AppColors.navyBlueBase,
+          ],
+          begin: Alignment.topCenter,
+          end: Alignment.bottomCenter,
         ),
       ),
       child: SafeArea(
@@ -828,9 +832,13 @@ class AppPageShell extends StatelessWidget {
       width: double.infinity,
       decoration: const BoxDecoration(
         gradient: LinearGradient(
-          colors: [AppColors.navyBlueDark, AppColors.navyBlueBase],
-          begin: Alignment.topLeft,
-          end: Alignment.bottomRight,
+          colors: [
+            AppColors.navyBlueDark,
+            AppColors.navyBlueLight,
+            AppColors.navyBlueBase,
+          ],
+          begin: Alignment.topCenter,
+          end: Alignment.bottomCenter,
         ),
       ),
       child: SafeArea(
