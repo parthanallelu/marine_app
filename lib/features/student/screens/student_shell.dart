@@ -21,6 +21,13 @@ class StudentShell extends StatelessWidget {
         selectedIndex: navigationShell.currentIndex,
         onDestinationSelected: (index) => navigationShell.goBranch(index),
         labelBehavior: NavigationDestinationLabelBehavior.alwaysShow,
+        height: 65,
+        selectedLabelTextStyle: WidgetStateProperty.all(
+          const TextStyle(fontSize: 10, fontWeight: FontWeight.w600),
+        ),
+        unselectedLabelTextStyle: WidgetStateProperty.all(
+          const TextStyle(fontSize: 10, fontWeight: FontWeight.w400),
+        ),
         destinations: [
           NavigationDestination(
             icon: Icon(Icons.home_outlined, color: Theme.of(context).hintColor),
@@ -30,7 +37,7 @@ class StudentShell extends StatelessWidget {
           NavigationDestination(
             icon: Icon(Icons.calendar_month_outlined, color: Theme.of(context).hintColor),
             selectedIcon: Icon(Icons.calendar_month_rounded, color: Theme.of(context).colorScheme.primary),
-            label: 'Attend',
+            label: 'Attendance',
           ),
           NavigationDestination(
             icon: Icon(Icons.assignment_outlined, color: Theme.of(context).hintColor),
