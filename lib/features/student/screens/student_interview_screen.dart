@@ -69,6 +69,7 @@ class StudentInterviewScreen extends StatelessWidget {
       itemBuilder: (context, index) {
         final module = modules[index];
         return DashboardCard(
+          title: module['title'] as String,
           padding: EdgeInsets.zero,
           child: InkWell(
             onTap: () {},
@@ -124,6 +125,7 @@ class _StatCard extends StatelessWidget {
   Widget build(BuildContext context) {
     return Expanded(
       child: DashboardCard(
+        title: title,
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
