@@ -30,7 +30,7 @@ class StudentShell extends StatelessWidget {
           NavigationDestination(
             icon: Icon(Icons.calendar_month_outlined, color: Theme.of(context).hintColor),
             selectedIcon: Icon(Icons.calendar_month_rounded, color: Theme.of(context).colorScheme.primary),
-            label: 'Attendance',
+            label: 'Attend',
           ),
           NavigationDestination(
             icon: Icon(Icons.assignment_outlined, color: Theme.of(context).hintColor),
@@ -43,9 +43,9 @@ class StudentShell extends StatelessWidget {
             label: 'Materials',
           ),
           NavigationDestination(
-            icon: Icon(Icons.forum_outlined, color: Theme.of(context).hintColor),
-            selectedIcon: Icon(Icons.forum_rounded, color: Theme.of(context).colorScheme.primary),
-            label: 'Interview',
+            icon: Icon(Icons.person_outline_rounded, color: Theme.of(context).hintColor),
+            selectedIcon: Icon(Icons.person_rounded, color: Theme.of(context).colorScheme.primary),
+            label: 'Profile',
           ),
         ],
       ),

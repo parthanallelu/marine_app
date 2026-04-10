@@ -118,7 +118,7 @@ class _StudentHomeScreenState extends State<StudentHomeScreen> {
                 borderRadius: BorderRadius.circular(20),
               ),
               child: Text(
-                student.batchId,
+                student.batchName,
                 style: AppTextStyles.labelSmall.copyWith(color: Colors.white),
               ),
             ),
@@ -132,18 +132,16 @@ class _StudentHomeScreenState extends State<StudentHomeScreen> {
       ],
       body: Column(
         children: [
-          const SizedBox(height: 14),
           Padding(
-            padding: const EdgeInsets.symmetric(horizontal: AppSpacing.lg),
+            padding: const EdgeInsets.fromLTRB(16, 16, 16, 0),
             child: _buildStatsRowContent(),
           ),
-          const SizedBox(height: 20),
           
           _buildQuickActionsContent(context),
           _buildUpcomingTestsContent(context),
           if (_announcements.isNotEmpty) _buildAnnouncementsContent(context),
           _buildTargetCompanyContent(context, student),
-          const SizedBox(height: 80),
+          const SizedBox(height: 100),
         ],
       ),
     );
@@ -198,7 +196,7 @@ class _StudentHomeScreenState extends State<StudentHomeScreen> {
 
   Widget _buildQuickActionsContent(BuildContext context) {
     return Padding(
-      padding: const EdgeInsets.fromLTRB(20, 0, 20, 0),
+      padding: const EdgeInsets.fromLTRB(20, 24, 20, 0),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
@@ -209,14 +207,14 @@ class _StudentHomeScreenState extends State<StudentHomeScreen> {
               Text("Quick Actions", style: AppTextStyles.headingSmall.copyWith(fontSize: 16)),
             ],
           ),
-          const SizedBox(height: 4),
+          const SizedBox(height: 12),
           GridView.count(
             crossAxisCount: 4,
-            crossAxisSpacing: 8,
-            mainAxisSpacing: 8,
+            crossAxisSpacing: 10,
+            mainAxisSpacing: 10,
             shrinkWrap: true,
             physics: const NeverScrollableScrollPhysics(),
-            childAspectRatio: 1.2,
+            childAspectRatio: 0.85,
             children: [
               QuickActionTile(
                 label: "Attendance",
@@ -276,7 +274,7 @@ class _StudentHomeScreenState extends State<StudentHomeScreen> {
 
   Widget _buildUpcomingTestsContent(BuildContext context) {
     return Padding(
-      padding: const EdgeInsets.fromLTRB(AppSpacing.xl, AppSpacing.xxl, AppSpacing.xl, 0),
+      padding: const EdgeInsets.fromLTRB(20, 24, 20, 0),
       child: DashboardCard(
         title: "Upcoming Tests",
         icon: Icons.quiz_rounded,
@@ -300,7 +298,7 @@ class _StudentHomeScreenState extends State<StudentHomeScreen> {
 
   Widget _buildAnnouncementsContent(BuildContext context) {
     return Padding(
-      padding: const EdgeInsets.fromLTRB(AppSpacing.xl, AppSpacing.xxl, AppSpacing.xl, 0),
+      padding: const EdgeInsets.fromLTRB(20, 24, 20, 0),
       child: DashboardCard(
         title: "Announcements",
         icon: Icons.announcement_rounded,
@@ -497,7 +495,7 @@ class _StudentHeader extends StatelessWidget {
                       borderRadius: BorderRadius.circular(20),
                     ),
                     child: Text(
-                      student.batchId,
+                      student.batchName,
                       style: AppTextStyles.labelSmall.copyWith(color: Colors.white),
                     ),
                   ),
