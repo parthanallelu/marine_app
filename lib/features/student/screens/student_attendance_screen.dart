@@ -22,7 +22,6 @@ class _StudentAttendanceScreenState extends State<StudentAttendanceScreen> {
   late AttendanceSummary _summary;
   late List<AttendanceRecord> _records;
   late Map<DateTime, AttendanceStatus> _statusMap;
-  CalendarFormat _calendarFormat = CalendarFormat.month;
   DateTime _focusedDay = DateTime.now().toUtc();
   DateTime? _selectedDay;
 
@@ -181,16 +180,16 @@ class _StudentAttendanceScreenState extends State<StudentAttendanceScreen> {
                 firstDay: DateTime.now().toUtc().subtract(const Duration(days: 90)),
                 lastDay: DateTime.now().toUtc().add(const Duration(days: 30)),
                 focusedDay: _focusedDay,
-                calendarFormat: _calendarFormat,
+                calendarFormat: CalendarFormat.month,
+                availableCalendarFormats: const {
+                  CalendarFormat.month: 'Month',
+                },
                 selectedDayPredicate: (day) => isSameDay(_selectedDay, day),
                 onDaySelected: (selectedDay, focusedDay) {
                   setState(() {
                     _selectedDay = selectedDay;
                     _focusedDay = focusedDay;
                   });
-                },
-                onFormatChanged: (format) {
-                  setState(() => _calendarFormat = format);
                 },
                 onPageChanged: (focusedDay) {
                   _focusedDay = focusedDay;
@@ -202,11 +201,7 @@ class _StudentAttendanceScreenState extends State<StudentAttendanceScreen> {
                   weekendTextStyle: AppTextStyles.bodyMedium.copyWith(color: AppColors.error),
                 ),
                 headerStyle: HeaderStyle(
-                  formatButtonDecoration: BoxDecoration(
-                    border: Border.all(color: Theme.of(context).colorScheme.primary),
-                    borderRadius: BorderRadius.circular(AppRadius.md),
-                  ),
-                  formatButtonTextStyle: AppTextStyles.labelSmall.copyWith(color: Theme.of(context).colorScheme.primary),
+                  formatButtonVisible: false,
                   titleTextStyle: AppTextStyles.labelLarge,
                   leftChevronIcon: Icon(Icons.chevron_left, color: Theme.of(context).colorScheme.primary),
                   rightChevronIcon: Icon(Icons.chevron_right, color: Theme.of(context).colorScheme.primary),
