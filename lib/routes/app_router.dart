@@ -11,6 +11,7 @@ import '../features/student/screens/student_materials_screen.dart';
 import '../features/student/screens/student_profile_screen.dart';
 import '../features/student/screens/student_shell.dart';
 import '../features/student/screens/student_announcements_screen.dart';
+import '../features/student/screens/student_interview_screen.dart';
 import '../features/professor/screens/professor_home_screen.dart';
 import '../features/professor/screens/mark_attendance_screen.dart';
 import '../features/professor/screens/professor_materials_screen.dart';
