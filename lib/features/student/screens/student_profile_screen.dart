@@ -7,6 +7,7 @@ import '../../../core/common_widgets/common_widgets.dart';
 import '../../../providers/auth_provider.dart';
 import '../../../models/app_models.dart';
 import '../../../models/dummy_data.dart';
+import 'widgets/student_drawer.dart';
 
 class StudentProfileScreen extends StatefulWidget {
   const StudentProfileScreen({super.key});
@@ -75,7 +76,9 @@ class _StudentProfileScreenState extends State<StudentProfileScreen> {
     return AppPageShell(
       title: "My Profile",
       subtitle: "Student Center",
-      showBackButton: false,
+      showBackButton: true,
+      showMenuButton: true,
+      endDrawer: const StudentDrawer(),
       headerWidgets: [
         Column(
           children: [
@@ -226,8 +229,6 @@ class _StudentProfileScreenState extends State<StudentProfileScreen> {
       ),
     );
   }
-}
-
 }
 
 class _ProfileStat extends StatelessWidget {

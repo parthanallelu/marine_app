@@ -33,6 +33,25 @@ class _AdminFeesScreenState extends State<AdminFeesScreen> {
     }
   }
 
+  @override
+  Widget build(BuildContext context) {
+    // CALCULATION LOGIC
+    final filteredRecords = _allFeeRecords.where((r) {
+      final student = DummyData.students.firstWhere((s) => s.id == r.studentId, orElse: () => DummyData.students.first);
+      final matchesBranch = _selectedBranch == "All" || student.branch == _selectedBranch;
+      final matchesSearch = r.studentName.toLowerCase().contains(_searchQuery.toLowerCase());
+      return matchesBranch && matchesSearch;
+    }).toList();
+
+    double totalPlanned = 0;
+    double totalCollected = 0;
+    for (var r in filteredRecords) {
+      totalPlanned += r.totalFees;
+      totalCollected += r.paidAmount;
+    }
+    final totalPending = totalPlanned - totalCollected;
+    final collectionPercent = totalPlanned > 0 ? totalCollected / totalPlanned : 0.0;
+
     return AppPageShell(
       title: "Financial Portal",
       subtitle: "Fee Management",
@@ -130,10 +149,10 @@ class _AdminFeesScreenState extends State<AdminFeesScreen> {
 
           // RECORDS LIST
           filteredRecords.isEmpty
-              ? const Column(
+              ? Column(
                   children: [
-                    SizedBox(height: 60),
-                    EmptyState(
+                    const SizedBox(height: 60),
+                    const EmptyState(
                       icon: Icons.payments_outlined,
                       title: "No Invoices Found",
                       subtitle: "Try adjusting filters or search criteria.",
@@ -157,8 +176,6 @@ class _AdminFeesScreenState extends State<AdminFeesScreen> {
         ],
       ),
     );
-  }
-;
   }
 
   void _showFeeDetailSheet(FeeRecord initialRecord) {

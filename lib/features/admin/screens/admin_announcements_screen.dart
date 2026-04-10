@@ -32,6 +32,14 @@ class _AdminAnnouncementsScreenState extends State<AdminAnnouncementsScreen> {
     }
   }
 
+  @override
+  Widget build(BuildContext context) {
+    // FILTER LOGIC
+    final announcements = _allAnnouncements.where((a) {
+      if (_selectedBranch == "All") return true;
+      return a.targetBranches.contains(_selectedBranch) || a.targetBranches.contains("All");
+    }).toList();
+
     return AppPageShell(
       title: "Notice Board",
       subtitle: "Academy Broadcasts",
@@ -65,10 +73,10 @@ class _AdminAnnouncementsScreenState extends State<AdminAnnouncementsScreen> {
         ),
       ],
       body: announcements.isEmpty
-          ? const Column(
+          ? Column(
               children: [
-                SizedBox(height: 100),
-                EmptyState(
+                const SizedBox(height: 100),
+                const EmptyState(
                   icon: Icons.campaign_outlined,
                   title: "No Announcements",
                   subtitle: "Create a notice to broadcast to the academy.",

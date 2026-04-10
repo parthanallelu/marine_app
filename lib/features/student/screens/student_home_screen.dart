@@ -7,6 +7,7 @@ import '../../../core/common_widgets/common_widgets.dart';
 import '../../../providers/auth_provider.dart';
 import '../../../models/app_models.dart';
 import '../../../models/dummy_data.dart';
+import 'widgets/student_drawer.dart';
 
 class StudentHomeScreen extends StatefulWidget {
   const StudentHomeScreen({super.key});
@@ -98,9 +99,11 @@ class _StudentHomeScreenState extends State<StudentHomeScreen> {
     }
 
     return AppPageShell(
-      title: "Good afternoon,",
-      subtitle: student.name.split(' ')[0],
+      title: "Howdy, ${student.name.split(' ')[0]}!",
+      subtitle: "Welcome back to your dashboard",
       showBackButton: false,
+      showMenuButton: true,
+      endDrawer: const StudentDrawer(),
       headerWidgets: [
         Row(
           children: [

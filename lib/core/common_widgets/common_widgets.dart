@@ -771,6 +771,8 @@ class AppPageShell extends StatelessWidget {
   final Color? backgroundColor;
   final bool isScrollable;
   final bool showBackButton;
+  final Widget? endDrawer;
+  final bool showMenuButton;
 
   const AppPageShell({
     super.key,
@@ -783,12 +785,15 @@ class AppPageShell extends StatelessWidget {
     this.backgroundColor,
     this.isScrollable = true,
     this.showBackButton = true,
+    this.endDrawer,
+    this.showMenuButton = false,
   });
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       backgroundColor: AppColors.navyBlueBase,
+      endDrawer: endDrawer,
       body: Column(
         children: [
           _buildHeader(context),
@@ -863,12 +868,23 @@ class AppPageShell extends StatelessWidget {
                       ],
                     ),
                   ),
-                  if (actions != null) ...[
-                    const SizedBox(width: 12),
-                    ...actions!,
+                    if (actions != null) ...[
+                      const SizedBox(width: 12),
+                      ...actions!,
+                    ],
+                    if (showMenuButton) ...[
+                      const SizedBox(width: 8),
+                      Builder(
+                        builder: (context) => IconButton(
+                          icon: const Icon(Icons.menu_rounded, color: Colors.white, size: 26),
+                          onPressed: () => Scaffold.of(context).openEndDrawer(),
+                          padding: EdgeInsets.zero,
+                          constraints: const BoxConstraints(),
+                        ),
+                      ),
+                    ],
                   ],
-                ],
-              ),
+                ),
               if (headerWidgets != null && headerWidgets!.isNotEmpty) ...[
                 const SizedBox(height: 20),
                 ...headerWidgets!,

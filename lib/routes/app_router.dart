@@ -104,6 +104,11 @@ class AppRouter {
           name: 'login',
           builder: (context, state) => const LoginScreen(),
         ),
+        GoRoute(
+          path: AppRoutes.studentProfile,
+          name: AppRoutes.studentProfileName,
+          builder: (context, state) => const StudentProfileScreen(),
+        ),
 
         // ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
         // STUDENT NAVIGATION (5 Branches)
@@ -167,18 +172,18 @@ class AppRouter {
             StatefulShellBranch(
               routes: [
                 GoRoute(
-                  path: AppRoutes.studentProfile,
-                  name: 'student_profile',
-                  builder: (context, state) => const StudentProfileScreen(),
+                  path: AppRoutes.studentInterview,
+                  name: AppRoutes.studentInterviewName,
+                  builder: (context, state) => const StudentInterviewScreen(),
                   routes: [
                     GoRoute(
                       path: 'fees',
-                      name: 'student_fees',
+                      name: AppRoutes.studentFeesName,
                       builder: (context, state) => const StudentFeesScreen(),
                     ),
                     GoRoute(
                       path: 'announcements',
-                      name: 'student_announcements',
+                      name: AppRoutes.studentAnnouncementsName,
                       builder: (context, state) => const AnnouncementsScreen(),
                     ),
                   ],

@@ -72,9 +72,10 @@ class AppRoutes {
   static const String studentAttendance = '/student/attendance';
   static const String studentTests = '/student/tests';
   static const String studentMaterials = '/student/materials';
+  static const String studentInterview = '/student/interview';
   static const String studentProfile = '/student/profile';
-  static const String studentFees = '/student/profile/fees';
-  static const String studentAnnouncements = '/student/profile/announcements';
+  static const String studentFees = '/student/interview/fees';
+  static const String studentAnnouncements = '/student/interview/announcements';
   
   // Professor
   static const String professorHome = '/professor/home';
@@ -99,6 +100,7 @@ class AppRoutes {
   static const String testAttemptName = 'test_attempt';
   static const String testResultName = 'test_result';
   static const String studentMaterialsName = 'student_materials';
+  static const String studentInterviewName = 'student_interview';
   static const String studentProfileName = 'student_profile';
   static const String studentFeesName = 'student_fees';
   static const String studentAnnouncementsName = 'student_announcements';

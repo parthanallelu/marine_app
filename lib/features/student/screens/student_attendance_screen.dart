@@ -8,6 +8,7 @@ import '../../../core/common_widgets/common_widgets.dart';
 import '../../../providers/auth_provider.dart';
 import '../../../models/app_models.dart';
 import '../../../models/dummy_data.dart';
+import 'widgets/student_drawer.dart';
 
 class StudentAttendanceScreen extends StatefulWidget {
   const StudentAttendanceScreen({super.key});
@@ -76,6 +77,8 @@ class _StudentAttendanceScreenState extends State<StudentAttendanceScreen> {
       title: "My Attendance",
       subtitle: "${_summary.percentageLabel} overall attendance",
       showBackButton: false,
+      showMenuButton: true,
+      endDrawer: const StudentDrawer(),
       headerWidgets: [
         Row(
           children: [

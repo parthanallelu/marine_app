@@ -89,6 +89,8 @@ class _AdminStudentsScreenState extends State<AdminStudentsScreen> {
   }
 
 
+  @override
+  Widget build(BuildContext context) {
     return AppPageShell(
       title: "Student Directory",
       subtitle: "Management Panel",
@@ -159,10 +161,10 @@ class _AdminStudentsScreenState extends State<AdminStudentsScreen> {
 
           // STUDENT LIST
           _filteredStudents.isEmpty
-              ? const Column(
+              ? Column(
                   children: [
-                    SizedBox(height: 60),
-                    EmptyState(
+                    const SizedBox(height: 60),
+                    const EmptyState(
                       icon: Icons.school_outlined,
                       title: "No Students Found",
                       subtitle: "Add students to get started or adjust your filters.",

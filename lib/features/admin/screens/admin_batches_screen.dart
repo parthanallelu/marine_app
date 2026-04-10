@@ -76,7 +76,8 @@ class _AdminBatchesScreenState extends State<AdminBatchesScreen> {
     if (mounted) setState(() => _isSubmitting = value);
   }
 
-
+  @override
+  Widget build(BuildContext context) {
     return AppPageShell(
       title: "Batch Management",
       subtitle: "Academy Schedule",
@@ -85,7 +86,7 @@ class _AdminBatchesScreenState extends State<AdminBatchesScreen> {
         onPressed: () => _showCreateBatchSheet(),
         backgroundColor: AppColors.navyBlueBase,
         icon: const Icon(Icons.add_rounded, color: Colors.white),
-        label: Text("Create Batch", style: AppTextStyles.labelLarge.copyWith(color: Colors.white)),
+        label: Text("Post Notice", style: AppTextStyles.labelLarge.copyWith(color: Colors.white)),
       ),
       headerWidgets: [
         CustomTextField(
@@ -98,10 +99,10 @@ class _AdminBatchesScreenState extends State<AdminBatchesScreen> {
         ),
       ],
       body: _filteredBatches.isEmpty
-          ? const Column(
+          ? Column(
               children: [
-                SizedBox(height: 100),
-                EmptyState(
+                const SizedBox(height: 100),
+                const EmptyState(
                   icon: Icons.class_outlined,
                   title: "No Batches Created",
                   subtitle: "Create a batch to get started.",

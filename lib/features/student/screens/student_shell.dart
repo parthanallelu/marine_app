@@ -24,28 +24,28 @@ class StudentShell extends StatelessWidget {
         destinations: [
           NavigationDestination(
             icon: Icon(Icons.home_outlined, color: AppColors.textHint),
-            selectedIcon: const Icon(Icons.home_rounded, color: AppColors.navyBlueBase),
+            selectedIcon: const Icon(Icons.home_rounded, color: Colors.white),
             label: 'Home',
           ),
           NavigationDestination(
             icon: Icon(Icons.calendar_month_outlined, color: AppColors.textHint),
-            selectedIcon: const Icon(Icons.calendar_month_rounded, color: AppColors.navyBlueBase),
+            selectedIcon: const Icon(Icons.calendar_month_rounded, color: Colors.white),
             label: 'Attendance',
           ),
           NavigationDestination(
             icon: Icon(Icons.assignment_outlined, color: AppColors.textHint),
-            selectedIcon: const Icon(Icons.assignment_rounded, color: AppColors.navyBlueBase),
+            selectedIcon: const Icon(Icons.assignment_rounded, color: Colors.white),
             label: 'Tests',
           ),
           NavigationDestination(
             icon: Icon(Icons.folder_open_outlined, color: AppColors.textHint),
-            selectedIcon: const Icon(Icons.folder_rounded, color: AppColors.navyBlueBase),
+            selectedIcon: const Icon(Icons.folder_rounded, color: Colors.white),
             label: 'Materials',
           ),
           NavigationDestination(
-            icon: Icon(Icons.person_outline_rounded, color: AppColors.textHint),
-            selectedIcon: const Icon(Icons.person_rounded, color: AppColors.navyBlueBase),
-            label: 'Profile',
+            icon: Icon(Icons.forum_outlined, color: AppColors.textHint),
+            selectedIcon: const Icon(Icons.forum_rounded, color: Colors.white),
+            label: 'Interview',
           ),
         ],
       ),

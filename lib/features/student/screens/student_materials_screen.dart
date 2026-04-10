@@ -7,6 +7,7 @@ import '../../../core/common_widgets/common_widgets.dart';
 import '../../../providers/auth_provider.dart';
 import '../../../models/app_models.dart';
 import '../../../models/dummy_data.dart';
+import 'widgets/student_drawer.dart';
 
 class StudentMaterialsScreen extends StatefulWidget {
   const StudentMaterialsScreen({super.key});
@@ -80,6 +81,8 @@ class _StudentMaterialsScreenState extends State<StudentMaterialsScreen> {
       title: "Study Materials",
       subtitle: "${_allMaterials.length} resources available",
       showBackButton: false,
+      showMenuButton: true,
+      endDrawer: const StudentDrawer(),
       headerWidgets: [
         CustomTextField(
           controller: _searchController,

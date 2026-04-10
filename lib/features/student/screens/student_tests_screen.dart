@@ -7,6 +7,7 @@ import '../../../core/common_widgets/common_widgets.dart';
 import '../../../providers/auth_provider.dart';
 import '../../../models/app_models.dart';
 import '../../../models/dummy_data.dart';
+import 'widgets/student_drawer.dart';
 
 class StudentTestsScreen extends StatefulWidget {
   const StudentTestsScreen({super.key});
@@ -74,6 +75,8 @@ class _StudentTestsScreenState extends State<StudentTestsScreen> with SingleTick
       title: "Mock Tests",
       subtitle: "Performance Center",
       showBackButton: false,
+      showMenuButton: true,
+      endDrawer: const StudentDrawer(),
       headerWidgets: [
         TabBar(
           controller: _tabController,

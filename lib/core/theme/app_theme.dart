@@ -16,13 +16,13 @@ class AppColors {
   static const Color errorSurface = Color(0xFFFFEBEE);
   static const Color warning = Color(0xFFF57F17);
   static const Color warningSurface = Color(0xFFFFF3E0);
-  static const Color background = Color(0xFFF4F6FC);
-  static const Color surface = Color(0xFFFFFFFF);
-  static const Color textPrimary = Color(0xFF0D1B3E);
-  static const Color textSecondary = Color(0xFF4A5578);
-  static const Color textHint = Color(0xFF8F9BBF);
-  static const Color divider = Color(0xFFE0E4EF);
-  static const Color border = Color(0xFFCDD3E5);
+  static const Color background = Color(0xFF0F172A);
+  static const Color surface = Color(0xFF1E293B);
+  static const Color textPrimary = Color(0xFFF8FAFC);
+  static const Color textSecondary = Color(0xFFCBD5E1);
+  static const Color textHint = Color(0xFF64748B);
+  static const Color divider = Color(0xFF334155);
+  static const Color border = Color(0xFF334155);
   static const Color present = Color(0xFF2E7D32);
   static const Color absent = Color(0xFFC62828);
   static const Color halfDay = Color(0xFFF57F17);
@@ -123,6 +123,7 @@ class AppTheme {
   static ThemeData get lightTheme {
     return ThemeData(
       useMaterial3: true,
+      brightness: Brightness.dark,
       fontFamily: 'Poppins',
       scaffoldBackgroundColor: AppColors.background,
       appBarTheme: const AppBarTheme(
@@ -132,7 +133,7 @@ class AppTheme {
         iconTheme: IconThemeData(color: Colors.white),
       ),
       cardTheme: CardThemeData(
-        color: Colors.white,
+        color: AppColors.surface,
         elevation: 0,
         shape: RoundedRectangleBorder(borderRadius: AppRadius.cardRadius),
       ),
@@ -148,16 +149,16 @@ class AppTheme {
       ),
       outlinedButtonTheme: OutlinedButtonThemeData(
         style: OutlinedButton.styleFrom(
-          foregroundColor: AppColors.navyBlueBase,
+          foregroundColor: Colors.white,
           side: const BorderSide(color: AppColors.navyBlueBase, width: 1.5),
           shape: RoundedRectangleBorder(borderRadius: AppRadius.buttonRadius),
           padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 14),
-          textStyle: AppTextStyles.buttonText.copyWith(color: AppColors.navyBlueBase),
+          textStyle: AppTextStyles.buttonText.copyWith(color: Colors.white),
         ),
       ),
       inputDecorationTheme: InputDecorationTheme(
         filled: true,
-        fillColor: Colors.white,
+        fillColor: AppColors.surface,
         border: OutlineInputBorder(
           borderRadius: AppRadius.inputRadius,
           borderSide: const BorderSide(color: AppColors.border),
@@ -176,17 +177,17 @@ class AppTheme {
         ),
       ),
       navigationBarTheme: NavigationBarThemeData(
-        backgroundColor: Colors.white,
-        indicatorColor: AppColors.navyBlueSurface,
+        backgroundColor: AppColors.surface,
+        indicatorColor: AppColors.navyBlueBase.withAlpha((0.2 * 255).round()),
         iconTheme: WidgetStateProperty.resolveWith((states) {
           if (states.contains(WidgetState.selected)) {
-            return const IconThemeData(color: AppColors.navyBlueBase);
+            return const IconThemeData(color: Colors.white);
           }
           return const IconThemeData(color: AppColors.textHint);
         }),
         labelTextStyle: WidgetStateProperty.resolveWith((states) {
           if (states.contains(WidgetState.selected)) {
-            return AppTextStyles.labelSmall.copyWith(color: AppColors.navyBlueBase);
+            return AppTextStyles.labelSmall.copyWith(color: Colors.white);
           }
           return AppTextStyles.labelSmall.copyWith(color: AppColors.textHint);
         }),
