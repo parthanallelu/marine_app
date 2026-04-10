@@ -800,9 +800,9 @@ class AppPageShell extends StatelessWidget {
           Expanded(
             child: Container(
               width: double.infinity,
-              decoration: const BoxDecoration(
-                color: AppColors.background,
-                borderRadius: BorderRadius.only(
+              decoration: BoxDecoration(
+                color: Theme.of(context).scaffoldBackgroundColor,
+                borderRadius: const BorderRadius.only(
                   topLeft: Radius.circular(AppRadius.extraLarge),
                   topRight: Radius.circular(AppRadius.extraLarge),
                 ),

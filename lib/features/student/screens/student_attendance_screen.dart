@@ -125,7 +125,7 @@ class _StudentAttendanceScreenState extends State<StudentAttendanceScreen> {
             Container(
               padding: const EdgeInsets.all(AppSpacing.lg),
               decoration: BoxDecoration(
-                color: Colors.white,
+                color: Theme.of(context).cardTheme.color,
                 borderRadius: AppRadius.cardRadius,
                 boxShadow: AppShadows.card,
               ),
@@ -173,7 +173,7 @@ class _StudentAttendanceScreenState extends State<StudentAttendanceScreen> {
             // TableCalendar
             Container(
               decoration: BoxDecoration(
-                color: Colors.white,
+                color: Theme.of(context).cardTheme.color,
                 borderRadius: AppRadius.cardRadius,
                 boxShadow: AppShadows.card,
               ),
@@ -195,18 +195,21 @@ class _StudentAttendanceScreenState extends State<StudentAttendanceScreen> {
                 onPageChanged: (focusedDay) {
                   _focusedDay = focusedDay;
                 },
-                calendarStyle: const CalendarStyle(
-                  todayDecoration: BoxDecoration(color: AppColors.navyBlueSurface, shape: BoxShape.circle),
-                  selectedDecoration: BoxDecoration(color: AppColors.navyBlueBase, shape: BoxShape.circle),
+                calendarStyle: CalendarStyle(
+                  todayDecoration: BoxDecoration(color: Theme.of(context).colorScheme.primary.withAlpha((0.2 * 255).round()), shape: BoxShape.circle),
+                  selectedDecoration: BoxDecoration(color: Theme.of(context).colorScheme.primary, shape: BoxShape.circle),
+                  defaultTextStyle: AppTextStyles.bodyMedium,
+                  weekendTextStyle: AppTextStyles.bodyMedium.copyWith(color: AppColors.error),
                 ),
                 headerStyle: HeaderStyle(
                   formatButtonDecoration: BoxDecoration(
-                    border: Border.all(color: AppColors.navyBlueBase),
+                    border: Border.all(color: Theme.of(context).colorScheme.primary),
                     borderRadius: BorderRadius.circular(AppRadius.md),
                   ),
-                  formatButtonTextStyle: AppTextStyles.labelSmall.copyWith(color: AppColors.navyBlueBase),
-                  leftChevronIcon: const Icon(Icons.chevron_left, color: AppColors.navyBlueBase),
-                  rightChevronIcon: const Icon(Icons.chevron_right, color: AppColors.navyBlueBase),
+                  formatButtonTextStyle: AppTextStyles.labelSmall.copyWith(color: Theme.of(context).colorScheme.primary),
+                  titleTextStyle: AppTextStyles.labelLarge,
+                  leftChevronIcon: Icon(Icons.chevron_left, color: Theme.of(context).colorScheme.primary),
+                  rightChevronIcon: Icon(Icons.chevron_right, color: Theme.of(context).colorScheme.primary),
                 ),
                 calendarBuilders: CalendarBuilders(
                   defaultBuilder: (context, day, focusedDay) {
