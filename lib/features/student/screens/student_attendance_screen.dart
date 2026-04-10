@@ -184,7 +184,7 @@ class _StudentAttendanceScreenState extends State<StudentAttendanceScreen> {
                 availableCalendarFormats: const {
                   CalendarFormat.month: 'Month',
                 },
-                availableGestures: AvailableGestures.horizontalOnly,
+                availableGestures: AvailableGestures.horizontalSwipe,
                 selectedDayPredicate: (day) => isSameDay(_selectedDay, day),
                 onDaySelected: (selectedDay, focusedDay) {
                   setState(() {

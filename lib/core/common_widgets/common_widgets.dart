@@ -98,7 +98,7 @@ class StudentStatCard extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Container(
-      padding: const EdgeInsets.symmetric(vertical: 10, horizontal: 8), // Reduced padding
+      padding: const EdgeInsets.symmetric(vertical: 8, horizontal: 8), 
       decoration: BoxDecoration(
         color: Theme.of(context).cardTheme.color,
         borderRadius: BorderRadius.circular(12),
@@ -106,47 +106,48 @@ class StudentStatCard extends StatelessWidget {
         boxShadow: [
           BoxShadow(
             color: Colors.black.withAlpha((0.04 * 255).round()),
-            blurRadius: 12,
-            offset: const Offset(0, 4),
+            blurRadius: 10,
+            offset: const Offset(0, 3),
           ),
         ],
       ),
       child: Column(
+        mainAxisSize: MainAxisSize.min,
         children: [
           Container(
-            width: 32,
-            height: 32,
+            width: 30,
+            height: 30,
             decoration: BoxDecoration(
               color: valueColor.withAlpha((0.12 * 255).round()),
               borderRadius: BorderRadius.circular(8),
             ),
-            child: Icon(icon, color: valueColor, size: 18),
+            child: Icon(icon, color: valueColor, size: 16),
           ),
-          const SizedBox(height: 6), // Reduced from 10
+          const SizedBox(height: 4), 
           FittedBox(
             fit: BoxFit.scaleDown,
             child: Text(
               value,
               style: AppTextStyles.headingLarge.copyWith(
-                fontSize: 18, // Reduced from 20
+                fontSize: 18, 
                 fontWeight: FontWeight.w600,
                 color: valueColor,
               ),
             ),
           ),
-          const SizedBox(height: 1), // Reduced from 2
+          const SizedBox(height: 0), 
           Text(
             label,
             style: AppTextStyles.bodySmall.copyWith(
               color: AppColors.textSecondary,
-              fontSize: 10, // Reduced from 11
+              fontSize: 10, 
             ),
             textAlign: TextAlign.center,
             maxLines: 1,
             overflow: TextOverflow.ellipsis,
           ),
           if (statusLabel != null) ...[
-            const SizedBox(height: 6),
+            const SizedBox(height: 4),
             Row(
               mainAxisAlignment: MainAxisAlignment.center,
               children: [
@@ -296,7 +297,7 @@ class QuickActionTile extends StatelessWidget {
     return GestureDetector(
       onTap: onTap,
       child: Container(
-        padding: const EdgeInsets.symmetric(vertical: 12, horizontal: 6),
+        padding: const EdgeInsets.symmetric(vertical: 8, horizontal: 4),
         decoration: BoxDecoration(
           color: Theme.of(context).cardTheme.color,
           borderRadius: BorderRadius.circular(12),
@@ -304,7 +305,7 @@ class QuickActionTile extends StatelessWidget {
           boxShadow: [
             BoxShadow(
               color: Colors.black.withAlpha((0.02 * 255).round()),
-              blurRadius: 8,
+              blurRadius: 6,
               offset: const Offset(0, 2),
             ),
           ],
@@ -317,23 +318,23 @@ class QuickActionTile extends StatelessWidget {
               mainAxisAlignment: MainAxisAlignment.center,
               children: [
                 Container(
-                  width: 34, // Reduced from 40
-                  height: 34,
+                  width: 30, 
+                  height: 30,
                   decoration: BoxDecoration(
                     color: color.withAlpha((0.12 * 255).round()),
-                    borderRadius: BorderRadius.circular(10),
+                    borderRadius: BorderRadius.circular(8),
                   ),
-                  child: Icon(icon, color: color, size: 18), // Reduced from 20
+                  child: Icon(icon, color: color, size: 16), 
                 ),
-                const SizedBox(height: 6), // Reduced from 10
+                const SizedBox(height: 4), 
                 Expanded(
                   child: Center(
                     child: Text(
                       label,
                       style: AppTextStyles.labelMedium.copyWith(
-                        fontSize: 9, // Reduced from 10
+                        fontSize: 9, 
                         color: AppColors.textSecondary,
-                        height: 1.1,
+                        height: 1.0,
                       ),
                       textAlign: TextAlign.center,
                       maxLines: 2,

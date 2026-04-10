@@ -132,14 +132,14 @@ class _StudentHomeScreenState extends State<StudentHomeScreen> {
       ],
       body: Column(
         children: [
-          // Stats Row with overlap
           Transform.translate(
-            offset: const Offset(0, -20),
+            offset: const Offset(0, -2),
             child: Padding(
               padding: const EdgeInsets.symmetric(horizontal: AppSpacing.lg),
               child: _buildStatsRowContent(),
             ),
           ),
+          const SizedBox(height: AppSpacing.md),
           
           _buildQuickActionsContent(context),
           _buildUpcomingTestsContent(context),
@@ -211,14 +211,14 @@ class _StudentHomeScreenState extends State<StudentHomeScreen> {
               Text("Quick Actions", style: AppTextStyles.headingSmall.copyWith(fontSize: 16)),
             ],
           ),
-          const SizedBox(height: 16),
+          const SizedBox(height: 8),
           GridView.count(
             crossAxisCount: 4,
-            crossAxisSpacing: 12,
-            mainAxisSpacing: 12,
+            crossAxisSpacing: 10,
+            mainAxisSpacing: 10,
             shrinkWrap: true,
             physics: const NeverScrollableScrollPhysics(),
-            childAspectRatio: 0.9,
+            childAspectRatio: 1.05,
             children: [
               QuickActionTile(
                 label: "Attendance",
