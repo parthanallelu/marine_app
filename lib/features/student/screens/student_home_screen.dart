@@ -132,7 +132,7 @@ class _StudentHomeScreenState extends State<StudentHomeScreen> {
       ],
       body: Column(
         children: [
-          const SizedBox(height: 12),
+          const SizedBox(height: 14),
           Padding(
             padding: const EdgeInsets.symmetric(horizontal: AppSpacing.lg),
             child: _buildStatsRowContent(),
@@ -209,7 +209,7 @@ class _StudentHomeScreenState extends State<StudentHomeScreen> {
               Text("Quick Actions", style: AppTextStyles.headingSmall.copyWith(fontSize: 16)),
             ],
           ),
-          const SizedBox(height: 12),
+          const SizedBox(height: 2),
           GridView.count(
             crossAxisCount: 4,
             crossAxisSpacing: 8,
