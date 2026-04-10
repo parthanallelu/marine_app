@@ -147,20 +147,20 @@ class StudentStatCard extends StatelessWidget {
             overflow: TextOverflow.ellipsis,
           ),
           if (statusLabel != null) ...[
-            const SizedBox(height: 4),
+            const SizedBox(height: 2),
             Row(
               mainAxisAlignment: MainAxisAlignment.center,
               children: [
                 if (statusIcon != null) ...[
-                  Icon(statusIcon, color: statusColor, size: 10),
-                  const SizedBox(width: 4),
+                  Icon(statusIcon, color: statusColor, size: 8),
+                  const SizedBox(width: 2),
                 ],
                 Flexible(
                   child: Text(
                     statusLabel!,
                     style: AppTextStyles.labelSmall.copyWith(
                       color: statusColor,
-                      fontSize: 10,
+                      fontSize: 9,
                       fontWeight: FontWeight.bold,
                     ),
                     maxLines: 1,
@@ -836,7 +836,7 @@ class AppPageShell extends StatelessWidget {
       child: SafeArea(
         bottom: false,
         child: Padding(
-          padding: const EdgeInsets.fromLTRB(20, 16, 20, 24),
+          padding: const EdgeInsets.fromLTRB(20, 16, 20, 12),
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
@@ -887,7 +887,7 @@ class AppPageShell extends StatelessWidget {
                   ],
                 ),
               if (headerWidgets != null && headerWidgets!.isNotEmpty) ...[
-                const SizedBox(height: 20),
+                const SizedBox(height: 12),
                 ...headerWidgets!,
               ],
             ],
