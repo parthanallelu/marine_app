@@ -203,6 +203,7 @@ class _StudentAttendanceScreenState extends State<StudentAttendanceScreen> {
                 ),
                 headerStyle: HeaderStyle(
                   formatButtonVisible: false,
+                  titleCentered: true,
                   titleTextStyle: AppTextStyles.labelLarge,
                   leftChevronIcon: Icon(Icons.chevron_left, color: Theme.of(context).colorScheme.primary),
                   rightChevronIcon: Icon(Icons.chevron_right, color: Theme.of(context).colorScheme.primary),
