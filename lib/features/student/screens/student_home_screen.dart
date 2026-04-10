@@ -209,7 +209,7 @@ class _StudentHomeScreenState extends State<StudentHomeScreen> {
               Text("Quick Actions", style: AppTextStyles.headingSmall.copyWith(fontSize: 16)),
             ],
           ),
-          const SizedBox(height: 2),
+          const SizedBox(height: 4),
           GridView.count(
             crossAxisCount: 4,
             crossAxisSpacing: 8,
