@@ -306,7 +306,7 @@ class _BranchChip extends StatelessWidget {
           decoration: BoxDecoration(
             color: isSelected 
                 ? (isLight ? Colors.white : AppColors.navyBlueBase) 
-                : (isLight ? Colors.white.withAlpha((0.1 * 255).round()) : AppColors.background),
+                : (isLight ? Colors.white.withAlpha((0.1 * 255).round()) : Theme.of(context).scaffoldBackgroundColor),
             borderRadius: BorderRadius.circular(AppRadius.xxl),
             border: Border.all(
               color: isSelected 

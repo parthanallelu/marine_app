@@ -368,55 +368,48 @@ class _DarkDashboardHeader extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    String initials = "S";
+    if (student.name.trim().isNotEmpty) {
+      final parts = student.name.trim().split(RegExp(r'\s+'));
+      if (parts.length > 1) {
+        initials = "${parts[0][0]}${parts[1][0]}".toUpperCase();
+      } else {
+        initials = parts[0][0].toUpperCase();
+      }
+    }
+
     return Padding(
       padding: const EdgeInsets.fromLTRB(20, 20, 20, 16),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
+      child: Row(
+        mainAxisAlignment: MainAxisAlignment.spaceBetween,
         children: [
           Row(
-            mainAxisAlignment: MainAxisAlignment.spaceBetween,
-            crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              Expanded(
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    Text("Welcome back", style: AppTextStyles.bodyMedium.copyWith(color: _textMuted, fontSize: 13)),
-                    const SizedBox(height: 4),
-                    Text("Howdy, ${student.name.split(' ')[0]}! 👋", style: AppTextStyles.headingLarge.copyWith(color: Colors.white, fontSize: 24)),
-                  ],
-                ),
+              CircleAvatar(
+                radius: 20,
+                backgroundColor: const Color(0xFFD05454),
+                child: Text(initials, style: const TextStyle(color: Colors.white, fontWeight: FontWeight.bold, fontSize: 16)),
               ),
-              Row(
-                children: [
-                   _ActionButton(
-                     icon: Icons.notifications_none_rounded, 
-                     badgeCount: announcementCount,
-                     onTap: () => context.pushNamed(AppRoutes.studentAnnouncementsName),
-                   ),
-                   const SizedBox(width: 12),
-                   Builder(
-                     builder: (ctx) => _ActionButton(
-                       icon: Icons.menu_rounded,
-                       onTap: () => Scaffold.of(ctx).openEndDrawer(),
-                     ),
-                   ),
-                ],
-              ),
+              const SizedBox(width: 12),
+              Text(student.name.toUpperCase(), style: AppTextStyles.headingMedium.copyWith(color: Colors.white, fontSize: 16, letterSpacing: 0.5)),
             ],
           ),
-          const SizedBox(height: 20),
-          Wrap(
-            spacing: 8,
-            runSpacing: 8,
+          Row(
             children: [
-              _DarkBadge(label: "12th Science", color: const Color(0xFF916BDB), isOutlined: true),
-              _DarkBadge(label: student.branch, color: const Color(0xFF64748B), icon: Icons.location_on, isOutlined: true),
-              _DarkBadge(label: student.batchName, color: const Color(0xFF64748B), isOutlined: true),
+               _ActionButton(
+                 icon: Icons.notifications_none_rounded, 
+                 badgeCount: announcementCount,
+                 onTap: () => context.pushNamed(AppRoutes.studentAnnouncementsName),
+               ),
+               const SizedBox(width: 12),
+               Builder(
+                 builder: (ctx) => _ActionButton(
+                   icon: Icons.menu_rounded,
+                   onTap: () => Scaffold.of(ctx).openEndDrawer(),
+                 ),
+               ),
             ],
           ),
-          const SizedBox(height: 16),
-          Text("Wednesday, 8 April 2026", style: AppTextStyles.caption.copyWith(color: _textMuted, fontSize: 13)),
         ],
       ),
     );

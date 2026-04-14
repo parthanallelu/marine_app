@@ -223,8 +223,8 @@ class _AddStudentsSheetState extends State<_AddStudentsSheet> {
       maxChildSize: 0.95,
       builder: (context, scrollController) {
         return Container(
-          decoration: const BoxDecoration(
-            color: AppColors.background,
+          decoration: BoxDecoration(
+            color: Theme.of(context).scaffoldBackgroundColor,
             borderRadius: BorderRadius.vertical(top: Radius.circular(AppRadius.xxl)),
           ),
           child: Column(
@@ -308,7 +308,7 @@ class _AddStudentsSheetState extends State<_AddStudentsSheet> {
               ),
               Container(
                 padding: const EdgeInsets.all(AppSpacing.xl),
-                decoration: const BoxDecoration(
+                decoration: BoxDecoration(
                   color: Colors.white,
                   boxShadow: [BoxShadow(color: Colors.black12, blurRadius: 10, offset: Offset(0, -2))],
                 ),

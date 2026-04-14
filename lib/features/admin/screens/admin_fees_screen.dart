@@ -189,8 +189,8 @@ class _AdminFeesScreenState extends State<AdminFeesScreen> {
           final pending = record.totalFees - record.paidAmount;
           return Container(
             height: MediaQuery.of(context).size.height * 0.8,
-            decoration: const BoxDecoration(
-              color: AppColors.background,
+            decoration: BoxDecoration(
+              color: Theme.of(context).scaffoldBackgroundColor,
               borderRadius: BorderRadius.vertical(top: Radius.circular(AppRadius.xxl)),
             ),
             child: Column(
@@ -363,7 +363,7 @@ class _Chip extends StatelessWidget {
           decoration: BoxDecoration(
             color: isSelected 
                 ? (isLight ? Colors.white : AppColors.navyBlueBase) 
-                : (isLight ? Colors.white.withAlpha((0.1 * 255).round()) : AppColors.background),
+                : (isLight ? Colors.white.withAlpha((0.1 * 255).round()) : Theme.of(context).scaffoldBackgroundColor),
             borderRadius: BorderRadius.circular(AppRadius.xxl),
             border: Border.all(
               color: isSelected 

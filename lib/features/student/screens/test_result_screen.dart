@@ -42,7 +42,7 @@ class TestResultScreen extends StatelessWidget {
     final accentColor = hasPassed ? AppColors.success : AppColors.error;
 
     return Scaffold(
-      backgroundColor: AppColors.background,
+      backgroundColor: Theme.of(context).scaffoldBackgroundColor,
       body: CustomScrollView(
         slivers: [
           // SLIVER 1 — Result header

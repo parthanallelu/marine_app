@@ -61,13 +61,13 @@ class _StudentProfileScreenState extends State<StudentProfileScreen> {
       WidgetsBinding.instance.addPostFrameCallback((_) {
         context.goNamed(AppRoutes.roleSelectionName);
       });
-      return const Scaffold(body: Center(child: CircularProgressIndicator()));
+      return Scaffold(body: const Center(child: CircularProgressIndicator()));
     }
 
     if (_isLoading) {
-      return const Scaffold(
-        backgroundColor: AppColors.background,
-        body: Center(child: CircularProgressIndicator()),
+      return Scaffold(
+        backgroundColor: Theme.of(context).scaffoldBackgroundColor,
+        body: const Center(child: CircularProgressIndicator()),
       );
     }
 
@@ -320,13 +320,13 @@ class _StudentFeesScreenState extends State<StudentFeesScreen> {
       WidgetsBinding.instance.addPostFrameCallback((_) {
         context.goNamed(AppRoutes.roleSelectionName);
       });
-      return const Scaffold(body: Center(child: CircularProgressIndicator()));
+      return Scaffold(body: const Center(child: CircularProgressIndicator()));
     }
 
     if (_isLoading) {
-      return const Scaffold(
-        backgroundColor: AppColors.background,
-        body: Center(child: CircularProgressIndicator()),
+      return Scaffold(
+        backgroundColor: Theme.of(context).scaffoldBackgroundColor,
+        body: const Center(child: CircularProgressIndicator()),
       );
     }
 

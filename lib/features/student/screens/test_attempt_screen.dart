@@ -203,7 +203,7 @@ class _TestAttemptScreenState extends State<TestAttemptScreen> {
                       decoration: BoxDecoration(
                         color: isCurrent 
                           ? AppColors.navyBlueBase 
-                          : (isAnswered ? AppColors.successSurface : AppColors.background),
+                          : (isAnswered ? AppColors.successSurface : Theme.of(context).scaffoldBackgroundColor),
                         borderRadius: BorderRadius.circular(AppRadius.sm),
                         border: Border.all(
                           color: isCurrent ? AppColors.navyBlueBase : AppColors.navyBlueSurface,
@@ -227,7 +227,7 @@ class _TestAttemptScreenState extends State<TestAttemptScreen> {
               children: [
                 _LegendItem(color: AppColors.navyBlueBase, label: "Current"),
                 _LegendItem(color: AppColors.successSurface, label: "Answered"),
-                _LegendItem(color: AppColors.background, label: "Not Visited"),
+                _LegendItem(color: Theme.of(context).scaffoldBackgroundColor, label: "Not Visited"),
               ],
             ),
           ],
@@ -351,7 +351,7 @@ class _TestAttemptScreenState extends State<TestAttemptScreen> {
 
   Widget _buildProgressHeader(int totalCount, int answeredCount) {
     return Container(
-      color: AppColors.background,
+      color: Theme.of(context).scaffoldBackgroundColor,
       padding: const EdgeInsets.symmetric(horizontal: AppSpacing.xl, vertical: AppSpacing.md),
       child: Column(
         children: [
@@ -505,7 +505,7 @@ class _OptionTile extends StatelessWidget {
         margin: const EdgeInsets.only(bottom: AppSpacing.md),
         padding: const EdgeInsets.all(AppSpacing.lg),
         decoration: BoxDecoration(
-          color: isSelected ? AppColors.navyBlueSurface : AppColors.background,
+          color: isSelected ? AppColors.navyBlueSurface : Theme.of(context).scaffoldBackgroundColor,
           borderRadius: BorderRadius.circular(AppRadius.md),
           border: Border.all(
             color: isSelected ? AppColors.navyBlueBase : AppColors.navyBlueSurface,

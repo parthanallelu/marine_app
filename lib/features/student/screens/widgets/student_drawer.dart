@@ -16,7 +16,7 @@ class StudentDrawer extends StatelessWidget {
     final student = authProvider.currentUser;
 
     return Drawer(
-      backgroundColor: AppColors.background,
+      backgroundColor: Theme.of(context).scaffoldBackgroundColor,
       child: Column(
         children: [
           _buildHeader(context, student),

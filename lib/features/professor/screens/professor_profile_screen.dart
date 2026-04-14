@@ -58,20 +58,20 @@ class _ProfessorProfileScreenState extends State<ProfessorProfileScreen> {
       WidgetsBinding.instance.addPostFrameCallback((_) {
         context.goNamed(AppRoutes.roleSelectionName);
       });
-      return const Scaffold(body: Center(child: CircularProgressIndicator()));
+      return Scaffold(body: const Center(child: CircularProgressIndicator()));
     }
 
     if (_isLoading) {
-      return const Scaffold(
-        backgroundColor: AppColors.background,
-        body: Center(child: CircularProgressIndicator()),
+      return Scaffold(
+        backgroundColor: Theme.of(context).scaffoldBackgroundColor,
+        body: const Center(child: CircularProgressIndicator()),
       );
     }
 
     final prof = authProvider.currentUser as ProfessorModel?;
     if (prof == null) {
-       return const Scaffold(
-        backgroundColor: AppColors.background,
+       return Scaffold(
+        backgroundColor: Theme.of(context).scaffoldBackgroundColor,
         body: Center(child: Text("Error loading profile. Please login again.")),
       );
     }

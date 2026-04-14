@@ -705,7 +705,7 @@ class _FilterButton extends StatelessWidget {
         decoration: BoxDecoration(
           color: isLight 
               ? Colors.white.withAlpha((0.1 * 255).round()) 
-              : AppColors.background,
+              : Theme.of(context).scaffoldBackgroundColor,
           borderRadius: BorderRadius.circular(AppRadius.md),
           border: Border.all(
             color: isLight 

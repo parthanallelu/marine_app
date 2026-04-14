@@ -94,7 +94,7 @@ class _AdminHomeScreenState extends State<AdminHomeScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: AppColors.background,
+      backgroundColor: Theme.of(context).scaffoldBackgroundColor,
       body: CustomScrollView(
         slivers: [
           SliverToBoxAdapter(child: _AdminHeader()),
@@ -354,7 +354,7 @@ class _AdminHomeScreenState extends State<AdminHomeScreen> {
                     child: LinearProgressIndicator(
                       value: collectedPct,
                       minHeight: 8,
-                      backgroundColor: AppColors.background,
+                      backgroundColor: Theme.of(context).scaffoldBackgroundColor,
                       color: AppColors.oceanBlue,
                     ),
                   ),
@@ -410,7 +410,7 @@ class _AdminHomeScreenState extends State<AdminHomeScreen> {
                         Expanded(
                           child: Stack(
                             children: [
-                              Container(height: 8, decoration: BoxDecoration(color: AppColors.background, borderRadius: BorderRadius.circular(8))),
+                              Container(height: 8, decoration: BoxDecoration(color: Theme.of(context).scaffoldBackgroundColor, borderRadius: BorderRadius.circular(8))),
                               FractionallySizedBox(
                                 widthFactor: count / maxCount,
                                 child: Container(height: 8, decoration: BoxDecoration(color: colors[i % colors.length], borderRadius: BorderRadius.circular(8))),
