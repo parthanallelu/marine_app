@@ -1,4 +1,4 @@
-import 'package:flutter/material.dart';
+﻿import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:go_router/go_router.dart';
 import '../../../core/theme/app_theme.dart';
@@ -9,10 +9,11 @@ import '../../../models/app_models.dart';
 import '../../../models/dummy_data.dart';
 import 'widgets/student_drawer.dart';
 
-const Color _bgDark = Color(0xFF0F172A);
-const Color _cardDark = Color(0xFF161F30);
-const Color _borderDark = Color(0xFF2E3B4E);
-const Color _textMuted = Color(0xFF94A3B8);
+// Theme-aware color helpers
+Color _bg(BuildContext context) => Theme.of(context).scaffoldBackgroundColor;
+Color _card(BuildContext context) => Theme.of(context).cardTheme.color ?? AppColors.cardDark;
+Color _borderC(BuildContext context) => Theme.of(context).brightness == Brightness.dark ? AppColors.borderCardDark : AppColors.borderLight;
+Color _muted(BuildContext context) => Theme.of(context).brightness == Brightness.dark ? AppColors.textSecondaryDark : AppColors.textHintLight;
 
 class StudentHomeScreen extends StatefulWidget {
   const StudentHomeScreen({super.key});
@@ -92,13 +93,13 @@ class _StudentHomeScreenState extends State<StudentHomeScreen> {
 
     if (_isLoading) {
       return const Scaffold(
-        backgroundColor: _bgDark,
+        backgroundColor: AppColors.backgroundDark,
         body: Center(child: CircularProgressIndicator()),
       );
     }
 
     return Scaffold(
-      backgroundColor: _bgDark,
+      backgroundColor: AppColors.backgroundDark,
       endDrawer: const StudentDrawer(),
       body: SafeArea(
         child: SingleChildScrollView(
@@ -128,10 +129,10 @@ class _StudentHomeScreenState extends State<StudentHomeScreen> {
 
   Widget _buildStatsRowContent() {
     final bool isLowAttendance = _attendanceSummary.percentage < 85;
-    final String attendanceStatus = isLowAttendance ? "⚠ Below 85%" : "✓ Good";
+    final String attendanceStatus = isLowAttendance ? "âš  Below 85%" : "âœ“ Good";
 
     final bool hasDue = _feeRecord.pendingAmount > 0;
-    final String feeStatus = hasDue ? "₹${(_feeRecord.pendingAmount / 1000).toStringAsFixed(1)}k due" : "✓ Cleared";
+    final String feeStatus = hasDue ? "â‚¹${(_feeRecord.pendingAmount / 1000).toStringAsFixed(1)}k due" : "âœ“ Cleared";
 
     return Row(
       children: [
@@ -152,7 +153,7 @@ class _StudentHomeScreenState extends State<StudentHomeScreen> {
             value: "${_avgScore.toStringAsFixed(0)}%",
             icon: Icons.bar_chart_rounded,
             color: const Color(0xFF5C8DF6),  
-            statusLabel: "✓ ${_upcomingTests.length} done",
+            statusLabel: "âœ“ ${_upcomingTests.length} done",
             statusColor: const Color(0xFF2E7D32),
           ),
         ),
@@ -282,7 +283,7 @@ class _StudentHomeScreenState extends State<StudentHomeScreen> {
                   const SizedBox(height: 2),
                   Text("Maersk Line", style: AppTextStyles.headingMedium.copyWith(color: const Color(0xFFD4A017), fontSize: 16)),
                   const SizedBox(height: 2),
-                  Text("Company-specific prep ready", style: AppTextStyles.caption.copyWith(color: _textMuted)),
+                  Text("Company-specific prep ready", style: AppTextStyles.caption.copyWith(color: AppColors.textSecondaryDark)),
                 ],
               ),
             ),
@@ -317,7 +318,7 @@ class _StudentHomeScreenState extends State<StudentHomeScreen> {
           ),
           const SizedBox(height: 16),
           if (_upcomingTests.isEmpty)
-             Text("No upcoming tests scheduled", style: AppTextStyles.bodyMedium.copyWith(color: _textMuted))
+             Text("No upcoming tests scheduled", style: AppTextStyles.bodyMedium.copyWith(color: AppColors.textSecondaryDark))
           else
             Column(
               children: _upcomingTests.take(2).map((t) => _DarkUpcomingTestTile(
@@ -435,7 +436,7 @@ class _ActionButton extends StatelessWidget {
             decoration: BoxDecoration(
               color: const Color(0xFF162133), // Slightly lighter circle
               borderRadius: BorderRadius.circular(12),
-              border: Border.all(color: _borderDark, width: 0.5),
+              border: Border.all(color: AppColors.borderCardDark, width: 0.5),
             ),
             child: Icon(icon, color: Colors.white70, size: 22),
           ),
@@ -503,9 +504,9 @@ class _DarkStatCard extends StatelessWidget {
   Widget build(BuildContext context) {
      return Container(
        decoration: BoxDecoration(
-         color: _cardDark,
+         color: AppColors.cardDark,
          borderRadius: BorderRadius.circular(16),
-         border: Border.all(color: _borderDark, width: 0.8),
+         border: Border.all(color: AppColors.borderCardDark, width: 0.8),
        ),
        child: Stack(
          alignment: Alignment.topCenter,
@@ -524,7 +525,7 @@ class _DarkStatCard extends StatelessWidget {
                   const SizedBox(height: 16),
                   FittedBox(fit: BoxFit.scaleDown, child: Text(value, style: TextStyle(color: color, fontSize: 24, fontWeight: FontWeight.bold))),
                   const SizedBox(height: 4),
-                  Text(label, style: const TextStyle(color: _textMuted, fontSize: 11)),
+                  Text(label, style: const TextStyle(color: AppColors.textSecondaryDark, fontSize: 11)),
                   const SizedBox(height: 10),
                   Text(statusLabel, style: TextStyle(color: statusColor, fontSize: 10, fontWeight: FontWeight.w600)),
                ]
@@ -559,9 +560,9 @@ class _DarkQuickActionTile extends StatelessWidget {
                height: 60,
                width: 60,
                decoration: BoxDecoration(
-                 color: _cardDark,
+                 color: AppColors.cardDark,
                  borderRadius: BorderRadius.circular(16),
-                 border: Border.all(color: _borderDark, width: 0.8),
+                 border: Border.all(color: AppColors.borderCardDark, width: 0.8),
                ),
                child: Center(
                  child: Container(
@@ -587,7 +588,7 @@ class _DarkQuickActionTile extends StatelessWidget {
            ],
          ),
          const SizedBox(height: 10),
-         Text(label, style: const TextStyle(color: _textMuted, fontSize: 10), maxLines: 1, overflow: TextOverflow.ellipsis)
+         Text(label, style: const TextStyle(color: AppColors.textSecondaryDark, fontSize: 10), maxLines: 1, overflow: TextOverflow.ellipsis)
        ]
      ),
     );
@@ -618,7 +619,7 @@ class _DarkSectionHeader extends StatelessWidget {
         OutlinedButton(
           onPressed: onAction,
           style: OutlinedButton.styleFrom(
-            side: const BorderSide(color: _borderDark, width: 1.5),
+            side: const BorderSide(color: AppColors.borderCardDark, width: 1.5),
             shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),
             padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 0),
             minimumSize: const Size(0, 36),
@@ -660,9 +661,9 @@ class _DarkUpcomingTestTile extends StatelessWidget {
         margin: const EdgeInsets.only(bottom: 12),
         padding: const EdgeInsets.all(16),
         decoration: BoxDecoration(
-          color: _cardDark,
+          color: AppColors.cardDark,
           borderRadius: BorderRadius.circular(16),
-          border: Border.all(color: _borderDark, width: 0.8),
+          border: Border.all(color: AppColors.borderCardDark, width: 0.8),
         ),
         child: Row(
           children: [
@@ -681,18 +682,18 @@ class _DarkUpcomingTestTile extends StatelessWidget {
                 children: [
                   Text(test.title, style: AppTextStyles.labelLarge.copyWith(color: Colors.white, fontSize: 13)),
                   const SizedBox(height: 4),
-                  Text("${test.durationMinutes} min • ${test.questions.length} questions • ${test.type}", style: AppTextStyles.caption.copyWith(color: _textMuted)),
+                  Text("${test.durationMinutes} min â€¢ ${test.questions.length} questions â€¢ ${test.type}", style: AppTextStyles.caption.copyWith(color: AppColors.textSecondaryDark)),
                 ],
               ),
             ),
             Container(
               padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
               decoration: BoxDecoration(
-                color: isUrgent ? const Color(0xFFD4A017).withOpacity(0.05) : _borderDark.withOpacity(0.3),
+                color: isUrgent ? const Color(0xFFD4A017).withAlpha((0.05 * 255).round()) : AppColors.borderCardDark.withAlpha((0.3 * 255).round()),
                 borderRadius: BorderRadius.circular(20),
-                border: Border.all(color: isUrgent ? const Color(0xFFD4A017).withOpacity(0.3) : _borderDark, width: 1.5),
+                border: Border.all(color: isUrgent ? const Color(0xFFD4A017).withAlpha((0.3 * 255).round()) : AppColors.borderCardDark, width: 1.5),
               ),
-              child: Text(daysLabel, style: AppTextStyles.labelSmall.copyWith(color: isUrgent ? const Color(0xFFD4A017) : _textMuted, fontSize: 10)),
+              child: Text(daysLabel, style: AppTextStyles.labelSmall.copyWith(color: isUrgent ? const Color(0xFFD4A017) : AppColors.textSecondaryDark, fontSize: 10)),
             ),
           ],
         ),
@@ -718,9 +719,9 @@ class _DarkAnnouncementTile extends StatelessWidget {
       child: Container(
         margin: const EdgeInsets.only(bottom: 12),
         decoration: BoxDecoration(
-          color: _cardDark,
+          color: AppColors.cardDark,
           borderRadius: BorderRadius.circular(16),
-          border: Border.all(color: _borderDark, width: 0.8),
+          border: Border.all(color: AppColors.borderCardDark, width: 0.8),
         ),
         clipBehavior: Clip.antiAlias,
         child: IntrinsicHeight(
@@ -750,13 +751,13 @@ class _DarkAnnouncementTile extends StatelessWidget {
                         ],
                       ),
                       const SizedBox(height: 6),
-                      Text(announcement.description, style: AppTextStyles.bodySmall.copyWith(color: _textMuted, height: 1.4), maxLines: 2, overflow: TextOverflow.ellipsis),
+                      Text(announcement.description, style: AppTextStyles.bodySmall.copyWith(color: AppColors.textSecondaryDark, height: 1.4), maxLines: 2, overflow: TextOverflow.ellipsis),
                       const SizedBox(height: 12),
                       Row(
                         children: [
                           const Icon(Icons.calendar_today_rounded, size: 12, color: Color(0xFF64748B)),
                           const SizedBox(width: 6),
-                          Text("${announcement.daysAgo} days ago • ${announcement.branch ?? 'All branches'}", style: AppTextStyles.caption.copyWith(color: const Color(0xFF64748B), fontSize: 11)),
+                          Text("${announcement.daysAgo} days ago â€¢ ${announcement.branch ?? 'All branches'}", style: AppTextStyles.caption.copyWith(color: const Color(0xFF64748B), fontSize: 11)),
                         ],
                       ),
                     ],
@@ -770,3 +771,4 @@ class _DarkAnnouncementTile extends StatelessWidget {
     );
   }
 }
+

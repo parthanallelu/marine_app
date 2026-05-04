@@ -24,7 +24,7 @@ class StudentDrawer extends StatelessWidget {
             child: ListView(
               padding: EdgeInsets.zero,
               children: [
-                _buildMenuItem(
+                _buildMenuItem(context,
                   icon: Icons.person_rounded,
                   title: "My Profile",
                   onTap: () {
@@ -34,7 +34,7 @@ class StudentDrawer extends StatelessWidget {
                     context.pushNamed(AppRoutes.studentProfileName);
                   },
                 ),
-                _buildMenuItem(
+                _buildMenuItem(context,
                   icon: Icons.dark_mode_rounded,
                   title: "Dark Mode",
                   trailing: Consumer<ThemeProvider>(
@@ -47,7 +47,7 @@ class StudentDrawer extends StatelessWidget {
                     ),
                   ),
                 ),
-                _buildMenuItem(
+                _buildMenuItem(context,
                   icon: Icons.assignment_rounded,
                   title: "Test Series",
                   onTap: () {
@@ -55,7 +55,7 @@ class StudentDrawer extends StatelessWidget {
                     context.pushNamed(AppRoutes.studentTestsName);
                   },
                 ),
-                _buildMenuItem(
+                _buildMenuItem(context,
                   icon: Icons.download_rounded,
                   title: "My Downloads",
                   onTap: () {
@@ -63,7 +63,7 @@ class StudentDrawer extends StatelessWidget {
                     context.pop();
                   },
                 ),
-                _buildMenuItem(
+                _buildMenuItem(context,
                   icon: Icons.info_rounded,
                   title: "About Us",
                   onTap: () {
@@ -75,7 +75,7 @@ class StudentDrawer extends StatelessWidget {
                   padding: EdgeInsets.symmetric(horizontal: AppSpacing.lg, vertical: AppSpacing.md),
                   child: Divider(color: AppColors.divider),
                 ),
-                _buildMenuItem(
+                _buildMenuItem(context,
                   icon: Icons.logout_rounded,
                   title: "Logout",
                   color: AppColors.error,
@@ -103,9 +103,9 @@ class StudentDrawer extends StatelessWidget {
   Widget _buildHeader(BuildContext context, dynamic student) {
     return Container(
       padding: const EdgeInsets.fromLTRB(AppSpacing.xl, 60, AppSpacing.xl, AppSpacing.xl),
-      decoration: const BoxDecoration(
-        color: AppColors.navyBlueBase,
-        borderRadius: BorderRadius.only(
+      decoration: BoxDecoration(
+        color: Theme.of(context).colorScheme.primary,
+        borderRadius: const BorderRadius.only(
           bottomLeft: Radius.circular(AppRadius.lg),
           bottomRight: Radius.circular(AppRadius.lg),
         ),
@@ -145,18 +145,20 @@ class StudentDrawer extends StatelessWidget {
     );
   }
 
-  Widget _buildMenuItem({
+  Widget _buildMenuItem(
+    BuildContext context, {
     required IconData icon,
     required String title,
     Widget? trailing,
     VoidCallback? onTap,
     Color? color,
   }) {
+    final defaultColor = Theme.of(context).colorScheme.onSurface;
     return ListTile(
-      leading: Icon(icon, color: color ?? AppColors.textPrimary, size: 22),
+      leading: Icon(icon, color: color ?? defaultColor, size: 22),
       title: Text(
         title,
-        style: AppTextStyles.labelLarge.copyWith(color: color ?? AppColors.textPrimary),
+        style: AppTextStyles.labelLarge.copyWith(color: color ?? defaultColor),
       ),
       trailing: trailing ?? (onTap != null ? const Icon(Icons.chevron_right_rounded, size: 20) : null),
       onTap: onTap,
