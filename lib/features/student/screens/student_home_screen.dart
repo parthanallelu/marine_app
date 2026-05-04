@@ -93,8 +93,7 @@ class _StudentHomeScreenState extends State<StudentHomeScreen> {
 
     return Scaffold(
       endDrawer: const StudentDrawer(),
-      body: SafeArea(
-        child: SingleChildScrollView(
+      body: SingleChildScrollView(
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
@@ -102,18 +101,25 @@ class _StudentHomeScreenState extends State<StudentHomeScreen> {
                 student: student,
                 announcementCount: _announcements.length,
               ),
-              const SizedBox(height: AppSpacing.lg),
-              _buildStatsRow(),
-              _buildQuickActions(context),
-              _buildTargetCompany(context, student),
-              _buildUpcomingTests(context),
-              if (_announcements.isNotEmpty) _buildAnnouncements(context),
-              const SizedBox(height: 100),
+              SafeArea(
+                top: false,
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    const SizedBox(height: AppSpacing.lg),
+                    _buildStatsRow(),
+                    _buildQuickActions(context),
+                    _buildTargetCompany(context, student),
+                    _buildUpcomingTests(context),
+                    if (_announcements.isNotEmpty) _buildAnnouncements(context),
+                    const SizedBox(height: 100),
+                  ],
+                ),
+              ),
             ],
           ),
         ),
-      ),
-    );
+      );
   }
 
   Widget _buildStatsRow() {
@@ -330,8 +336,6 @@ class _DashboardHeader extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final theme = Theme.of(context);
-    
     String initials = "S";
     if (student.name.trim().isNotEmpty) {
       final parts = student.name.trim().split(RegExp(r'\s+'));
@@ -342,42 +346,58 @@ class _DashboardHeader extends StatelessWidget {
       }
     }
 
-    return Padding(
-      padding: const EdgeInsets.fromLTRB(20, 20, 20, 16),
-      child: Row(
-        mainAxisAlignment: MainAxisAlignment.spaceBetween,
-        children: [
-          Row(
+    return Container(
+      width: double.infinity,
+      decoration: BoxDecoration(
+        gradient: LinearGradient(
+          colors: [
+            Theme.of(context).brightness == Brightness.dark ? AppColors.navyChrome : AppColors.navyChromeLight,
+            Theme.of(context).brightness == Brightness.dark ? const Color(0xFF0D1F35) : const Color(0xFF0E3578),
+          ],
+          begin: Alignment.topCenter,
+          end: Alignment.bottomCenter,
+        ),
+      ),
+      child: SafeArea(
+        bottom: false,
+        child: Padding(
+          padding: const EdgeInsets.fromLTRB(20, 20, 20, 16),
+          child: Row(
+            mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
-              CircleAvatar(
-                radius: 20,
-                backgroundColor: AppColors.error,
-                child: Text(initials, style: const TextStyle(color: Colors.white, fontWeight: FontWeight.bold, fontSize: 16)),
+              Row(
+                children: [
+                  CircleAvatar(
+                    radius: 20,
+                    backgroundColor: AppColors.error,
+                    child: Text(initials, style: const TextStyle(color: Colors.white, fontWeight: FontWeight.bold, fontSize: 16)),
+                  ),
+                  const SizedBox(width: AppSpacing.md),
+                  Text(student.name.toUpperCase(), style: AppTextStyles.headingMedium.copyWith(
+                    color: Colors.white,
+                    fontSize: 16, letterSpacing: 0.5,
+                  )),
+                ],
               ),
-              const SizedBox(width: AppSpacing.md),
-              Text(student.name.toUpperCase(), style: AppTextStyles.headingMedium.copyWith(
-                color: theme.colorScheme.onSurface,
-                fontSize: 16, letterSpacing: 0.5,
-              )),
+              Row(
+                children: [
+                   _ActionButton(
+                     icon: Icons.notifications_none_rounded, 
+                     badgeCount: announcementCount,
+                     onTap: () => context.pushNamed(AppRoutes.studentAnnouncementsName),
+                   ),
+                   const SizedBox(width: AppSpacing.md),
+                   Builder(
+                     builder: (ctx) => _ActionButton(
+                       icon: Icons.menu_rounded,
+                       onTap: () => Scaffold.of(ctx).openEndDrawer(),
+                     ),
+                   ),
+                ],
+              ),
             ],
           ),
-          Row(
-            children: [
-               _ActionButton(
-                 icon: Icons.notifications_none_rounded, 
-                 badgeCount: announcementCount,
-                 onTap: () => context.pushNamed(AppRoutes.studentAnnouncementsName),
-               ),
-               const SizedBox(width: AppSpacing.md),
-               Builder(
-                 builder: (ctx) => _ActionButton(
-                   icon: Icons.menu_rounded,
-                   onTap: () => Scaffold.of(ctx).openEndDrawer(),
-                 ),
-               ),
-            ],
-          ),
-        ],
+        ),
       ),
     );
   }
