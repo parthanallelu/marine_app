@@ -530,10 +530,6 @@ class _AdminHeader extends StatelessWidget {
       padding: const EdgeInsets.fromLTRB(20, 48, 20, 32),
       decoration: const BoxDecoration(
         color: AppColors.navyBlueBase,
-        borderRadius: BorderRadius.only(
-          bottomLeft: Radius.circular(28),
-          bottomRight: Radius.circular(28),
-        ),
       ),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,

@@ -43,7 +43,7 @@ class StudentDrawer extends StatelessWidget {
                       onChanged: (val) {
                         themeProvider.toggleTheme();
                       },
-                      activeColor: AppColors.gold,
+                      activeThumbColor: AppColors.gold,
                     ),
                   ),
                 ),

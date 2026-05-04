@@ -1,19 +1,13 @@
-﻿import 'package:flutter/material.dart';
+import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:go_router/go_router.dart';
 import '../../../core/theme/app_theme.dart';
 import '../../../core/constants/app_constants.dart';
-import '../../../core/common_widgets/common_widgets.dart' show AppSnackBar, CourseBadge, BranchBadge;
+import '../../../core/common_widgets/common_widgets.dart' show AppSnackBar;
 import '../../../providers/auth_provider.dart';
 import '../../../models/app_models.dart';
 import '../../../models/dummy_data.dart';
 import 'widgets/student_drawer.dart';
-
-// Theme-aware color helpers
-Color _bg(BuildContext context) => Theme.of(context).scaffoldBackgroundColor;
-Color _card(BuildContext context) => Theme.of(context).cardTheme.color ?? AppColors.cardDark;
-Color _borderC(BuildContext context) => Theme.of(context).brightness == Brightness.dark ? AppColors.borderCardDark : AppColors.borderLight;
-Color _muted(BuildContext context) => Theme.of(context).brightness == Brightness.dark ? AppColors.textSecondaryDark : AppColors.textHintLight;
 
 class StudentHomeScreen extends StatefulWidget {
   const StudentHomeScreen({super.key});
@@ -92,33 +86,28 @@ class _StudentHomeScreenState extends State<StudentHomeScreen> {
     final student = authProvider.currentUser as StudentModel;
 
     if (_isLoading) {
-      return const Scaffold(
-        backgroundColor: AppColors.backgroundDark,
-        body: Center(child: CircularProgressIndicator()),
+      return Scaffold(
+        body: Center(child: CircularProgressIndicator(color: Theme.of(context).colorScheme.primary)),
       );
     }
 
     return Scaffold(
-      backgroundColor: AppColors.backgroundDark,
       endDrawer: const StudentDrawer(),
       body: SafeArea(
         child: SingleChildScrollView(
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              _DarkDashboardHeader(
+              _DashboardHeader(
                 student: student,
                 announcementCount: _announcements.length,
               ),
-              const SizedBox(height: 16),
-              Padding(
-                padding: const EdgeInsets.symmetric(horizontal: 20),
-                child: _buildStatsRowContent(),
-              ),
-              _buildQuickActionsContent(context),
-              _buildTargetCompanyContent(context, student),
-              _buildUpcomingTestsContent(context),
-              if (_announcements.isNotEmpty) _buildAnnouncementsContent(context),
+              const SizedBox(height: AppSpacing.lg),
+              _buildStatsRow(),
+              _buildQuickActions(context),
+              _buildTargetCompany(context, student),
+              _buildUpcomingTests(context),
+              if (_announcements.isNotEmpty) _buildAnnouncements(context),
               const SizedBox(height: 100),
             ],
           ),
@@ -127,65 +116,71 @@ class _StudentHomeScreenState extends State<StudentHomeScreen> {
     );
   }
 
-  Widget _buildStatsRowContent() {
+  Widget _buildStatsRow() {
     final bool isLowAttendance = _attendanceSummary.percentage < 85;
-    final String attendanceStatus = isLowAttendance ? "âš  Below 85%" : "âœ“ Good";
+    final String attendanceStatus = isLowAttendance ? "⚠ Below 85%" : "✓ Good";
 
     final bool hasDue = _feeRecord.pendingAmount > 0;
-    final String feeStatus = hasDue ? "â‚¹${(_feeRecord.pendingAmount / 1000).toStringAsFixed(1)}k due" : "âœ“ Cleared";
+    final String feeStatus = hasDue ? "₹${(_feeRecord.pendingAmount / 1000).toStringAsFixed(1)}k due" : "✓ Cleared";
 
     return Row(
-      children: [
-        Expanded(
-          child: _DarkStatCard(
-            label: "Attendance",
-            value: _attendanceSummary.percentageLabel,
-            icon: Icons.calendar_today_outlined,
-            color: const Color(0xFF20B2AA), 
-            statusLabel: attendanceStatus,
-            statusColor: isLowAttendance ? const Color(0xFFD4A017) : const Color(0xFF20B2AA),
+        children: [
+          Expanded(
+            child: _StatCard(
+              margin: const EdgeInsets.only(left: 12),
+              label: "Attendance",
+              value: _attendanceSummary.percentageLabel,
+              icon: Icons.calendar_today_outlined,
+              color: AppColors.teal,
+              statusLabel: attendanceStatus,
+              statusColor: isLowAttendance ? AppColors.gold : AppColors.teal,
+            ),
           ),
-        ),
-        const SizedBox(width: 12),
-        Expanded(
-          child: _DarkStatCard(
-            label: "Test Avg",
-            value: "${_avgScore.toStringAsFixed(0)}%",
-            icon: Icons.bar_chart_rounded,
-            color: const Color(0xFF5C8DF6),  
-            statusLabel: "âœ“ ${_upcomingTests.length} done",
-            statusColor: const Color(0xFF2E7D32),
+          const SizedBox(width: AppSpacing.md),
+          Expanded(
+            child: _StatCard(
+              label: "Test Avg",
+              value: "${_avgScore.toStringAsFixed(0)}%",
+              icon: Icons.bar_chart_rounded,
+              color: AppColors.primaryLight,
+              statusLabel: "✓ ${_upcomingTests.length} done",
+              statusColor: AppColors.success,
+            ),
           ),
-        ),
-        const SizedBox(width: 12),
-        Expanded(
-          child: _DarkStatCard(
-            label: "Fees Paid",
-            value: "${_feeRecord.percentagePaid.toStringAsFixed(0)}%",
-            icon: Icons.attach_money_rounded,
-            color: const Color(0xFFD4A017), 
-            statusLabel: feeStatus,
-            statusColor: hasDue ? const Color(0xFFD05454) : const Color(0xFF2E7D32), 
+          const SizedBox(width: AppSpacing.md),
+          Expanded(
+            child: _StatCard(
+              margin: const EdgeInsets.only(right: 12),
+              label: "Fees Paid",
+              value: "${_feeRecord.percentagePaid.toStringAsFixed(0)}%",
+              icon: Icons.attach_money_rounded,
+              color: AppColors.gold,
+              statusLabel: feeStatus,
+              statusColor: hasDue ? AppColors.error : AppColors.success,
+            ),
           ),
-        ),
-      ],
-    );
+        ],
+      );
   }
 
-  Widget _buildQuickActionsContent(BuildContext context) {
+  Widget _buildQuickActions(BuildContext context) {
+    final theme = Theme.of(context);
     return Padding(
-      padding: const EdgeInsets.fromLTRB(20, 32, 20, 0),
+      padding: const EdgeInsets.only(top: 32),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          Row(
-            children: [
-              const Icon(Icons.bolt_rounded, size: 20, color: Color(0xFFD4A017)),
-              const SizedBox(width: 8),
-              Text("Quick Actions", style: AppTextStyles.headingSmall.copyWith(fontSize: 16, color: Colors.white)),
-            ],
+          Container(
+            margin: const EdgeInsets.symmetric(horizontal: 12),
+            child: Row(
+              children: [
+                const Icon(Icons.bolt_rounded, size: 20, color: AppColors.gold),
+                const SizedBox(width: AppSpacing.sm),
+                Text("Quick Actions", style: AppTextStyles.headingSmall.copyWith(color: theme.colorScheme.onSurface)),
+              ],
+            ),
           ),
-          const SizedBox(height: 16),
+          const SizedBox(height: AppSpacing.lg),
           GridView.count(
             crossAxisCount: 4,
             crossAxisSpacing: 10,
@@ -195,55 +190,14 @@ class _StudentHomeScreenState extends State<StudentHomeScreen> {
             physics: const NeverScrollableScrollPhysics(),
             childAspectRatio: 0.80,
             children: [
-              _DarkQuickActionTile(
-                label: "Attendance",
-                icon: Icons.calendar_today_outlined,
-                color: const Color(0xFF5C8DF6),
-                onTap: () => context.goNamed(AppRoutes.studentAttendanceName),
-              ),
-              _DarkQuickActionTile(
-                label: "Mock Tests",
-                icon: Icons.check_box_outlined,
-                color: const Color(0xFF916BDB), 
-                onTap: () => context.goNamed(AppRoutes.studentTestsName),
-              ),
-              _DarkQuickActionTile(
-                label: "Materials",
-                icon: Icons.book_outlined,
-                color: const Color(0xFF20B2AA), 
-                onTap: () => context.goNamed(AppRoutes.studentMaterialsName),
-              ),
-              _DarkQuickActionTile(
-                label: "Interview",
-                icon: Icons.chat_bubble_outline_rounded,
-                color: const Color(0xFFC47B44), 
-                onTap: () => context.goNamed(AppRoutes.studentMaterialsName),
-              ),
-              _DarkQuickActionTile(
-                label: "Maritime GK",
-                icon: Icons.shield_outlined,
-                color: const Color(0xFF42A5F5), 
-                onTap: () => context.goNamed(AppRoutes.studentMaterialsName),
-              ),
-              _DarkQuickActionTile(
-                label: "Fees",
-                icon: Icons.attach_money_rounded,
-                color: const Color(0xFFD05454), 
-                onTap: () => context.pushNamed(AppRoutes.studentFeesName),
-              ),
-              _DarkQuickActionTile(
-                label: "Schedule",
-                icon: Icons.access_time_rounded,
-                color: const Color(0xFF2E7D32), 
-                onTap: () => AppSnackBar.showInfo(context, "Schedule feature coming soon!"),
-              ),
-              _DarkQuickActionTile(
-                label: "Notices",
-                icon: Icons.notifications_none_rounded,
-                color: const Color(0xFFD4A017), 
-                badgeCount: _announcements.length,
-                onTap: () => context.pushNamed(AppRoutes.studentAnnouncementsName),
-              ),
+              _QuickActionTile(label: "Attendance", icon: Icons.calendar_today_outlined, color: AppColors.primaryLight, onTap: () => context.goNamed(AppRoutes.studentAttendanceName)),
+              _QuickActionTile(label: "Mock Tests", icon: Icons.check_box_outlined, color: AppColors.purple, onTap: () => context.goNamed(AppRoutes.studentTestsName)),
+              _QuickActionTile(label: "Materials", icon: Icons.book_outlined, color: AppColors.teal, onTap: () => context.goNamed(AppRoutes.studentMaterialsName)),
+              _QuickActionTile(label: "Interview", icon: Icons.chat_bubble_outline_rounded, color: AppColors.orange, onTap: () => context.goNamed(AppRoutes.studentMaterialsName)),
+              _QuickActionTile(label: "Maritime GK", icon: Icons.shield_outlined, color: const Color(0xFF42A5F5), onTap: () => context.goNamed(AppRoutes.studentMaterialsName)),
+              _QuickActionTile(label: "Fees", icon: Icons.attach_money_rounded, color: AppColors.error, onTap: () => context.pushNamed(AppRoutes.studentFeesName)),
+              _QuickActionTile(label: "Schedule", icon: Icons.access_time_rounded, color: AppColors.success, onTap: () => AppSnackBar.showInfo(context, "Schedule feature coming soon!")),
+              _QuickActionTile(label: "Notices", icon: Icons.notifications_none_rounded, color: AppColors.gold, badgeCount: _announcements.length, onTap: () => context.pushNamed(AppRoutes.studentAnnouncementsName)),
             ],
           ),
         ],
@@ -251,51 +205,48 @@ class _StudentHomeScreenState extends State<StudentHomeScreen> {
     );
   }
 
-  Widget _buildTargetCompanyContent(BuildContext context, StudentModel student) {
+  Widget _buildTargetCompany(BuildContext context, StudentModel student) {
     if (student.targetCompany.isEmpty && DummyData.students.first.targetCompany.isEmpty) return const SizedBox();
+    final theme = Theme.of(context);
+    final isDark = theme.brightness == Brightness.dark;
     
     return Padding(
-      padding: const EdgeInsets.fromLTRB(20, 32, 20, 0),
+      padding: const EdgeInsets.only(top: 32),
       child: Container(
-        padding: const EdgeInsets.all(16),
+        margin: const EdgeInsets.symmetric(horizontal: 12),
+        padding: AppSpacing.cardPadding,
         decoration: BoxDecoration(
-          color: const Color(0xFF131D31),
-          borderRadius: BorderRadius.circular(16),
-          border: Border.all(color: const Color(0xFF1F3050), width: 1),
+          color: isDark ? const Color(0xFF131D31) : theme.colorScheme.surface,
+          borderRadius: AppRadius.cardRadius,
+          border: Border.all(color: isDark ? AppColors.borderCardDark : AppColors.borderLight, width: isDark ? 0.8 : 1),
+          boxShadow: isDark ? AppShadows.none : AppShadows.card,
         ),
         child: Row(
           children: [
             Container(
-              width: 52,
-              height: 52,
+              width: 52, height: 52,
               decoration: BoxDecoration(
-                color: const Color(0xFF202C40),
-                borderRadius: BorderRadius.circular(12),
+                color: isDark ? const Color(0xFF202C40) : AppColors.errorSurface,
+                borderRadius: BorderRadius.circular(AppRadius.md),
               ),
-              child: const Icon(Icons.directions_boat_rounded, color: Color(0xFFD05454), size: 28), // Matches Maersk reddish
+              child: Icon(Icons.directions_boat_rounded, color: AppColors.error, size: 28),
             ),
-            const SizedBox(width: 16),
+            const SizedBox(width: AppSpacing.lg),
             Expanded(
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  Text("Target company", style: AppTextStyles.bodySmall.copyWith(color: const Color(0xFF64748B), fontSize: 10)),
+                  Text("Target company", style: AppTextStyles.overline.copyWith(color: theme.textTheme.bodySmall?.color)),
                   const SizedBox(height: 2),
-                  Text("Maersk Line", style: AppTextStyles.headingMedium.copyWith(color: const Color(0xFFD4A017), fontSize: 16)),
+                  Text("Maersk Line", style: AppTextStyles.headingMedium.copyWith(color: AppColors.gold, fontSize: 16)),
                   const SizedBox(height: 2),
-                  Text("Company-specific prep ready", style: AppTextStyles.caption.copyWith(color: AppColors.textSecondaryDark)),
+                  Text("Company-specific prep ready", style: AppTextStyles.caption.copyWith(color: theme.textTheme.bodyMedium?.color)),
                 ],
               ),
             ),
             OutlinedButton(
               onPressed: () => context.goNamed(AppRoutes.studentTestsName),
-              style: OutlinedButton.styleFrom(
-                side: const BorderSide(color: Color(0xFF2A3D63), width: 1.5),
-                shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),
-                padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
-                minimumSize: Size.zero,
-              ),
-              child: Text("Practice", style: AppTextStyles.labelMedium.copyWith(color: Colors.white)),
+              child: Text("Practice", style: AppTextStyles.labelMedium.copyWith(color: theme.colorScheme.onSurface)),
             ),
           ],
         ),
@@ -303,25 +254,32 @@ class _StudentHomeScreenState extends State<StudentHomeScreen> {
     );
   }
 
-  Widget _buildUpcomingTestsContent(BuildContext context) {
+  Widget _buildUpcomingTests(BuildContext context) {
+    final theme = Theme.of(context);
     return Padding(
-      padding: const EdgeInsets.fromLTRB(20, 32, 20, 0),
+      padding: const EdgeInsets.only(top: 32),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          _DarkSectionHeader(
-            title: "Upcoming Tests", 
-            icon: Icons.access_time_rounded, 
-            iconColor: const Color(0xFF5C8DF6),
-            actionLabel: "All Tests",
-            onAction: () => context.goNamed(AppRoutes.studentTestsName),
+          Container(
+            margin: const EdgeInsets.symmetric(horizontal: 12),
+            child: _SectionHeader(
+              title: "Upcoming Tests", 
+              icon: Icons.access_time_rounded, 
+              iconColor: AppColors.primaryLight,
+              actionLabel: "All Tests",
+              onAction: () => context.goNamed(AppRoutes.studentTestsName),
+            ),
           ),
-          const SizedBox(height: 16),
+          const SizedBox(height: AppSpacing.lg),
           if (_upcomingTests.isEmpty)
-             Text("No upcoming tests scheduled", style: AppTextStyles.bodyMedium.copyWith(color: AppColors.textSecondaryDark))
+             Container(
+               margin: const EdgeInsets.symmetric(horizontal: 12),
+               child: Text("No upcoming tests scheduled", style: AppTextStyles.bodyMedium.copyWith(color: theme.textTheme.bodyMedium?.color)),
+             )
           else
             Column(
-              children: _upcomingTests.take(2).map((t) => _DarkUpcomingTestTile(
+              children: _upcomingTests.take(2).map((t) => _UpcomingTestTile(
                 test: t, 
                 onTap: () => context.pushNamed(AppRoutes.testAttemptName, pathParameters: {'testId': t.id}),
               )).toList(),
@@ -331,22 +289,25 @@ class _StudentHomeScreenState extends State<StudentHomeScreen> {
     );
   }
 
-  Widget _buildAnnouncementsContent(BuildContext context) {
+  Widget _buildAnnouncements(BuildContext context) {
     return Padding(
-      padding: const EdgeInsets.fromLTRB(20, 32, 20, 0),
+      padding: const EdgeInsets.only(top: 32),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          _DarkSectionHeader(
-            title: "Announcements", 
-            icon: Icons.notifications_active_rounded, 
-            iconColor: const Color(0xFFD4A017),
-            actionLabel: "View All",
-            onAction: () => context.pushNamed(AppRoutes.studentAnnouncementsName),
+          Container(
+            margin: const EdgeInsets.symmetric(horizontal: 12),
+            child: _SectionHeader(
+              title: "Announcements", 
+              icon: Icons.notifications_active_rounded, 
+              iconColor: AppColors.gold,
+              actionLabel: "View All",
+              onAction: () => context.pushNamed(AppRoutes.studentAnnouncementsName),
+            ),
           ),
-          const SizedBox(height: 16),
+          const SizedBox(height: AppSpacing.lg),
           Column(
-            children: _announcements.take(2).map((a) => _DarkAnnouncementTile(
+            children: _announcements.take(2).map((a) => _AnnouncementTile(
               announcement: a,
               onTap: () => context.pushNamed(AppRoutes.studentAnnouncementsName),
             )).toList(),
@@ -358,17 +319,19 @@ class _StudentHomeScreenState extends State<StudentHomeScreen> {
 }
 
 // ---------------------------------------------------------
-// RE-USABLE LOCAL DARK WIDGETS
+// THEME-AWARE REUSABLE LOCAL WIDGETS
 // ---------------------------------------------------------
 
-class _DarkDashboardHeader extends StatelessWidget {
+class _DashboardHeader extends StatelessWidget {
   final StudentModel student;
   final int announcementCount;
 
-  const _DarkDashboardHeader({required this.student, required this.announcementCount});
+  const _DashboardHeader({required this.student, required this.announcementCount});
 
   @override
   Widget build(BuildContext context) {
+    final theme = Theme.of(context);
+    
     String initials = "S";
     if (student.name.trim().isNotEmpty) {
       final parts = student.name.trim().split(RegExp(r'\s+'));
@@ -388,11 +351,14 @@ class _DarkDashboardHeader extends StatelessWidget {
             children: [
               CircleAvatar(
                 radius: 20,
-                backgroundColor: const Color(0xFFD05454),
+                backgroundColor: AppColors.error,
                 child: Text(initials, style: const TextStyle(color: Colors.white, fontWeight: FontWeight.bold, fontSize: 16)),
               ),
-              const SizedBox(width: 12),
-              Text(student.name.toUpperCase(), style: AppTextStyles.headingMedium.copyWith(color: Colors.white, fontSize: 16, letterSpacing: 0.5)),
+              const SizedBox(width: AppSpacing.md),
+              Text(student.name.toUpperCase(), style: AppTextStyles.headingMedium.copyWith(
+                color: theme.colorScheme.onSurface,
+                fontSize: 16, letterSpacing: 0.5,
+              )),
             ],
           ),
           Row(
@@ -402,7 +368,7 @@ class _DarkDashboardHeader extends StatelessWidget {
                  badgeCount: announcementCount,
                  onTap: () => context.pushNamed(AppRoutes.studentAnnouncementsName),
                ),
-               const SizedBox(width: 12),
+               const SizedBox(width: AppSpacing.md),
                Builder(
                  builder: (ctx) => _ActionButton(
                    icon: Icons.menu_rounded,
@@ -426,6 +392,9 @@ class _ActionButton extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final theme = Theme.of(context);
+    final isDark = theme.brightness == Brightness.dark;
+    
     return GestureDetector(
       onTap: onTap,
       child: Stack(
@@ -434,19 +403,21 @@ class _ActionButton extends StatelessWidget {
           Container(
             padding: const EdgeInsets.all(10),
             decoration: BoxDecoration(
-              color: const Color(0xFF162133), // Slightly lighter circle
-              borderRadius: BorderRadius.circular(12),
-              border: Border.all(color: AppColors.borderCardDark, width: 0.5),
+              color: isDark ? const Color(0xFF162133) : AppColors.surfaceContainerLight,
+              borderRadius: BorderRadius.circular(AppRadius.md),
+              border: Border.all(
+                color: isDark ? AppColors.borderCardDark : AppColors.borderLight,
+                width: 0.5,
+              ),
             ),
-            child: Icon(icon, color: Colors.white70, size: 22),
+            child: Icon(icon, color: theme.colorScheme.onSurface.withAlpha(180), size: 22),
           ),
           if (badgeCount > 0)
             Positioned(
-              top: -4,
-              right: -4,
+              top: -4, right: -4,
               child: Container(
                 padding: const EdgeInsets.all(4),
-                decoration: const BoxDecoration(color: Color(0xFFD4A017), shape: BoxShape.circle),
+                decoration: const BoxDecoration(color: AppColors.gold, shape: BoxShape.circle),
                 child: const SizedBox(width: 6, height: 6),
               ),
             ),
@@ -456,38 +427,7 @@ class _ActionButton extends StatelessWidget {
   }
 }
 
-class _DarkBadge extends StatelessWidget {
-  final String label;
-  final Color color;
-  final IconData? icon;
-  final bool isOutlined;
-
-  const _DarkBadge({required this.label, required this.color, this.icon, this.isOutlined = false});
-
-  @override
-  Widget build(BuildContext context) {
-    return Container(
-      padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
-      decoration: BoxDecoration(
-        color: isOutlined ? Colors.transparent : color.withOpacity(0.1),
-        borderRadius: BorderRadius.circular(20),
-        border: Border.all(color: color.withOpacity(isOutlined ? 0.3 : 0.8), width: 1),
-      ),
-      child: Row(
-        mainAxisSize: MainAxisSize.min,
-        children: [
-          if (icon != null) ...[
-            Icon(icon, size: 12, color: color),
-            const SizedBox(width: 4),
-          ],
-          Text(label, style: TextStyle(color: color.withOpacity(0.9), fontSize: 11, fontWeight: FontWeight.w600)),
-        ],
-      ),
-    );
-  }
-}
-
-class _DarkStatCard extends StatelessWidget {
+class _StatCard extends StatelessWidget {
   final String label;
   final String value;
   final IconData icon;
@@ -495,18 +435,26 @@ class _DarkStatCard extends StatelessWidget {
   final String statusLabel;
   final Color statusColor;
 
-  const _DarkStatCard({
+  const _StatCard({
     required this.label, required this.value, required this.icon, 
-    required this.color, required this.statusLabel, required this.statusColor
+    required this.color, required this.statusLabel, required this.statusColor,
+    this.margin,
   });
+
+  final EdgeInsetsGeometry? margin;
 
   @override
   Widget build(BuildContext context) {
+    final theme = Theme.of(context);
+    final isDark = theme.brightness == Brightness.dark;
+    
      return Container(
+       margin: margin,
        decoration: BoxDecoration(
-         color: AppColors.cardDark,
-         borderRadius: BorderRadius.circular(16),
-         border: Border.all(color: AppColors.borderCardDark, width: 0.8),
+         color: isDark ? AppColors.cardDark : theme.colorScheme.surface,
+         borderRadius: AppRadius.cardRadius,
+         border: isDark ? Border.all(color: AppColors.borderCardDark, width: 0.8) : null,
+         boxShadow: isDark ? AppShadows.none : AppShadows.card,
        ),
        child: Stack(
          alignment: Alignment.topCenter,
@@ -519,13 +467,13 @@ class _DarkStatCard extends StatelessWidget {
                children: [
                   Container(
                     padding: const EdgeInsets.all(10),
-                    decoration: BoxDecoration(color: color.withOpacity(0.15), borderRadius: BorderRadius.circular(12)),
+                    decoration: BoxDecoration(color: color.withAlpha(25), borderRadius: BorderRadius.circular(AppRadius.md)),
                     child: Icon(icon, color: color, size: 18),
                   ),
-                  const SizedBox(height: 16),
+                  const SizedBox(height: AppSpacing.lg),
                   FittedBox(fit: BoxFit.scaleDown, child: Text(value, style: TextStyle(color: color, fontSize: 24, fontWeight: FontWeight.bold))),
-                  const SizedBox(height: 4),
-                  Text(label, style: const TextStyle(color: AppColors.textSecondaryDark, fontSize: 11)),
+                  const SizedBox(height: AppSpacing.xs),
+                  Text(label, style: AppTextStyles.labelSmall.copyWith(color: theme.textTheme.bodyMedium?.color)),
                   const SizedBox(height: 10),
                   Text(statusLabel, style: TextStyle(color: statusColor, fontSize: 10, fontWeight: FontWeight.w600)),
                ]
@@ -537,38 +485,43 @@ class _DarkStatCard extends StatelessWidget {
   }
 }
 
-class _DarkQuickActionTile extends StatelessWidget {
+class _QuickActionTile extends StatelessWidget {
   final String label;
   final IconData icon;
   final Color color;
   final VoidCallback onTap;
   final int badgeCount;
 
-  const _DarkQuickActionTile({required this.label, required this.icon, required this.color, required this.onTap, this.badgeCount = 0});
+  const _QuickActionTile({required this.label, required this.icon, required this.color, required this.onTap, this.badgeCount = 0});
 
   @override
   Widget build(BuildContext context) {
+    final theme = Theme.of(context);
+    final isDark = theme.brightness == Brightness.dark;
+    
     return GestureDetector(
       onTap: onTap,
-      child: Column(
+      child: Container(
+        margin: const EdgeInsets.symmetric(horizontal: 4),
+        child: Column(
        mainAxisAlignment: MainAxisAlignment.center,
        children: [
          Stack(
            clipBehavior: Clip.none,
            children: [
              Container(
-               height: 60,
-               width: 60,
+               height: 60, width: 60,
                decoration: BoxDecoration(
-                 color: AppColors.cardDark,
-                 borderRadius: BorderRadius.circular(16),
-                 border: Border.all(color: AppColors.borderCardDark, width: 0.8),
+                 color: isDark ? AppColors.cardDark : theme.colorScheme.surface,
+                 borderRadius: BorderRadius.circular(AppRadius.lg),
+                 border: isDark ? Border.all(color: AppColors.borderCardDark, width: 0.8) : null,
+                 boxShadow: isDark ? AppShadows.none : AppShadows.subtle,
                ),
                child: Center(
                  child: Container(
                    padding: const EdgeInsets.all(10),
                    decoration: BoxDecoration(
-                      color: color.withOpacity(0.15),
+                      color: color.withAlpha(25),
                       borderRadius: BorderRadius.circular(10),
                    ),
                    child: Icon(icon, color: color, size: 22) 
@@ -577,59 +530,54 @@ class _DarkQuickActionTile extends StatelessWidget {
              ),
              if (badgeCount > 0)
                Positioned(
-                 top: -6,
-                 right: -6,
+                 top: -6, right: -6,
                  child: Container(
                    padding: const EdgeInsets.all(5),
-                   decoration: const BoxDecoration(color: Color(0xFFD05454), shape: BoxShape.circle), 
+                   decoration: BoxDecoration(color: AppColors.error, shape: BoxShape.circle), 
                    child: Text(badgeCount.toString(), style: const TextStyle(color: Colors.white, fontSize: 10, fontWeight: FontWeight.w900, height: 1.0)),
                  ),
                ),
            ],
          ),
          const SizedBox(height: 10),
-         Text(label, style: const TextStyle(color: AppColors.textSecondaryDark, fontSize: 10), maxLines: 1, overflow: TextOverflow.ellipsis)
+         Text(label, style: AppTextStyles.labelSmall.copyWith(color: theme.textTheme.bodyMedium?.color), maxLines: 1, overflow: TextOverflow.ellipsis)
        ]
+     ),
      ),
     );
   }
 }
 
-class _DarkSectionHeader extends StatelessWidget {
+class _SectionHeader extends StatelessWidget {
   final String title;
   final IconData icon;
   final Color iconColor;
   final String actionLabel;
   final VoidCallback onAction;
 
-  const _DarkSectionHeader({required this.title, required this.icon, required this.iconColor, required this.actionLabel, required this.onAction});
+  const _SectionHeader({required this.title, required this.icon, required this.iconColor, required this.actionLabel, required this.onAction});
 
   @override
   Widget build(BuildContext context) {
+    final theme = Theme.of(context);
     return Row(
       mainAxisAlignment: MainAxisAlignment.spaceBetween,
       children: [
         Row(
           children: [
             Icon(icon, size: 18, color: iconColor),
-            const SizedBox(width: 8),
-            Text(title, style: AppTextStyles.headingSmall.copyWith(color: Colors.white, fontSize: 16)),
+            const SizedBox(width: AppSpacing.sm),
+            Text(title, style: AppTextStyles.headingSmall.copyWith(color: theme.colorScheme.onSurface)),
           ],
         ),
         OutlinedButton(
           onPressed: onAction,
-          style: OutlinedButton.styleFrom(
-            side: const BorderSide(color: AppColors.borderCardDark, width: 1.5),
-            shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),
-            padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 0),
-            minimumSize: const Size(0, 36),
-          ),
           child: Row(
             mainAxisSize: MainAxisSize.min,
             children: [
-              Text(actionLabel, style: AppTextStyles.labelMedium.copyWith(color: Colors.white)),
+              Text(actionLabel, style: AppTextStyles.labelMedium.copyWith(color: theme.colorScheme.onSurface)),
               const SizedBox(width: 6),
-              const Icon(Icons.arrow_forward_rounded, size: 14, color: Colors.white),
+              Icon(Icons.arrow_forward_rounded, size: 14, color: theme.colorScheme.onSurface),
             ],
           ),
         ),
@@ -638,62 +586,69 @@ class _DarkSectionHeader extends StatelessWidget {
   }
 }
 
-class _DarkUpcomingTestTile extends StatelessWidget {
+class _UpcomingTestTile extends StatelessWidget {
   final TestModel test;
   final VoidCallback onTap;
 
-  const _DarkUpcomingTestTile({required this.test, required this.onTap});
+  const _UpcomingTestTile({required this.test, required this.onTap});
 
   @override
   Widget build(BuildContext context) {
+    final theme = Theme.of(context);
+    final isDark = theme.brightness == Brightness.dark;
     final now = DateTime.now();
     final difference = test.scheduledDate.difference(DateTime(now.year, now.month, now.day)).inDays;
     
     String daysLabel;
     bool isUrgent = difference <= 1;
-    if (difference == 0) daysLabel = "Today";
-    else if (difference == 1) daysLabel = "Tomorrow";
-    else daysLabel = "In $difference days";
+    if (difference == 0) {
+      daysLabel = "Today";
+    } else if (difference == 1) {
+      daysLabel = "Tomorrow";
+    } else {
+      daysLabel = "In $difference days";
+    }
 
     return GestureDetector(
       onTap: onTap,
       child: Container(
-        margin: const EdgeInsets.only(bottom: 12),
-        padding: const EdgeInsets.all(16),
+        margin: const EdgeInsets.only(bottom: AppSpacing.md, left: 12, right: 12),
+        padding: AppSpacing.cardPadding,
         decoration: BoxDecoration(
-          color: AppColors.cardDark,
-          borderRadius: BorderRadius.circular(16),
-          border: Border.all(color: AppColors.borderCardDark, width: 0.8),
+          color: isDark ? AppColors.cardDark : theme.colorScheme.surface,
+          borderRadius: AppRadius.cardRadius,
+          border: isDark ? Border.all(color: AppColors.borderCardDark, width: 0.8) : null,
+          boxShadow: isDark ? AppShadows.none : AppShadows.card,
         ),
         child: Row(
           children: [
             Container(
               padding: const EdgeInsets.all(12),
               decoration: BoxDecoration(
-                color: const Color(0xFF916BDB).withOpacity(0.15),
-                borderRadius: BorderRadius.circular(12),
+                color: AppColors.purple.withAlpha(25),
+                borderRadius: BorderRadius.circular(AppRadius.md),
               ),
-              child: const Icon(Icons.edit_document, color: Color(0xFF916BDB), size: 22),
+              child: Icon(Icons.edit_document, color: AppColors.purple, size: 22),
             ),
-            const SizedBox(width: 16),
+            const SizedBox(width: AppSpacing.lg),
             Expanded(
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  Text(test.title, style: AppTextStyles.labelLarge.copyWith(color: Colors.white, fontSize: 13)),
-                  const SizedBox(height: 4),
-                  Text("${test.durationMinutes} min â€¢ ${test.questions.length} questions â€¢ ${test.type}", style: AppTextStyles.caption.copyWith(color: AppColors.textSecondaryDark)),
+                  Text(test.title, style: AppTextStyles.labelLarge.copyWith(color: theme.colorScheme.onSurface, fontSize: 13)),
+                  const SizedBox(height: AppSpacing.xs),
+                  Text("${test.durationMinutes} min • ${test.questions.length} questions • ${test.type}", style: AppTextStyles.caption.copyWith(color: theme.textTheme.bodyMedium?.color)),
                 ],
               ),
             ),
             Container(
               padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
               decoration: BoxDecoration(
-                color: isUrgent ? const Color(0xFFD4A017).withAlpha((0.05 * 255).round()) : AppColors.borderCardDark.withAlpha((0.3 * 255).round()),
-                borderRadius: BorderRadius.circular(20),
-                border: Border.all(color: isUrgent ? const Color(0xFFD4A017).withAlpha((0.3 * 255).round()) : AppColors.borderCardDark, width: 1.5),
+                color: isUrgent ? AppColors.gold.withAlpha(13) : (isDark ? AppColors.borderCardDark.withAlpha(77) : AppColors.surfaceContainerLight),
+                borderRadius: BorderRadius.circular(AppRadius.pill),
+                border: Border.all(color: isUrgent ? AppColors.gold.withAlpha(77) : (isDark ? AppColors.borderCardDark : AppColors.borderLight), width: 1.5),
               ),
-              child: Text(daysLabel, style: AppTextStyles.labelSmall.copyWith(color: isUrgent ? const Color(0xFFD4A017) : AppColors.textSecondaryDark, fontSize: 10)),
+              child: Text(daysLabel, style: AppTextStyles.labelSmall.copyWith(color: isUrgent ? AppColors.gold : theme.textTheme.bodyMedium?.color, fontSize: 10)),
             ),
           ],
         ),
@@ -702,26 +657,29 @@ class _DarkUpcomingTestTile extends StatelessWidget {
   }
 }
 
-class _DarkAnnouncementTile extends StatelessWidget {
+class _AnnouncementTile extends StatelessWidget {
   final AnnouncementModel announcement;
   final VoidCallback onTap;
 
-  const _DarkAnnouncementTile({required this.announcement, required this.onTap});
+  const _AnnouncementTile({required this.announcement, required this.onTap});
 
   @override
   Widget build(BuildContext context) {
+    final theme = Theme.of(context);
+    final isDark = theme.brightness == Brightness.dark;
     final isHigh = announcement.priority.toLowerCase() == 'high';
     final isMedium = announcement.priority.toLowerCase() == 'medium';
-    final color = isHigh ? const Color(0xFFD05454) : (isMedium ? const Color(0xFFD4A017) : const Color(0xFF20B2AA));
+    final color = isHigh ? AppColors.error : (isMedium ? AppColors.gold : AppColors.teal);
 
     return GestureDetector(
       onTap: onTap,
       child: Container(
-        margin: const EdgeInsets.only(bottom: 12),
+        margin: const EdgeInsets.only(bottom: AppSpacing.md),
         decoration: BoxDecoration(
-          color: AppColors.cardDark,
-          borderRadius: BorderRadius.circular(16),
-          border: Border.all(color: AppColors.borderCardDark, width: 0.8),
+          color: isDark ? AppColors.cardDark : theme.colorScheme.surface,
+          borderRadius: AppRadius.cardRadius,
+          border: isDark ? Border.all(color: AppColors.borderCardDark, width: 0.8) : null,
+          boxShadow: isDark ? AppShadows.none : AppShadows.card,
         ),
         clipBehavior: Clip.antiAlias,
         child: IntrinsicHeight(
@@ -731,33 +689,33 @@ class _DarkAnnouncementTile extends StatelessWidget {
               Container(width: 4, color: color),
               Expanded(
                 child: Padding(
-                  padding: const EdgeInsets.all(16),
+                  padding: AppSpacing.cardPadding,
                   child: Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
                       Row(
                         mainAxisAlignment: MainAxisAlignment.spaceBetween,
                         children: [
-                          Expanded(child: Text(announcement.title, style: AppTextStyles.labelLarge.copyWith(color: Colors.white, fontSize: 14))),
+                          Expanded(child: Text(announcement.title, style: AppTextStyles.labelLarge.copyWith(color: theme.colorScheme.onSurface, fontSize: 14))),
                           Container(
                             padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
                             decoration: BoxDecoration(
-                              color: color.withOpacity(0.1),
-                              borderRadius: BorderRadius.circular(20),
-                              border: Border.all(color: color.withOpacity(0.3)),
+                              color: color.withAlpha(25),
+                              borderRadius: BorderRadius.circular(AppRadius.pill),
+                              border: Border.all(color: color.withAlpha(77)),
                             ),
                             child: Text(announcement.priority, style: AppTextStyles.labelSmall.copyWith(color: color, fontSize: 10)),
                           ),
                         ],
                       ),
                       const SizedBox(height: 6),
-                      Text(announcement.description, style: AppTextStyles.bodySmall.copyWith(color: AppColors.textSecondaryDark, height: 1.4), maxLines: 2, overflow: TextOverflow.ellipsis),
-                      const SizedBox(height: 12),
+                      Text(announcement.description, style: AppTextStyles.bodySmall.copyWith(color: theme.textTheme.bodyMedium?.color, height: 1.4), maxLines: 2, overflow: TextOverflow.ellipsis),
+                      const SizedBox(height: AppSpacing.md),
                       Row(
                         children: [
-                          const Icon(Icons.calendar_today_rounded, size: 12, color: Color(0xFF64748B)),
+                          Icon(Icons.calendar_today_rounded, size: 12, color: theme.textTheme.bodySmall?.color),
                           const SizedBox(width: 6),
-                          Text("${announcement.daysAgo} days ago â€¢ ${announcement.branch ?? 'All branches'}", style: AppTextStyles.caption.copyWith(color: const Color(0xFF64748B), fontSize: 11)),
+                          Text("${announcement.daysAgo} days ago • ${announcement.branch ?? 'All branches'}", style: AppTextStyles.caption.copyWith(color: theme.textTheme.bodySmall?.color)),
                         ],
                       ),
                     ],
@@ -771,4 +729,3 @@ class _DarkAnnouncementTile extends StatelessWidget {
     );
   }
 }
-

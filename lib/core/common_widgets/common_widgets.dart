@@ -193,6 +193,7 @@ class DashboardCard extends StatelessWidget {
   final Widget? leading;
   final Widget? trailing;
   final String? subtitle;
+  final EdgeInsetsGeometry? margin;
 
   const DashboardCard({
     super.key,
@@ -208,6 +209,7 @@ class DashboardCard extends StatelessWidget {
     this.leading,
     this.trailing,
     this.subtitle,
+    this.margin,
   });
 
   @override
@@ -215,6 +217,7 @@ class DashboardCard extends StatelessWidget {
     return GestureDetector(
       onTap: onTap,
       child: Container(
+        margin: margin,
         decoration: BoxDecoration(
           color: Theme.of(context).cardTheme.color,
           borderRadius: AppRadius.cardRadius,
@@ -599,9 +602,11 @@ class SectionHeader extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return Row(
-      mainAxisAlignment: MainAxisAlignment.spaceBetween,
-      children: [
+    return Container(
+      margin: const EdgeInsets.symmetric(horizontal: 12),
+      child: Row(
+        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+        children: [
         Text(title, style: AppTextStyles.headingMedium),
         if (actionLabel != null)
           GestureDetector(
@@ -612,6 +617,7 @@ class SectionHeader extends StatelessWidget {
             ),
           ),
       ],
+      ),
     );
   }
 }
@@ -693,12 +699,11 @@ class NavyHeader extends StatelessWidget {
     return Container(
       width: double.infinity,
       constraints: BoxConstraints(minHeight: minHeight),
-      decoration: const BoxDecoration(
+      decoration: BoxDecoration(
         gradient: LinearGradient(
           colors: [
-            AppColors.navyBlueDark,
-            AppColors.navyBlueLight,
-            AppColors.navyBlueBase,
+            Theme.of(context).brightness == Brightness.dark ? AppColors.navyChrome : AppColors.navyChromeLight,
+            Theme.of(context).brightness == Brightness.dark ? const Color(0xFF0D1F35) : const Color(0xFF0E3578),
           ],
           begin: Alignment.topCenter,
           end: Alignment.bottomCenter,
@@ -797,7 +802,7 @@ class AppPageShell extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: AppColors.navyBlueBase,
+      backgroundColor: Theme.of(context).brightness == Brightness.dark ? AppColors.navyChrome : AppColors.navyChromeLight,
       endDrawer: endDrawer,
       body: Column(
         children: [
@@ -807,12 +812,7 @@ class AppPageShell extends StatelessWidget {
               width: double.infinity,
               decoration: BoxDecoration(
                 color: Theme.of(context).scaffoldBackgroundColor,
-                borderRadius: const BorderRadius.only(
-                  topLeft: Radius.circular(AppRadius.extraLarge),
-                  topRight: Radius.circular(AppRadius.extraLarge),
-                ),
               ),
-              clipBehavior: Clip.antiAlias,
               child: isScrollable
                   ? SingleChildScrollView(
                       padding: const EdgeInsets.only(bottom: 24),
@@ -830,12 +830,11 @@ class AppPageShell extends StatelessWidget {
   Widget _buildHeader(BuildContext context) {
     return Container(
       width: double.infinity,
-      decoration: const BoxDecoration(
+      decoration: BoxDecoration(
         gradient: LinearGradient(
           colors: [
-            AppColors.navyBlueDark,
-            AppColors.navyBlueLight,
-            AppColors.navyBlueBase,
+            Theme.of(context).brightness == Brightness.dark ? AppColors.navyChrome : AppColors.navyChromeLight,
+            Theme.of(context).brightness == Brightness.dark ? const Color(0xFF0D1F35) : const Color(0xFF0E3578),
           ],
           begin: Alignment.topCenter,
           end: Alignment.bottomCenter,
@@ -1011,7 +1010,7 @@ class AppSnackBar {
             ),
           ],
         ),
-        backgroundColor: AppColors.navyBlueBase,
+        backgroundColor: Theme.of(context).colorScheme.primary,
         behavior: SnackBarBehavior.floating,
         shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(AppRadius.md)),
         margin: const EdgeInsets.all(AppSpacing.lg),
@@ -1332,7 +1331,7 @@ class MaterialCard extends StatelessWidget {
     }
 
     return Container(
-      margin: const EdgeInsets.only(bottom: 12),
+      margin: const EdgeInsets.only(bottom: 12, left: 12, right: 12),
       padding: const EdgeInsets.all(AppSpacing.md),
       decoration: BoxDecoration(
         color: Theme.of(context).cardTheme.color,
@@ -1880,7 +1879,7 @@ class TestCard extends StatelessWidget {
     return GestureDetector(
       onTap: onTap,
       child: Container(
-        margin: const EdgeInsets.only(bottom: AppSpacing.md),
+        margin: const EdgeInsets.only(bottom: AppSpacing.md, left: 12, right: 12),
         decoration: BoxDecoration(
           color: Theme.of(context).cardTheme.color,
           borderRadius: AppRadius.cardRadius,
@@ -2009,7 +2008,7 @@ class ResultCard extends StatelessWidget {
     return GestureDetector(
       onTap: onTap,
       child: Container(
-        margin: const EdgeInsets.only(bottom: AppSpacing.md),
+        margin: const EdgeInsets.only(bottom: AppSpacing.md, left: 12, right: 12),
         padding: const EdgeInsets.all(AppSpacing.lg),
         decoration: BoxDecoration(
           color: Theme.of(context).cardTheme.color,

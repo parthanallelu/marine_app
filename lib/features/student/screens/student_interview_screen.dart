@@ -16,34 +16,37 @@ class StudentInterviewScreen extends StatelessWidget {
       showBackButton: false,
       showMenuButton: true,
       endDrawer: const StudentDrawer(),
-      body: Padding(
-        padding: const EdgeInsets.symmetric(horizontal: AppSpacing.xl),
-        child: Column(
+      body: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
             const SizedBox(height: AppSpacing.lg),
             _buildQuickStats(),
             const SizedBox(height: AppSpacing.xxl),
-            const SectionHeader(title: "Preparation Modules"),
+            Container(
+              margin: const EdgeInsets.symmetric(horizontal: AppSpacing.xl),
+              child: const SectionHeader(title: "Preparation Modules"),
+            ),
             const SizedBox(height: AppSpacing.md),
             _buildModuleGrid(context),
             const SizedBox(height: AppSpacing.xxl),
-            const SectionHeader(title: "Upcoming Mock Interviews"),
+            Container(
+              margin: const EdgeInsets.symmetric(horizontal: AppSpacing.xl),
+              child: const SectionHeader(title: "Upcoming Mock Interviews"),
+            ),
             const SizedBox(height: AppSpacing.md),
             _buildUpcomingMocks(),
             const SizedBox(height: 100),
           ],
         ),
-      ),
     );
   }
 
   Widget _buildQuickStats() {
     return Row(
       children: [
-        _StatCard(title: "Mock Score", value: "8.5", icon: Icons.star_rounded, color: AppColors.gold),
+        _StatCard(margin: const EdgeInsets.only(left: AppSpacing.xl), title: "Mock Score", value: "8.5", icon: Icons.star_rounded, color: AppColors.gold),
         const SizedBox(width: AppSpacing.md),
-        _StatCard(title: "Confidence", value: "High", icon: Icons.trending_up_rounded, color: AppColors.success),
+        _StatCard(margin: const EdgeInsets.only(right: AppSpacing.xl), title: "Confidence", value: "High", icon: Icons.trending_up_rounded, color: AppColors.success),
       ],
     );
   }
@@ -58,6 +61,7 @@ class StudentInterviewScreen extends StatelessWidget {
 
     return GridView.builder(
       shrinkWrap: true,
+      padding: const EdgeInsets.symmetric(horizontal: AppSpacing.xl),
       physics: const NeverScrollableScrollPhysics(),
       gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
         crossAxisCount: 2,
@@ -132,12 +136,15 @@ class _StatCard extends StatelessWidget {
   final IconData icon;
   final Color color;
 
-  const _StatCard({required this.title, required this.value, required this.icon, required this.color});
+  const _StatCard({required this.title, required this.value, required this.icon, required this.color, this.margin});
+
+  final EdgeInsetsGeometry? margin;
 
   @override
   Widget build(BuildContext context) {
     return Expanded(
       child: DashboardCard(
+        margin: margin,
         title: title,
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
@@ -164,7 +171,7 @@ class _MockInterviewTile extends StatelessWidget {
   Widget build(BuildContext context) {
     final isConfirmed = status == "Confirmed";
     return Container(
-      margin: const EdgeInsets.only(bottom: AppSpacing.md),
+      margin: const EdgeInsets.only(bottom: AppSpacing.md, left: AppSpacing.xl, right: AppSpacing.xl),
       padding: const EdgeInsets.all(AppSpacing.md),
       decoration: BoxDecoration(
         color: Theme.of(context).cardTheme.color,

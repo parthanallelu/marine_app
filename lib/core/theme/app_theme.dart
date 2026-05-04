@@ -49,6 +49,8 @@ class AppColors {
   static const Color surfaceDark = Color(0xFF1E293B);
   static const Color cardDark = Color(0xFF161F30);
   static const Color surfaceContainerDark = Color(0xFF253448);
+  static const Color navyChrome = Color(0xFF050C16);       // Bottom nav & headers — much darker for strong separation
+  static const Color navyChromeLight = Color(0xFF0A2A66);   // Headers in light mode
 
   // ── Text (Light Mode) ──
   static const Color textPrimaryLight = Color(0xFF0F172A);
@@ -324,24 +326,24 @@ class AppTheme {
         padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
       ),
       navigationBarTheme: NavigationBarThemeData(
-        backgroundColor: AppColors.surfaceLight,
+        backgroundColor: AppColors.navyChromeLight,
         elevation: 0,
         height: 64,
-        indicatorColor: AppColors.primaryLight.withAlpha((0.1 * 255).round()),
+        indicatorColor: Colors.white.withAlpha(25),
         labelTextStyle: WidgetStateProperty.resolveWith((states) {
           if (states.contains(WidgetState.selected)) {
             return AppTextStyles.labelSmall.copyWith(
-              color: AppColors.primaryLight,
+              color: Colors.white,
               fontWeight: FontWeight.w600,
             );
           }
-          return AppTextStyles.labelSmall.copyWith(color: AppColors.textHintLight);
+          return AppTextStyles.labelSmall.copyWith(color: Colors.white.withAlpha(140));
         }),
         iconTheme: WidgetStateProperty.resolveWith((states) {
           if (states.contains(WidgetState.selected)) {
-            return const IconThemeData(color: AppColors.primaryLight, size: 24);
+            return const IconThemeData(color: Colors.white, size: 24);
           }
-          return const IconThemeData(color: AppColors.textHintLight, size: 24);
+          return IconThemeData(color: Colors.white.withAlpha(140), size: 24);
         }),
       ),
     );
@@ -443,10 +445,11 @@ class AppTheme {
         padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
       ),
       navigationBarTheme: NavigationBarThemeData(
-        backgroundColor: AppColors.backgroundDark,
+        backgroundColor: AppColors.navyChrome,
+        surfaceTintColor: Colors.transparent, // Prevent Material 3 blending
         elevation: 0,
         height: 64,
-        indicatorColor: Colors.transparent,
+        indicatorColor: AppColors.primaryDark.withAlpha(30),
         labelTextStyle: WidgetStateProperty.resolveWith((states) {
           if (states.contains(WidgetState.selected)) {
             return AppTextStyles.labelSmall.copyWith(

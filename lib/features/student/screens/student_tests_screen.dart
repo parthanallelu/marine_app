@@ -132,7 +132,7 @@ class _TestList extends StatelessWidget {
 
     // LIST PERFORMANCE: Using ListView.builder for dynamic lists
     return ListView.builder(
-      padding: const EdgeInsets.all(AppSpacing.lg),
+      padding: const EdgeInsets.symmetric(vertical: AppSpacing.lg),
       itemCount: tests.length,
       itemBuilder: (context, index) {
         final test = tests[index];
@@ -168,7 +168,7 @@ class _ResultList extends StatelessWidget {
     }
 
     return ListView.builder(
-      padding: const EdgeInsets.all(AppSpacing.lg),
+      padding: const EdgeInsets.symmetric(vertical: AppSpacing.lg),
       itemCount: results.length,
       itemBuilder: (context, index) {
         final result = results[index];

@@ -99,8 +99,8 @@ class _StudentMaterialsScreenState extends State<StudentMaterialsScreen> {
             itemBuilder: (context, index) {
               final category = categories[index];
               final isSelected = _selectedCategory == category;
-              return Padding(
-                padding: const EdgeInsets.only(right: AppSpacing.sm),
+              return Container(
+                margin: const EdgeInsets.only(right: AppSpacing.sm),
                 child: ChoiceChip(
                   label: Text(category),
                   selected: isSelected,
@@ -141,7 +141,7 @@ class _StudentMaterialsScreenState extends State<StudentMaterialsScreen> {
           : ListView.builder(
               shrinkWrap: true,
               physics: const NeverScrollableScrollPhysics(),
-              padding: const EdgeInsets.all(AppSpacing.lg),
+              padding: const EdgeInsets.symmetric(vertical: AppSpacing.lg),
               itemCount: filteredMaterials.length,
               itemBuilder: (context, index) {
                 final material = filteredMaterials[index];

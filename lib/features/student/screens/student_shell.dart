@@ -18,10 +18,11 @@ class StudentShell extends StatelessWidget {
       body: navigationShell,
       bottomNavigationBar: Container(
         decoration: BoxDecoration(
+          color: isDark ? AppColors.navyChrome : AppColors.navyChromeLight,
           border: Border(
             top: BorderSide(
-              color: isDark ? AppColors.borderCardDark : AppColors.borderLight,
-              width: 1,
+              color: isDark ? AppColors.borderCardDark.withAlpha(100) : Colors.transparent,
+              width: 0.5,
             ),
           ),
         ),

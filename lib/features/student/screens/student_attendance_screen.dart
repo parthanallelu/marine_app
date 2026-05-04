@@ -115,13 +115,12 @@ class _StudentAttendanceScreenState extends State<StudentAttendanceScreen> {
           ],
         ),
       ],
-      body: Padding(
-        padding: const EdgeInsets.symmetric(horizontal: AppSpacing.xl),
-        child: Column(
+      body: Column(
           children: [
             const SizedBox(height: AppSpacing.lg),
             // Progress card
             Container(
+              margin: const EdgeInsets.symmetric(horizontal: AppSpacing.xl),
               padding: const EdgeInsets.all(AppSpacing.lg),
               decoration: BoxDecoration(
                 color: Theme.of(context).cardTheme.color,
@@ -171,6 +170,7 @@ class _StudentAttendanceScreenState extends State<StudentAttendanceScreen> {
             const SizedBox(height: AppSpacing.xl),
             // TableCalendar
             Container(
+              margin: const EdgeInsets.symmetric(horizontal: AppSpacing.xl),
               decoration: BoxDecoration(
                 color: Theme.of(context).cardTheme.color,
                 borderRadius: AppRadius.cardRadius,
@@ -261,7 +261,6 @@ class _StudentAttendanceScreenState extends State<StudentAttendanceScreen> {
             const SizedBox(height: 60),
           ],
         ),
-      ),
     );
   }
 }
