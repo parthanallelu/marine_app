@@ -12,11 +12,7 @@ class TestResultScreen extends StatelessWidget {
   final String resultId;
   final TestResult? result;
 
-  const TestResultScreen({
-    super.key,
-    required this.resultId,
-    this.result,
-  });
+  const TestResultScreen({super.key, required this.resultId, this.result});
 
   @override
   Widget build(BuildContext context) {
@@ -32,13 +28,17 @@ class TestResultScreen extends StatelessWidget {
     // SAFE CASTING: If result was not passed via extra, we try to fetch it or show error
     // TODO: Replace with Firestore fetch:
     // final testResult = result ?? await testRepository.getResultById(resultId);
-    final testResult = result ?? DummyData.testResults.firstWhere(
-      (r) => r.id == resultId,
-      orElse: () => DummyData.testResults.first, // Fallback for dummy demo
-    );
+    final testResult =
+        result ??
+        DummyData.testResults.firstWhere(
+          (r) => r.id == resultId,
+          orElse: () => DummyData.testResults.first, // Fallback for dummy demo
+        );
 
     final hasPassed = testResult.isPassed;
-    final primaryColor = hasPassed ? AppColors.testPassed : AppColors.testFailed;
+    final primaryColor = hasPassed
+        ? AppColors.testPassed
+        : AppColors.testFailed;
     final accentColor = hasPassed ? AppColors.success : AppColors.error;
 
     return Scaffold(
@@ -58,7 +58,10 @@ class TestResultScreen extends StatelessWidget {
               ),
               child: SafeArea(
                 child: Padding(
-                  padding: const EdgeInsets.symmetric(horizontal: AppSpacing.xxl, vertical: AppSpacing.xxxl),
+                  padding: const EdgeInsets.symmetric(
+                    horizontal: AppSpacing.xxl,
+                    vertical: AppSpacing.xxxl,
+                  ),
                   child: Column(
                     children: [
                       Container(
@@ -77,12 +80,16 @@ class TestResultScreen extends StatelessWidget {
                       const SizedBox(height: AppSpacing.lg),
                       Text(
                         hasPassed ? "Congratulations!" : "Keep Trying!",
-                        style: AppTextStyles.headingLarge.copyWith(color: Colors.white),
+                        style: AppTextStyles.headingLarge.copyWith(
+                          color: Colors.white,
+                        ),
                       ),
                       const SizedBox(height: AppSpacing.xs),
                       Text(
                         testResult.testTitle,
-                        style: AppTextStyles.bodyMedium.copyWith(color: Colors.white.withAlpha((0.8 * 255).round())),
+                        style: AppTextStyles.bodyMedium.copyWith(
+                          color: Colors.white.withAlpha((0.8 * 255).round()),
+                        ),
                         textAlign: TextAlign.center,
                       ),
                       const SizedBox(height: AppSpacing.xxl),
@@ -91,15 +98,18 @@ class TestResultScreen extends StatelessWidget {
                         children: [
                           _ResultStat(
                             label: "Score",
-                            value: "${testResult.score.toInt()} / ${testResult.totalMarks.toInt()}",
+                            value:
+                                "${testResult.score.toInt()} / ${testResult.totalMarks.toInt()}",
                           ),
                           _ResultStat(
                             label: "Percentage",
-                            value: "${testResult.percentage.toStringAsFixed(1)}%",
+                            value:
+                                "${testResult.percentage.toStringAsFixed(1)}%",
                           ),
                           _ResultStat(
                             label: "Time taken",
-                            value: "${testResult.timeTakenSeconds ~/ 60}m ${testResult.timeTakenSeconds % 60}s",
+                            value:
+                                "${testResult.timeTakenSeconds ~/ 60}m ${testResult.timeTakenSeconds % 60}s",
                           ),
                         ],
                       ),
@@ -110,34 +120,48 @@ class TestResultScreen extends StatelessWidget {
             ),
           ),
 
-
-  // SLIVER 2 — Actions
-  SliverPadding(
-    padding: const EdgeInsets.all(AppSpacing.lg),
-    sliver: SliverToBoxAdapter(
-      child: Column(
-        children: [
-          CustomButton(
-            label: "Back to Tests",
-            width: double.infinity,
-            icon: Icons.quiz_rounded,
-            // NAVIGATION SAFETY: Using goNamed
-            onPressed: () => context.goNamed(AppRoutes.studentTestsName),
-          ),
-          const SizedBox(height: AppSpacing.md),
-          CustomButton(
-            label: "Dashboard",
-            width: double.infinity,
-            isOutlined: true,
-            // NAVIGATION SAFETY: Using goNamed
-            onPressed: () => context.goNamed(AppRoutes.studentHomeName),
+          // SLIVER 2 — Actions
+          SliverPadding(
+            padding: const EdgeInsets.all(AppSpacing.lg),
+            sliver: SliverToBoxAdapter(
+              child: Column(
+                children: [
+                  if (testResult.feedback.isNotEmpty) ...[
+                    DashboardCard(
+                      title: "Professor Feedback",
+                      icon: Icons.rate_review_outlined,
+                      iconColor: AppColors.gold,
+                      child: Text(
+                        testResult.feedback,
+                        style: AppTextStyles.bodyMedium.copyWith(
+                          color: AppColors.textSecondary,
+                          height: 1.4,
+                        ),
+                      ),
+                    ),
+                    const SizedBox(height: AppSpacing.lg),
+                  ],
+                  CustomButton(
+                    label: "Back to Tests",
+                    width: double.infinity,
+                    icon: Icons.quiz_rounded,
+                    // NAVIGATION SAFETY: Using goNamed
+                    onPressed: () =>
+                        context.goNamed(AppRoutes.studentTestsName),
+                  ),
+                  const SizedBox(height: AppSpacing.md),
+                  CustomButton(
+                    label: "Dashboard",
+                    width: double.infinity,
+                    isOutlined: true,
+                    // NAVIGATION SAFETY: Using goNamed
+                    onPressed: () => context.goNamed(AppRoutes.studentHomeName),
+                  ),
+                ],
+              ),
+            ),
           ),
         ],
-      ),
-    ),
-  ),
-],
-
       ),
     );
   }
@@ -159,10 +183,11 @@ class _ResultStat extends StatelessWidget {
         const SizedBox(height: AppSpacing.xs),
         Text(
           label,
-          style: AppTextStyles.caption.copyWith(color: Colors.white.withAlpha((0.7 * 255).round())),
+          style: AppTextStyles.caption.copyWith(
+            color: Colors.white.withAlpha((0.7 * 255).round()),
+          ),
         ),
       ],
     );
-
   }
 }

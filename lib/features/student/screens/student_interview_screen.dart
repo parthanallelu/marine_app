@@ -15,40 +15,93 @@ class StudentInterviewScreen extends StatelessWidget {
       showMenuButton: true,
       endDrawer: const StudentDrawer(),
       body: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            const SizedBox(height: AppSpacing.lg),
-            _buildQuickStats(),
-            const SizedBox(height: AppSpacing.xxl),
-            const SectionHeader(title: "Preparation Modules"),
-            const SizedBox(height: AppSpacing.md),
-            _buildModuleGrid(context),
-            const SizedBox(height: AppSpacing.xxl),
-            const SectionHeader(title: "Upcoming Mock Interviews"),
-            const SizedBox(height: AppSpacing.md),
-            _buildUpcomingMocks(),
-            const SizedBox(height: 100),
-          ],
-        ),
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          const SizedBox(height: AppSpacing.lg),
+          _buildQuickStats(),
+          const SizedBox(height: AppSpacing.xxl),
+          const SectionHeader(title: "Preparation Modules"),
+          const SizedBox(height: AppSpacing.md),
+          _buildModuleGrid(context),
+          const SizedBox(height: AppSpacing.xxl),
+          const SectionHeader(title: "Upcoming Mock Interviews"),
+          const SizedBox(height: AppSpacing.md),
+          _buildUpcomingMocks(),
+          const SizedBox(height: 100),
+        ],
+      ),
     );
   }
 
   Widget _buildQuickStats() {
     return Row(
       children: [
-        _StatCard(margin: const EdgeInsets.only(left: 12), title: "Mock Score", value: "8.5", icon: Icons.star_rounded, color: AppColors.gold),
+        _buildQuickStat(
+          margin: const EdgeInsets.only(left: 12),
+          title: "Mock Score",
+          value: "8.5",
+          icon: Icons.star_rounded,
+          color: AppColors.gold,
+        ),
         const SizedBox(width: AppSpacing.md),
-        _StatCard(margin: const EdgeInsets.only(right: 12), title: "Confidence", value: "High", icon: Icons.trending_up_rounded, color: AppColors.success),
+        _buildQuickStat(
+          margin: const EdgeInsets.only(right: 12),
+          title: "Confidence",
+          value: "High",
+          icon: Icons.trending_up_rounded,
+          color: AppColors.success,
+        ),
       ],
+    );
+  }
+
+  Widget _buildQuickStat({
+    required String title,
+    required String value,
+    required IconData icon,
+    required Color color,
+    EdgeInsetsGeometry? margin,
+  }) {
+    return Expanded(
+      child: DashboardCard(
+        margin: margin,
+        title: title,
+        icon: icon,
+        iconColor: color,
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Text(value, style: AppTextStyles.headingMedium),
+            const SizedBox(height: 4),
+            Text("Based on last 5 mocks", style: AppTextStyles.caption),
+          ],
+        ),
+      ),
     );
   }
 
   Widget _buildModuleGrid(BuildContext context) {
     final modules = [
-      {'title': 'General IQ', 'icon': Icons.psychology_rounded, 'color': Colors.blue},
-      {'title': 'Technical', 'icon': Icons.engineering_rounded, 'color': Colors.orange},
-      {'title': 'Psychometric', 'icon': Icons.remove_red_eye_rounded, 'color': Colors.purple},
-      {'title': 'Communication', 'icon': Icons.record_voice_over_rounded, 'color': Colors.teal},
+      {
+        'title': 'General IQ',
+        'icon': Icons.psychology_rounded,
+        'color': Colors.blue,
+      },
+      {
+        'title': 'Technical',
+        'icon': Icons.engineering_rounded,
+        'color': Colors.orange,
+      },
+      {
+        'title': 'Psychometric',
+        'icon': Icons.remove_red_eye_rounded,
+        'color': Colors.purple,
+      },
+      {
+        'title': 'Communication',
+        'icon': Icons.record_voice_over_rounded,
+        'color': Colors.teal,
+      },
     ];
 
     return GridView.builder(
@@ -68,7 +121,11 @@ class StudentInterviewScreen extends StatelessWidget {
           decoration: BoxDecoration(
             color: Theme.of(context).cardTheme.color,
             borderRadius: BorderRadius.circular(AppRadius.lg),
-            border: Border.all(color: Theme.of(context).dividerColor.withAlpha((0.1 * 255).round())),
+            border: Border.all(
+              color: Theme.of(
+                context,
+              ).dividerColor.withAlpha((0.1 * 255).round()),
+            ),
             boxShadow: AppShadows.card,
           ),
           child: Material(
@@ -84,14 +141,20 @@ class StudentInterviewScreen extends StatelessWidget {
                     height: 44,
                     alignment: Alignment.center,
                     decoration: BoxDecoration(
-                      color: (module['color'] as Color).withAlpha((0.1 * 255).round()),
+                      color: (module['color'] as Color).withAlpha(
+                        (0.1 * 255).round(),
+                      ),
                       shape: BoxShape.circle,
                     ),
-                    child: Icon(module['icon'] as IconData, color: module['color'] as Color, size: 24),
+                    child: Icon(
+                      module['icon'] as IconData,
+                      color: module['color'] as Color,
+                      size: 24,
+                    ),
                   ),
                   const SizedBox(height: 8),
                   Text(
-                    module['title'] as String, 
+                    module['title'] as String,
                     style: AppTextStyles.labelLarge.copyWith(fontSize: 13),
                     textAlign: TextAlign.center,
                   ),
@@ -122,43 +185,16 @@ class StudentInterviewScreen extends StatelessWidget {
   }
 }
 
-class _StatCard extends StatelessWidget {
-  final String title;
-  final String value;
-  final IconData icon;
-  final Color color;
-
-  const _StatCard({required this.title, required this.value, required this.icon, required this.color, this.margin});
-
-  final EdgeInsetsGeometry? margin;
-
-  @override
-  Widget build(BuildContext context) {
-    return Expanded(
-      child: DashboardCard(
-        margin: margin,
-        title: title,
-        icon: icon,
-        iconColor: color,
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            Text(value, style: AppTextStyles.headingMedium),
-            const SizedBox(height: 4),
-            Text("Based on last 5 mocks", style: AppTextStyles.caption),
-          ],
-        ),
-      ),
-    );
-  }
-}
-
 class _MockInterviewTile extends StatelessWidget {
   final String company;
   final String date;
   final String status;
 
-  const _MockInterviewTile({required this.company, required this.date, required this.status});
+  const _MockInterviewTile({
+    required this.company,
+    required this.date,
+    required this.status,
+  });
 
   @override
   Widget build(BuildContext context) {
@@ -169,7 +205,9 @@ class _MockInterviewTile extends StatelessWidget {
       decoration: BoxDecoration(
         color: Theme.of(context).cardTheme.color,
         borderRadius: BorderRadius.circular(AppRadius.lg),
-        border: Border.all(color: Theme.of(context).dividerColor.withAlpha((0.1 * 255).round())),
+        border: Border.all(
+          color: Theme.of(context).dividerColor.withAlpha((0.1 * 255).round()),
+        ),
       ),
       child: Row(
         children: [
@@ -179,7 +217,11 @@ class _MockInterviewTile extends StatelessWidget {
               color: AppColors.navyBlueBase.withAlpha((0.1 * 255).round()),
               borderRadius: BorderRadius.circular(AppRadius.sm),
             ),
-            child: const Icon(Icons.business_rounded, color: AppColors.navyBlueBase, size: 24),
+            child: const Icon(
+              Icons.business_rounded,
+              color: AppColors.navyBlueBase,
+              size: 24,
+            ),
           ),
           const SizedBox(width: AppSpacing.md),
           Expanded(
@@ -194,7 +236,8 @@ class _MockInterviewTile extends StatelessWidget {
           Container(
             padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
             decoration: BoxDecoration(
-              color: (isConfirmed ? AppColors.success : AppColors.warning).withAlpha((0.1 * 255).round()),
+              color: (isConfirmed ? AppColors.success : AppColors.warning)
+                  .withAlpha((0.1 * 255).round()),
               borderRadius: BorderRadius.circular(AppRadius.xs),
             ),
             child: Text(

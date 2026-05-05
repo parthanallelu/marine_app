@@ -16,13 +16,17 @@ import '../features/professor/screens/professor_home_screen.dart';
 import '../features/professor/screens/mark_attendance_screen.dart';
 import '../features/professor/screens/professor_materials_screen.dart';
 import '../features/professor/screens/professor_tests_screen.dart';
+import '../features/professor/screens/professor_submissions_screen.dart';
+import '../features/professor/screens/professor_students_screen.dart';
 import '../features/professor/screens/professor_profile_screen.dart';
 import '../features/professor/screens/professor_shell.dart';
 import '../features/admin/screens/admin_home_screen.dart';
 import '../features/admin/screens/admin_students_screen.dart';
+import '../features/admin/screens/admin_professors_screen.dart';
 import '../features/admin/screens/admin_batches_screen.dart';
 import '../features/admin/screens/admin_fees_screen.dart';
 import '../features/admin/screens/admin_announcements_screen.dart';
+import '../features/admin/screens/admin_reports_screen.dart';
 import '../features/admin/screens/admin_shell.dart';
 import '../features/common/screens/splash_screen.dart';
 import '../features/common/screens/error_screen.dart';
@@ -31,7 +35,8 @@ import '../core/constants/app_constants.dart';
 import '../models/app_models.dart';
 
 class AppRouter {
-  static final GlobalKey<NavigatorState> _rootNavigatorKey = GlobalKey<NavigatorState>();
+  static final GlobalKey<NavigatorState> _rootNavigatorKey =
+      GlobalKey<NavigatorState>();
 
   static GoRouter createRouter(AuthProvider authProvider) {
     return GoRouter(
@@ -46,9 +51,10 @@ class AppRouter {
         final role = authProvider.currentUser?.role;
 
         // Public paths that don't require authentication
-        final isAuthPath = location == AppRoutes.roleSelection || 
-                          location == AppRoutes.login || 
-                          location == AppRoutes.splash;
+        final isAuthPath =
+            location == AppRoutes.roleSelection ||
+            location == AppRoutes.login ||
+            location == AppRoutes.splash;
 
         // 1. If not logged in and trying to access a private route, redirect to role-selection
         if (!isLoggedIn && !isAuthPath) {
@@ -66,19 +72,22 @@ class AppRouter {
         if (isLoggedIn) {
           // Student Guards
           if (role == AppConstants.roleStudent) {
-            if (location.startsWith('/admin') || location.startsWith('/professor')) {
+            if (location.startsWith('/admin') ||
+                location.startsWith('/professor')) {
               return AppRoutes.studentHome;
             }
           }
           // Professor Guards
           if (role == AppConstants.roleProfessor) {
-            if (location.startsWith('/admin') || location.startsWith('/student')) {
+            if (location.startsWith('/admin') ||
+                location.startsWith('/student')) {
               return AppRoutes.professorHome;
             }
           }
           // Admin Guards
           if (role == AppConstants.roleAdmin) {
-            if (location.startsWith('/student') || location.startsWith('/professor')) {
+            if (location.startsWith('/student') ||
+                location.startsWith('/professor')) {
               return AppRoutes.adminHome;
             }
           }
@@ -110,12 +119,33 @@ class AppRouter {
           name: AppRoutes.studentProfileName,
           builder: (context, state) => const StudentProfileScreen(),
         ),
+        GoRoute(
+          path: AppRoutes.professorSubmissions,
+          name: AppRoutes.professorSubmissionsName,
+          builder: (context, state) => const ProfessorSubmissionsScreen(),
+        ),
+        GoRoute(
+          path: AppRoutes.professorStudents,
+          name: AppRoutes.professorStudentsName,
+          builder: (context, state) => const ProfessorStudentsScreen(),
+        ),
+        GoRoute(
+          path: AppRoutes.adminProfessors,
+          name: AppRoutes.adminProfessorsName,
+          builder: (context, state) => const AdminProfessorsScreen(),
+        ),
+        GoRoute(
+          path: AppRoutes.adminReports,
+          name: AppRoutes.adminReportsName,
+          builder: (context, state) => const AdminReportsScreen(),
+        ),
 
         // ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
         // STUDENT NAVIGATION (5 Branches)
         // ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
         StatefulShellRoute.indexedStack(
-          builder: (context, state, navigationShell) => StudentShell(navigationShell: navigationShell),
+          builder: (context, state, navigationShell) =>
+              StudentShell(navigationShell: navigationShell),
           branches: [
             StatefulShellBranch(
               routes: [
@@ -154,7 +184,9 @@ class AppRouter {
                       name: 'test_result',
                       builder: (context, state) => TestResultScreen(
                         resultId: state.pathParameters['resultId'] ?? '',
-                        result: state.extra is TestResult ? state.extra as TestResult : null,
+                        result: state.extra is TestResult
+                            ? state.extra as TestResult
+                            : null,
                       ),
                     ),
                   ],
@@ -185,7 +217,8 @@ class AppRouter {
                     GoRoute(
                       path: 'announcements',
                       name: AppRoutes.studentAnnouncementsName,
-                      builder: (context, state) => const AnnouncementsScreen(),
+                      builder: (context, state) =>
+                          const StudentAnnouncementsScreen(),
                     ),
                   ],
                 ),
@@ -198,7 +231,8 @@ class AppRouter {
         // PROFESSOR NAVIGATION (4 Branches)
         // ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
         StatefulShellRoute.indexedStack(
-          builder: (context, state, navigationShell) => ProfessorShell(navigationShell: navigationShell),
+          builder: (context, state, navigationShell) =>
+              ProfessorShell(navigationShell: navigationShell),
           branches: [
             StatefulShellBranch(
               routes: [
@@ -252,7 +286,8 @@ class AppRouter {
         // ADMIN NAVIGATION (5 Branches)
         // ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
         StatefulShellRoute.indexedStack(
-          builder: (context, state, navigationShell) => AdminShell(navigationShell: navigationShell),
+          builder: (context, state, navigationShell) =>
+              AdminShell(navigationShell: navigationShell),
           branches: [
             StatefulShellBranch(
               routes: [

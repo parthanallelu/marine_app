@@ -48,12 +48,17 @@ class StatCard extends StatelessWidget {
               children: [
                 Text(
                   value,
-                  style: AppTextStyles.statNumber.copyWith(color: AppColors.textPrimary, fontSize: 18),
+                  style: AppTextStyles.statNumber.copyWith(
+                    color: AppColors.textPrimary,
+                    fontSize: 18,
+                  ),
                 ),
                 Container(
                   padding: const EdgeInsets.all(AppSpacing.sm),
                   decoration: BoxDecoration(
-                    color: (bgColor ?? cardColor).withAlpha((0.15 * 255).round()),
+                    color: (bgColor ?? cardColor).withAlpha(
+                      (0.15 * 255).round(),
+                    ),
                     borderRadius: BorderRadius.circular(AppRadius.md),
                   ),
                   child: Icon(icon, color: cardColor, size: 20),
@@ -98,11 +103,14 @@ class StudentStatCard extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Container(
-      padding: const EdgeInsets.symmetric(vertical: 8, horizontal: 8), 
+      padding: const EdgeInsets.symmetric(vertical: 8, horizontal: 8),
       decoration: BoxDecoration(
         color: Theme.of(context).cardTheme.color,
         borderRadius: BorderRadius.circular(12),
-        border: Border.all(color: Theme.of(context).dividerColor.withAlpha((0.2 * 255).round()), width: 0.5),
+        border: Border.all(
+          color: Theme.of(context).dividerColor.withAlpha((0.2 * 255).round()),
+          width: 0.5,
+        ),
         boxShadow: [
           BoxShadow(
             color: Colors.black.withAlpha((0.04 * 255).round()),
@@ -123,24 +131,24 @@ class StudentStatCard extends StatelessWidget {
             ),
             child: Icon(icon, color: valueColor, size: 16),
           ),
-          const SizedBox(height: 4), 
+          const SizedBox(height: 4),
           FittedBox(
             fit: BoxFit.scaleDown,
             child: Text(
               value,
               style: AppTextStyles.headingLarge.copyWith(
-                fontSize: 18, 
+                fontSize: 18,
                 fontWeight: FontWeight.w600,
                 color: valueColor,
               ),
             ),
           ),
-          const SizedBox(height: 0), 
+          const SizedBox(height: 0),
           Text(
             label,
             style: AppTextStyles.bodySmall.copyWith(
               color: AppColors.textSecondary,
-              fontSize: 10, 
+              fontSize: 10,
             ),
             textAlign: TextAlign.center,
             maxLines: 1,
@@ -234,7 +242,11 @@ class DashboardCard extends StatelessWidget {
                     leading!,
                     SizedBox(width: AppSpacing.md),
                   ] else if (icon != null) ...[
-                    Icon(icon, size: 20, color: iconColor ?? AppColors.navyBlueBase),
+                    Icon(
+                      icon,
+                      size: 20,
+                      color: iconColor ?? AppColors.navyBlueBase,
+                    ),
                     SizedBox(width: AppSpacing.sm),
                   ],
                   Expanded(
@@ -245,19 +257,23 @@ class DashboardCard extends StatelessWidget {
                         if (subtitle != null)
                           Text(
                             subtitle!,
-                            style: AppTextStyles.bodySmall.copyWith(color: AppColors.textSecondary),
+                            style: AppTextStyles.bodySmall.copyWith(
+                              color: AppColors.textSecondary,
+                            ),
                           ),
                       ],
                     ),
                   ),
-                  if (trailing != null) 
+                  if (trailing != null)
                     trailing!
                   else if (actionLabel != null)
                     TextButton(
                       onPressed: onAction,
                       child: Text(
                         actionLabel!,
-                        style: AppTextStyles.labelMedium.copyWith(color: AppColors.oceanBlue),
+                        style: AppTextStyles.labelMedium.copyWith(
+                          color: AppColors.oceanBlue,
+                        ),
                       ),
                     ),
                   if (actions != null) ...actions!,
@@ -265,7 +281,14 @@ class DashboardCard extends StatelessWidget {
               ),
             ),
             Padding(
-              padding: padding ?? EdgeInsets.fromLTRB(AppSpacing.lg, 0, AppSpacing.lg, AppSpacing.lg),
+              padding:
+                  padding ??
+                  EdgeInsets.fromLTRB(
+                    AppSpacing.lg,
+                    0,
+                    AppSpacing.lg,
+                    AppSpacing.lg,
+                  ),
               child: child,
             ),
           ],
@@ -304,7 +327,11 @@ class QuickActionTile extends StatelessWidget {
         decoration: BoxDecoration(
           color: Theme.of(context).cardTheme.color,
           borderRadius: BorderRadius.circular(12),
-          border: Border.all(color: Theme.of(context).dividerColor.withAlpha((0.1 * 255).round())),
+          border: Border.all(
+            color: Theme.of(
+              context,
+            ).dividerColor.withAlpha((0.1 * 255).round()),
+          ),
           boxShadow: [
             BoxShadow(
               color: Colors.black.withAlpha((0.02 * 255).round()),
@@ -321,21 +348,21 @@ class QuickActionTile extends StatelessWidget {
               mainAxisAlignment: MainAxisAlignment.center,
               children: [
                 Container(
-                  width: 30, 
+                  width: 30,
                   height: 30,
                   decoration: BoxDecoration(
                     color: color.withAlpha((0.12 * 255).round()),
                     borderRadius: BorderRadius.circular(8),
                   ),
-                  child: Icon(icon, color: color, size: 16), 
+                  child: Icon(icon, color: color, size: 16),
                 ),
-                const SizedBox(height: 4), 
+                const SizedBox(height: 4),
                 Expanded(
                   child: Center(
                     child: Text(
                       label,
                       style: AppTextStyles.labelMedium.copyWith(
-                        fontSize: 9, 
+                        fontSize: 9,
                         color: AppColors.textSecondary,
                         height: 1.0,
                       ),
@@ -357,11 +384,18 @@ class QuickActionTile extends StatelessWidget {
                     color: AppColors.error,
                     shape: BoxShape.circle,
                   ),
-                  constraints: const BoxConstraints(minWidth: 16, minHeight: 16),
+                  constraints: const BoxConstraints(
+                    minWidth: 16,
+                    minHeight: 16,
+                  ),
                   alignment: Alignment.center,
                   child: Text(
                     badgeCount.toString(),
-                    style: const TextStyle(color: Colors.white, fontSize: 9, fontWeight: FontWeight.bold),
+                    style: const TextStyle(
+                      color: Colors.white,
+                      fontSize: 9,
+                      fontWeight: FontWeight.bold,
+                    ),
                   ),
                 ),
               ),
@@ -408,7 +442,9 @@ class CustomButton extends StatelessWidget {
             width: 20,
             child: CircularProgressIndicator(
               strokeWidth: 2.5,
-              valueColor: AlwaysStoppedAnimation<Color>(isOutlined ? themeColor : Colors.white),
+              valueColor: AlwaysStoppedAnimation<Color>(
+                isOutlined ? themeColor : Colors.white,
+              ),
             ),
           )
         : Row(
@@ -423,7 +459,6 @@ class CustomButton extends StatelessWidget {
             ],
           );
 
-
     return SizedBox(
       width: width,
       height: height,
@@ -433,7 +468,9 @@ class CustomButton extends StatelessWidget {
               style: OutlinedButton.styleFrom(
                 foregroundColor: themeColor,
                 side: BorderSide(color: themeColor, width: 1.5),
-                shape: RoundedRectangleBorder(borderRadius: AppRadius.buttonRadius),
+                shape: RoundedRectangleBorder(
+                  borderRadius: AppRadius.buttonRadius,
+                ),
               ),
               child: content,
             )
@@ -442,7 +479,9 @@ class CustomButton extends StatelessWidget {
               style: ElevatedButton.styleFrom(
                 backgroundColor: themeColor,
                 foregroundColor: Colors.white,
-                shape: RoundedRectangleBorder(borderRadius: AppRadius.buttonRadius),
+                shape: RoundedRectangleBorder(
+                  borderRadius: AppRadius.buttonRadius,
+                ),
               ),
               child: content,
             ),
@@ -491,17 +530,31 @@ class BranchBadge extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Container(
-      padding: EdgeInsets.symmetric(horizontal: AppSpacing.sm, vertical: AppSpacing.xs),
+      padding: EdgeInsets.symmetric(
+        horizontal: AppSpacing.sm,
+        vertical: AppSpacing.xs,
+      ),
       decoration: BoxDecoration(
-        color: Theme.of(context).colorScheme.primary.withAlpha((0.1 * 255).round()),
+        color: Theme.of(
+          context,
+        ).colorScheme.primary.withAlpha((0.1 * 255).round()),
         borderRadius: BorderRadius.circular(AppRadius.xxl),
       ),
       child: Row(
         mainAxisSize: MainAxisSize.min,
         children: [
-          const Icon(Icons.location_on, size: 12, color: AppColors.navyBlueBase),
+          const Icon(
+            Icons.location_on,
+            size: 12,
+            color: AppColors.navyBlueBase,
+          ),
           const SizedBox(width: 4),
-          Text(branch, style: AppTextStyles.labelSmall.copyWith(color: Theme.of(context).colorScheme.primary)),
+          Text(
+            branch,
+            style: AppTextStyles.labelSmall.copyWith(
+              color: Theme.of(context).colorScheme.primary,
+            ),
+          ),
         ],
       ),
     );
@@ -567,7 +620,10 @@ class InfoRow extends StatelessWidget {
         children: [
           Icon(icon, size: 16, color: iconColor ?? AppColors.textHint),
           SizedBox(width: AppSpacing.sm),
-          Text(label, style: AppTextStyles.bodyMedium.copyWith(color: AppColors.textHint)),
+          Text(
+            label,
+            style: AppTextStyles.bodyMedium.copyWith(color: AppColors.textHint),
+          ),
           const SizedBox(width: AppSpacing.md),
           Expanded(
             child: Text(
@@ -590,12 +646,16 @@ class InfoRow extends StatelessWidget {
 
 class SectionHeader extends StatelessWidget {
   final String title;
+  final IconData? icon;
+  final Color? iconColor;
   final String? actionLabel;
   final VoidCallback? onAction;
 
   const SectionHeader({
     super.key,
     required this.title,
+    this.icon,
+    this.iconColor,
     this.actionLabel,
     this.onAction,
   });
@@ -607,16 +667,27 @@ class SectionHeader extends StatelessWidget {
       child: Row(
         mainAxisAlignment: MainAxisAlignment.spaceBetween,
         children: [
-        Text(title, style: AppTextStyles.headingMedium),
-        if (actionLabel != null)
-          GestureDetector(
-            onTap: onAction,
-            child: Text(
-              actionLabel!,
-              style: AppTextStyles.labelMedium.copyWith(color: AppColors.oceanBlue),
-            ),
+          Row(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              if (icon != null) ...[
+                Icon(icon, size: 18, color: iconColor ?? AppColors.oceanBlue),
+                const SizedBox(width: AppSpacing.sm),
+              ],
+              Text(title, style: AppTextStyles.headingMedium),
+            ],
           ),
-      ],
+          if (actionLabel != null)
+            GestureDetector(
+              onTap: onAction,
+              child: Text(
+                actionLabel!,
+                style: AppTextStyles.labelMedium.copyWith(
+                  color: AppColors.oceanBlue,
+                ),
+              ),
+            ),
+        ],
       ),
     );
   }
@@ -660,9 +731,17 @@ class EmptyState extends StatelessWidget {
               child: Icon(icon, size: 40, color: AppColors.navyBlueBase),
             ),
             const SizedBox(height: AppSpacing.xl),
-            Text(title, style: AppTextStyles.headingSmall, textAlign: TextAlign.center),
+            Text(
+              title,
+              style: AppTextStyles.headingSmall,
+              textAlign: TextAlign.center,
+            ),
             const SizedBox(height: AppSpacing.sm),
-            Text(subtitle, style: AppTextStyles.bodyMedium, textAlign: TextAlign.center),
+            Text(
+              subtitle,
+              style: AppTextStyles.bodyMedium,
+              textAlign: TextAlign.center,
+            ),
             if (actionLabel != null) ...[
               const SizedBox(height: AppSpacing.xl),
               CustomButton(label: actionLabel!, onPressed: onAction),
@@ -702,8 +781,12 @@ class NavyHeader extends StatelessWidget {
       decoration: BoxDecoration(
         gradient: LinearGradient(
           colors: [
-            Theme.of(context).brightness == Brightness.dark ? AppColors.navyChrome : AppColors.navyChromeLight,
-            Theme.of(context).brightness == Brightness.dark ? const Color(0xFF0D1F35) : const Color(0xFF0E3578),
+            Theme.of(context).brightness == Brightness.dark
+                ? AppColors.navyChrome
+                : AppColors.navyChromeLight,
+            Theme.of(context).brightness == Brightness.dark
+                ? const Color(0xFF0D1F35)
+                : const Color(0xFF0E3578),
           ],
           begin: Alignment.topCenter,
           end: Alignment.bottomCenter,
@@ -712,7 +795,10 @@ class NavyHeader extends StatelessWidget {
       child: SafeArea(
         bottom: false,
         child: Padding(
-          padding: const EdgeInsets.symmetric(horizontal: AppSpacing.xl, vertical: AppSpacing.lg),
+          padding: const EdgeInsets.symmetric(
+            horizontal: AppSpacing.xl,
+            vertical: AppSpacing.lg,
+          ),
           child: Row(
             crossAxisAlignment: CrossAxisAlignment.center,
             children: [
@@ -744,7 +830,9 @@ class NavyHeader extends StatelessWidget {
                   children: [
                     Text(
                       title,
-                      style: AppTextStyles.bodyMedium.copyWith(color: Colors.white70),
+                      style: AppTextStyles.bodyMedium.copyWith(
+                        color: Colors.white70,
+                      ),
                     ),
                     const SizedBox(height: AppSpacing.xxs),
                     Text(
@@ -802,7 +890,9 @@ class AppPageShell extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: Theme.of(context).brightness == Brightness.dark ? AppColors.navyChrome : AppColors.navyChromeLight,
+      backgroundColor: Theme.of(context).brightness == Brightness.dark
+          ? AppColors.navyChrome
+          : AppColors.navyChromeLight,
       endDrawer: endDrawer,
       body: Column(
         children: [
@@ -833,8 +923,12 @@ class AppPageShell extends StatelessWidget {
       decoration: BoxDecoration(
         gradient: LinearGradient(
           colors: [
-            Theme.of(context).brightness == Brightness.dark ? AppColors.navyChrome : AppColors.navyChromeLight,
-            Theme.of(context).brightness == Brightness.dark ? const Color(0xFF0D1F35) : const Color(0xFF0E3578),
+            Theme.of(context).brightness == Brightness.dark
+                ? AppColors.navyChrome
+                : AppColors.navyChromeLight,
+            Theme.of(context).brightness == Brightness.dark
+                ? const Color(0xFF0D1F35)
+                : const Color(0xFF0E3578),
           ],
           begin: Alignment.topCenter,
           end: Alignment.bottomCenter,
@@ -851,7 +945,11 @@ class AppPageShell extends StatelessWidget {
                 children: [
                   if (showBackButton && Navigator.of(context).canPop()) ...[
                     IconButton(
-                      icon: const Icon(Icons.arrow_back_ios_new_rounded, color: Colors.white, size: 20),
+                      icon: const Icon(
+                        Icons.arrow_back_ios_new_rounded,
+                        color: Colors.white,
+                        size: 20,
+                      ),
                       onPressed: () => Navigator.of(context).pop(),
                       padding: EdgeInsets.zero,
                       constraints: const BoxConstraints(),
@@ -864,35 +962,48 @@ class AppPageShell extends StatelessWidget {
                       children: [
                         Text(
                           title,
-                          style: AppTextStyles.headingLarge.copyWith(color: Colors.white, fontSize: 22, fontWeight: FontWeight.w600),
+                          style: AppTextStyles.headingLarge.copyWith(
+                            color: Colors.white,
+                            fontSize: 22,
+                            fontWeight: FontWeight.w600,
+                          ),
                         ),
                         if (subtitle != null) ...[
                           const SizedBox(height: 2),
                           Text(
                             subtitle!,
-                            style: AppTextStyles.bodySmall.copyWith(color: Colors.white.withAlpha((0.65 * 255).round()), fontSize: 13),
+                            style: AppTextStyles.bodySmall.copyWith(
+                              color: Colors.white.withAlpha(
+                                (0.65 * 255).round(),
+                              ),
+                              fontSize: 13,
+                            ),
                           ),
                         ],
                       ],
                     ),
                   ),
-                    if (actions != null) ...[
-                      const SizedBox(width: 12),
-                      ...actions!,
-                    ],
-                    if (showMenuButton) ...[
-                      const SizedBox(width: 8),
-                      Builder(
-                        builder: (context) => IconButton(
-                          icon: const Icon(Icons.menu_rounded, color: Colors.white, size: 26),
-                          onPressed: () => Scaffold.of(context).openEndDrawer(),
-                          padding: EdgeInsets.zero,
-                          constraints: const BoxConstraints(),
-                        ),
-                      ),
-                    ],
+                  if (actions != null) ...[
+                    const SizedBox(width: 12),
+                    ...actions!,
                   ],
-                ),
+                  if (showMenuButton) ...[
+                    const SizedBox(width: 8),
+                    Builder(
+                      builder: (context) => IconButton(
+                        icon: const Icon(
+                          Icons.menu_rounded,
+                          color: Colors.white,
+                          size: 26,
+                        ),
+                        onPressed: () => Scaffold.of(context).openEndDrawer(),
+                        padding: EdgeInsets.zero,
+                        constraints: const BoxConstraints(),
+                      ),
+                    ),
+                  ],
+                ],
+              ),
               if (headerWidgets != null && headerWidgets!.isNotEmpty) ...[
                 const SizedBox(height: 12),
                 ...headerWidgets!,
@@ -928,7 +1039,10 @@ class PriorityTag extends StatelessWidget {
     }
 
     return Container(
-      padding: EdgeInsets.symmetric(horizontal: AppSpacing.sm, vertical: AppSpacing.xs),
+      padding: EdgeInsets.symmetric(
+        horizontal: AppSpacing.sm,
+        vertical: AppSpacing.xs,
+      ),
       decoration: BoxDecoration(
         color: baseColor.withAlpha((0.10 * 255).round()),
         borderRadius: BorderRadius.circular(AppRadius.md),
@@ -936,7 +1050,10 @@ class PriorityTag extends StatelessWidget {
       ),
       child: Text(
         priority.toUpperCase(),
-        style: AppTextStyles.labelSmall.copyWith(color: baseColor, fontWeight: FontWeight.bold),
+        style: AppTextStyles.labelSmall.copyWith(
+          color: baseColor,
+          fontWeight: FontWeight.bold,
+        ),
       ),
     );
   }
@@ -952,7 +1069,11 @@ class AppSnackBar {
       SnackBar(
         content: Row(
           children: [
-            const Icon(Icons.check_circle_rounded, color: Colors.white, size: 20),
+            const Icon(
+              Icons.check_circle_rounded,
+              color: Colors.white,
+              size: 20,
+            ),
             const SizedBox(width: AppSpacing.md),
             Expanded(
               child: Text(
@@ -964,7 +1085,9 @@ class AppSnackBar {
         ),
         backgroundColor: AppColors.success,
         behavior: SnackBarBehavior.floating,
-        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(AppRadius.md)),
+        shape: RoundedRectangleBorder(
+          borderRadius: BorderRadius.circular(AppRadius.md),
+        ),
         margin: const EdgeInsets.all(AppSpacing.lg),
         duration: const Duration(seconds: 3),
       ),
@@ -976,7 +1099,11 @@ class AppSnackBar {
       SnackBar(
         content: Row(
           children: [
-            const Icon(Icons.error_outline_rounded, color: Colors.white, size: 20),
+            const Icon(
+              Icons.error_outline_rounded,
+              color: Colors.white,
+              size: 20,
+            ),
             const SizedBox(width: AppSpacing.md),
             Expanded(
               child: Text(
@@ -988,7 +1115,9 @@ class AppSnackBar {
         ),
         backgroundColor: AppColors.error,
         behavior: SnackBarBehavior.floating,
-        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(AppRadius.md)),
+        shape: RoundedRectangleBorder(
+          borderRadius: BorderRadius.circular(AppRadius.md),
+        ),
         margin: const EdgeInsets.all(AppSpacing.lg),
         duration: const Duration(seconds: 4),
       ),
@@ -1000,7 +1129,11 @@ class AppSnackBar {
       SnackBar(
         content: Row(
           children: [
-            const Icon(Icons.info_outline_rounded, color: Colors.white, size: 20),
+            const Icon(
+              Icons.info_outline_rounded,
+              color: Colors.white,
+              size: 20,
+            ),
             const SizedBox(width: AppSpacing.md),
             Expanded(
               child: Text(
@@ -1012,13 +1145,14 @@ class AppSnackBar {
         ),
         backgroundColor: Theme.of(context).colorScheme.primary,
         behavior: SnackBarBehavior.floating,
-        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(AppRadius.md)),
+        shape: RoundedRectangleBorder(
+          borderRadius: BorderRadius.circular(AppRadius.md),
+        ),
         margin: const EdgeInsets.all(AppSpacing.lg),
       ),
     );
   }
 }
-
 
 // ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 // CustomTextField
@@ -1056,7 +1190,6 @@ class CustomTextField extends StatelessWidget {
     this.focusNode,
   });
 
-
   @override
   Widget build(BuildContext context) {
     return Column(
@@ -1079,13 +1212,19 @@ class CustomTextField extends StatelessWidget {
           style: AppTextStyles.bodyLarge,
           decoration: InputDecoration(
             hintText: hintText,
-            hintStyle: AppTextStyles.bodyMedium.copyWith(color: AppColors.textHint),
-            prefixIcon: prefixIcon != null ? Icon(prefixIcon, color: AppColors.textHint, size: 20) : null,
+            hintStyle: AppTextStyles.bodyMedium.copyWith(
+              color: AppColors.textHint,
+            ),
+            prefixIcon: prefixIcon != null
+                ? Icon(prefixIcon, color: AppColors.textHint, size: 20)
+                : null,
             suffixIcon: suffixIcon,
-            contentPadding: const EdgeInsets.symmetric(horizontal: AppSpacing.lg, vertical: AppSpacing.md),
+            contentPadding: const EdgeInsets.symmetric(
+              horizontal: AppSpacing.lg,
+              vertical: AppSpacing.md,
+            ),
           ),
         ),
-
       ],
     );
   }
@@ -1105,8 +1244,10 @@ class UpcomingTestTile extends StatelessWidget {
   Widget build(BuildContext context) {
     final now = DateTime.now();
     final scheduledDate = test.scheduledDate;
-    final difference = scheduledDate.difference(DateTime(now.year, now.month, now.day)).inDays;
-    
+    final difference = scheduledDate
+        .difference(DateTime(now.year, now.month, now.day))
+        .inDays;
+
     String daysLabel;
     bool isUrgent = difference <= 2;
     if (difference == 0) {
@@ -1125,7 +1266,11 @@ class UpcomingTestTile extends StatelessWidget {
         decoration: BoxDecoration(
           color: Theme.of(context).cardTheme.color,
           borderRadius: BorderRadius.circular(12),
-          border: Border.all(color: Theme.of(context).dividerColor.withAlpha((0.1 * 255).round())),
+          border: Border.all(
+            color: Theme.of(
+              context,
+            ).dividerColor.withAlpha((0.1 * 255).round()),
+          ),
           boxShadow: [
             BoxShadow(
               color: Colors.black.withAlpha((0.02 * 255).round()),
@@ -1143,7 +1288,11 @@ class UpcomingTestTile extends StatelessWidget {
                 color: AppColors.oceanBlue.withAlpha((0.12 * 255).round()),
                 borderRadius: BorderRadius.circular(10),
               ),
-              child: const Icon(Icons.assignment_rounded, color: AppColors.oceanBlue, size: 20),
+              child: const Icon(
+                Icons.assignment_rounded,
+                color: AppColors.oceanBlue,
+                size: 20,
+              ),
             ),
             const SizedBox(width: 14),
             Expanded(
@@ -1152,14 +1301,20 @@ class UpcomingTestTile extends StatelessWidget {
                 children: [
                   Text(
                     test.title,
-                    style: AppTextStyles.labelLarge.copyWith(fontSize: 13, fontWeight: FontWeight.w500),
+                    style: AppTextStyles.labelLarge.copyWith(
+                      fontSize: 13,
+                      fontWeight: FontWeight.w500,
+                    ),
                     maxLines: 1,
                     overflow: TextOverflow.ellipsis,
                   ),
                   const SizedBox(height: 2),
                   Text(
                     "${test.durationMinutes}min • ${test.questions.length} questions • ${test.type}",
-                    style: AppTextStyles.bodySmall.copyWith(color: AppColors.textSecondary, fontSize: 11),
+                    style: AppTextStyles.bodySmall.copyWith(
+                      color: AppColors.textSecondary,
+                      fontSize: 11,
+                    ),
                     maxLines: 1,
                     overflow: TextOverflow.ellipsis,
                   ),
@@ -1170,7 +1325,8 @@ class UpcomingTestTile extends StatelessWidget {
             Container(
               padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
               decoration: BoxDecoration(
-                color: (isUrgent ? AppColors.error : AppColors.navyBlueBase).withAlpha((0.1 * 255).round()),
+                color: (isUrgent ? AppColors.error : AppColors.navyBlueBase)
+                    .withAlpha((0.1 * 255).round()),
                 borderRadius: BorderRadius.circular(20),
               ),
               child: Text(
@@ -1209,7 +1365,9 @@ class AnnouncementTile extends StatelessWidget {
   Widget build(BuildContext context) {
     final isHigh = announcement.priority.toLowerCase() == 'high';
     final isMedium = announcement.priority.toLowerCase() == 'medium';
-    final color = isHigh ? AppColors.error : (isMedium ? AppColors.warning : AppColors.success);
+    final color = isHigh
+        ? AppColors.error
+        : (isMedium ? AppColors.warning : AppColors.success);
 
     return GestureDetector(
       onTap: onTap,
@@ -1218,7 +1376,11 @@ class AnnouncementTile extends StatelessWidget {
         decoration: BoxDecoration(
           color: Theme.of(context).cardTheme.color,
           borderRadius: BorderRadius.circular(12),
-          border: Border.all(color: Theme.of(context).dividerColor.withAlpha((0.1 * 255).round())),
+          border: Border.all(
+            color: Theme.of(
+              context,
+            ).dividerColor.withAlpha((0.1 * 255).round()),
+          ),
           boxShadow: [
             BoxShadow(
               color: Colors.black.withAlpha((0.02 * 255).round()),
@@ -1235,7 +1397,10 @@ class AnnouncementTile extends StatelessWidget {
               Container(width: 3, color: color),
               Expanded(
                 child: Padding(
-                  padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 12),
+                  padding: const EdgeInsets.symmetric(
+                    horizontal: 14,
+                    vertical: 12,
+                  ),
                   child: Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
@@ -1244,7 +1409,9 @@ class AnnouncementTile extends StatelessWidget {
                           Expanded(
                             child: Text(
                               announcement.title,
-                              style: AppTextStyles.labelLarge.copyWith(fontWeight: FontWeight.w600),
+                              style: AppTextStyles.labelLarge.copyWith(
+                                fontWeight: FontWeight.w600,
+                              ),
                               maxLines: 1,
                               overflow: TextOverflow.ellipsis,
                             ),
@@ -1255,7 +1422,11 @@ class AnnouncementTile extends StatelessWidget {
                             const SizedBox(width: 4),
                             IconButton(
                               onPressed: onDelete,
-                              icon: const Icon(Icons.delete_outline, size: 20, color: AppColors.error),
+                              icon: const Icon(
+                                Icons.delete_outline,
+                                size: 20,
+                                color: AppColors.error,
+                              ),
                               padding: EdgeInsets.zero,
                               constraints: const BoxConstraints(),
                             ),
@@ -1265,19 +1436,29 @@ class AnnouncementTile extends StatelessWidget {
                       const SizedBox(height: 6),
                       Text(
                         announcement.description,
-                        style: AppTextStyles.bodySmall.copyWith(color: AppColors.textSecondary, height: 1.4),
+                        style: AppTextStyles.bodySmall.copyWith(
+                          color: AppColors.textSecondary,
+                          height: 1.4,
+                        ),
                         maxLines: 2,
                         overflow: TextOverflow.ellipsis,
                       ),
                       const SizedBox(height: 12),
                       Row(
                         children: [
-                          Icon(Icons.calendar_today_rounded, size: 10, color: AppColors.textHint),
+                          Icon(
+                            Icons.calendar_today_rounded,
+                            size: 10,
+                            color: AppColors.textHint,
+                          ),
                           const SizedBox(width: 4),
                           Expanded(
                             child: Text(
                               "${announcement.daysAgo} days ago • ${announcement.branch ?? 'All branches'}",
-                              style: AppTextStyles.caption.copyWith(color: AppColors.textHint, fontSize: 10),
+                              style: AppTextStyles.caption.copyWith(
+                                color: AppColors.textHint,
+                                fontSize: 10,
+                              ),
                               maxLines: 1,
                               overflow: TextOverflow.ellipsis,
                             ),
@@ -1349,7 +1530,9 @@ class MaterialCard extends StatelessWidget {
             ),
             alignment: Alignment.center,
             child: Icon(
-              material.fileType == FileType.pdf ? Icons.description_rounded : Icons.play_circle_rounded,
+              material.fileType == FileType.pdf
+                  ? Icons.description_rounded
+                  : Icons.play_circle_rounded,
               color: categoryColor,
               size: 28,
             ),
@@ -1369,14 +1552,21 @@ class MaterialCard extends StatelessWidget {
                 Row(
                   children: [
                     Container(
-                      padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 2),
+                      padding: const EdgeInsets.symmetric(
+                        horizontal: 6,
+                        vertical: 2,
+                      ),
                       decoration: BoxDecoration(
-                        color: Theme.of(context).colorScheme.primary.withAlpha((0.1 * 255).round()),
+                        color: Theme.of(
+                          context,
+                        ).colorScheme.primary.withAlpha((0.1 * 255).round()),
                         borderRadius: BorderRadius.circular(4),
                       ),
                       child: Text(
                         material.category,
-                        style: AppTextStyles.caption.copyWith(color: AppColors.textSecondary),
+                        style: AppTextStyles.caption.copyWith(
+                          color: AppColors.textSecondary,
+                        ),
                       ),
                     ),
                     if (material.companyTarget != null) ...[
@@ -1385,7 +1575,10 @@ class MaterialCard extends StatelessWidget {
                       const SizedBox(width: 6),
                       Text(
                         material.companyTarget!,
-                        style: AppTextStyles.caption.copyWith(color: AppColors.gold, fontWeight: FontWeight.bold),
+                        style: AppTextStyles.caption.copyWith(
+                          color: AppColors.gold,
+                          fontWeight: FontWeight.bold,
+                        ),
                       ),
                     ],
                   ],
@@ -1393,14 +1586,19 @@ class MaterialCard extends StatelessWidget {
                 const SizedBox(height: 2),
                 Text(
                   "${material.uploaderName} • ${material.fileSizeLabel}",
-                  style: AppTextStyles.caption.copyWith(color: AppColors.textHint),
+                  style: AppTextStyles.caption.copyWith(
+                    color: AppColors.textHint,
+                  ),
                 ),
               ],
             ),
           ),
           IconButton(
             onPressed: onDownload,
-            icon: const Icon(Icons.file_download_outlined, color: AppColors.navyBlueBase),
+            icon: const Icon(
+              Icons.file_download_outlined,
+              color: AppColors.navyBlueBase,
+            ),
           ),
         ],
       ),
@@ -1456,11 +1654,18 @@ class GenericConfirmationDialog extends StatelessWidget {
     return AlertDialog(
       title: Text(title, style: AppTextStyles.headingSmall),
       content: Text(content, style: AppTextStyles.bodyMedium),
-      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(AppRadius.lg)),
+      shape: RoundedRectangleBorder(
+        borderRadius: BorderRadius.circular(AppRadius.lg),
+      ),
       actions: [
         TextButton(
           onPressed: () => Navigator.pop(context, false),
-          child: Text(cancelLabel, style: AppTextStyles.labelLarge.copyWith(color: AppColors.textSecondary)),
+          child: Text(
+            cancelLabel,
+            style: AppTextStyles.labelLarge.copyWith(
+              color: AppColors.textSecondary,
+            ),
+          ),
         ),
         ElevatedButton(
           onPressed: () {
@@ -1468,9 +1673,13 @@ class GenericConfirmationDialog extends StatelessWidget {
             Navigator.pop(context, true);
           },
           style: ElevatedButton.styleFrom(
-            backgroundColor: isDestructive ? AppColors.error : AppColors.navyBlueBase,
+            backgroundColor: isDestructive
+                ? AppColors.error
+                : AppColors.navyBlueBase,
             foregroundColor: Colors.white,
-            shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(AppRadius.md)),
+            shape: RoundedRectangleBorder(
+              borderRadius: BorderRadius.circular(AppRadius.md),
+            ),
             elevation: 0,
           ),
           child: Text(confirmLabel),
@@ -1519,7 +1728,9 @@ class StudentCard extends StatelessWidget {
                 backgroundColor: AppColors.navyBlueSurface,
                 child: Text(
                   student.name.isNotEmpty ? student.name[0] : 'S',
-                  style: AppTextStyles.labelLarge.copyWith(color: AppColors.navyBlueBase),
+                  style: AppTextStyles.labelLarge.copyWith(
+                    color: AppColors.navyBlueBase,
+                  ),
                 ),
               ),
               const SizedBox(width: AppSpacing.lg),
@@ -1528,21 +1739,35 @@ class StudentCard extends StatelessWidget {
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
                     Text(student.name, style: AppTextStyles.labelLarge),
-                    Text(student.rollNumber, style: AppTextStyles.caption.copyWith(color: AppColors.textHint)),
+                    Text(
+                      student.rollNumber,
+                      style: AppTextStyles.caption.copyWith(
+                        color: AppColors.textHint,
+                      ),
+                    ),
                   ],
                 ),
               ),
-              if (trailing != null) 
+              if (trailing != null)
                 trailing!
-              else 
+              else
                 PopupMenuButton<String>(
-                  icon: const Icon(Icons.more_vert_rounded, color: AppColors.textHint),
+                  icon: const Icon(
+                    Icons.more_vert_rounded,
+                    color: AppColors.textHint,
+                  ),
                   tooltip: "Manage Student",
                   onSelected: (val) {
                     switch (val) {
-                      case 'edit': onEdit(); break;
-                      case 'assign': onAssignBatch?.call(); break;
-                      case 'delete': onDelete(); break;
+                      case 'edit':
+                        onEdit();
+                        break;
+                      case 'assign':
+                        onAssignBatch?.call();
+                        break;
+                      case 'delete':
+                        onDelete();
+                        break;
                     }
                   },
                   itemBuilder: (context) => [
@@ -1571,9 +1796,18 @@ class StudentCard extends StatelessWidget {
                       value: 'delete',
                       child: Row(
                         children: [
-                          const Icon(Icons.delete_outline, size: 18, color: AppColors.error),
+                          const Icon(
+                            Icons.delete_outline,
+                            size: 18,
+                            color: AppColors.error,
+                          ),
                           const SizedBox(width: AppSpacing.sm),
-                          Text("Delete", style: AppTextStyles.labelMedium.copyWith(color: AppColors.error)),
+                          Text(
+                            "Delete",
+                            style: AppTextStyles.labelMedium.copyWith(
+                              color: AppColors.error,
+                            ),
+                          ),
                         ],
                       ),
                     ),
@@ -1586,31 +1820,57 @@ class StudentCard extends StatelessWidget {
             children: [
               if (student.batchId.isNotEmpty)
                 Container(
-                  padding: const EdgeInsets.symmetric(horizontal: AppSpacing.sm, vertical: AppSpacing.xs),
+                  padding: const EdgeInsets.symmetric(
+                    horizontal: AppSpacing.sm,
+                    vertical: AppSpacing.xs,
+                  ),
                   decoration: BoxDecoration(
                     color: AppColors.gold.withAlpha((0.1 * 255).round()),
                     borderRadius: BorderRadius.circular(AppRadius.sm),
                   ),
                   child: Row(
                     children: [
-                      const Icon(Icons.class_outlined, size: 14, color: AppColors.gold),
+                      const Icon(
+                        Icons.class_outlined,
+                        size: 14,
+                        color: AppColors.gold,
+                      ),
                       const SizedBox(width: AppSpacing.xs),
-                      Text(student.batchName, style: AppTextStyles.caption.copyWith(color: AppColors.gold, fontWeight: FontWeight.bold)),
+                      Text(
+                        student.batchName,
+                        style: AppTextStyles.caption.copyWith(
+                          color: AppColors.gold,
+                          fontWeight: FontWeight.bold,
+                        ),
+                      ),
                     ],
                   ),
                 )
               else
                 Container(
-                  padding: const EdgeInsets.symmetric(horizontal: AppSpacing.sm, vertical: AppSpacing.xs),
+                  padding: const EdgeInsets.symmetric(
+                    horizontal: AppSpacing.sm,
+                    vertical: AppSpacing.xs,
+                  ),
                   decoration: BoxDecoration(
                     color: AppColors.warning.withAlpha((0.1 * 255).round()),
                     borderRadius: BorderRadius.circular(AppRadius.sm),
                   ),
                   child: Row(
                     children: [
-                      const Icon(Icons.warning_amber_rounded, size: 14, color: AppColors.warning),
+                      const Icon(
+                        Icons.warning_amber_rounded,
+                        size: 14,
+                        color: AppColors.warning,
+                      ),
                       const SizedBox(width: AppSpacing.xs),
-                      Text("Not Assigned", style: AppTextStyles.caption.copyWith(color: AppColors.warning, fontWeight: FontWeight.bold)),
+                      Text(
+                        "Not Assigned",
+                        style: AppTextStyles.caption.copyWith(
+                          color: AppColors.warning,
+                          fontWeight: FontWeight.bold,
+                        ),
+                      ),
                     ],
                   ),
                 ),
@@ -1650,7 +1910,10 @@ class StudentTile extends StatelessWidget {
   Widget build(BuildContext context) {
     return Container(
       margin: const EdgeInsets.only(bottom: AppSpacing.md),
-      padding: const EdgeInsets.symmetric(horizontal: AppSpacing.lg, vertical: AppSpacing.md),
+      padding: const EdgeInsets.symmetric(
+        horizontal: AppSpacing.lg,
+        vertical: AppSpacing.md,
+      ),
       decoration: BoxDecoration(
         color: Theme.of(context).cardTheme.color,
         borderRadius: BorderRadius.circular(AppRadius.md),
@@ -1663,7 +1926,10 @@ class StudentTile extends StatelessWidget {
             backgroundColor: AppColors.navyBlueSurface,
             child: Text(
               name.isNotEmpty ? name[0] : 'S',
-              style: AppTextStyles.labelMedium.copyWith(color: AppColors.navyBlueBase, fontSize: 12),
+              style: AppTextStyles.labelMedium.copyWith(
+                color: AppColors.navyBlueBase,
+                fontSize: 12,
+              ),
             ),
           ),
           const SizedBox(width: AppSpacing.md),
@@ -1671,8 +1937,17 @@ class StudentTile extends StatelessWidget {
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                Text(name, style: AppTextStyles.labelMedium.copyWith(fontSize: 14)),
-                Text(rollNumber, style: AppTextStyles.caption.copyWith(color: AppColors.textHint, fontSize: 11)),
+                Text(
+                  name,
+                  style: AppTextStyles.labelMedium.copyWith(fontSize: 14),
+                ),
+                Text(
+                  rollNumber,
+                  style: AppTextStyles.caption.copyWith(
+                    color: AppColors.textHint,
+                    fontSize: 11,
+                  ),
+                ),
               ],
             ),
           ),
@@ -1719,7 +1994,11 @@ class BatchCard extends StatelessWidget {
                   color: AppColors.gold.withAlpha((0.1 * 255).round()),
                   borderRadius: BorderRadius.circular(AppRadius.md),
                 ),
-                child: const Icon(Icons.class_outlined, color: AppColors.gold, size: 24),
+                child: const Icon(
+                  Icons.class_outlined,
+                  color: AppColors.gold,
+                  size: 24,
+                ),
               ),
               const SizedBox(width: AppSpacing.lg),
               Expanded(
@@ -1727,18 +2006,32 @@ class BatchCard extends StatelessWidget {
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
                     Text(batch.name, style: AppTextStyles.labelLarge),
-                    Text(batch.courseType, style: AppTextStyles.caption.copyWith(color: AppColors.textHint)),
+                    Text(
+                      batch.courseType,
+                      style: AppTextStyles.caption.copyWith(
+                        color: AppColors.textHint,
+                      ),
+                    ),
                   ],
                 ),
               ),
               if (onEdit != null || onManage != null || onDelete != null)
                 PopupMenuButton<String>(
-                  icon: const Icon(Icons.more_vert_rounded, color: AppColors.textHint),
+                  icon: const Icon(
+                    Icons.more_vert_rounded,
+                    color: AppColors.textHint,
+                  ),
                   onSelected: (val) {
                     switch (val) {
-                      case 'edit': onEdit?.call(); break;
-                      case 'manage': onManage?.call(); break;
-                      case 'delete': onDelete?.call(); break;
+                      case 'edit':
+                        onEdit?.call();
+                        break;
+                      case 'manage':
+                        onManage?.call();
+                        break;
+                      case 'delete':
+                        onDelete?.call();
+                        break;
                     }
                   },
                   itemBuilder: (context) => [
@@ -1769,9 +2062,18 @@ class BatchCard extends StatelessWidget {
                         value: 'delete',
                         child: Row(
                           children: [
-                            const Icon(Icons.delete_outline, size: 18, color: AppColors.error),
+                            const Icon(
+                              Icons.delete_outline,
+                              size: 18,
+                              color: AppColors.error,
+                            ),
                             const SizedBox(width: AppSpacing.sm),
-                            Text("Delete", style: AppTextStyles.labelMedium.copyWith(color: AppColors.error)),
+                            Text(
+                              "Delete",
+                              style: AppTextStyles.labelMedium.copyWith(
+                                color: AppColors.error,
+                              ),
+                            ),
                           ],
                         ),
                       ),
@@ -1782,7 +2084,10 @@ class BatchCard extends StatelessWidget {
           const Divider(height: AppSpacing.xl),
           Row(
             children: [
-              _BatchMeta(icon: Icons.person_pin_outlined, label: batch.professorName),
+              _BatchMeta(
+                icon: Icons.person_pin_outlined,
+                label: batch.professorName,
+              ),
               const Spacer(),
               _BatchMeta(icon: Icons.access_time_rounded, label: batch.timing),
             ],
@@ -1790,7 +2095,10 @@ class BatchCard extends StatelessWidget {
           const SizedBox(height: AppSpacing.md),
           Row(
             children: [
-              _BatchMeta(icon: Icons.people_alt_outlined, label: "$studentCount Enrolled"),
+              _BatchMeta(
+                icon: Icons.people_alt_outlined,
+                label: "$studentCount Enrolled",
+              ),
               const Spacer(),
               TextButton.icon(
                 onPressed: onManage,
@@ -1798,7 +2106,9 @@ class BatchCard extends StatelessWidget {
                 label: const Text("Manage"),
                 style: TextButton.styleFrom(
                   foregroundColor: AppColors.navyBlueBase,
-                  padding: const EdgeInsets.symmetric(horizontal: AppSpacing.lg),
+                  padding: const EdgeInsets.symmetric(
+                    horizontal: AppSpacing.lg,
+                  ),
                 ),
               ),
             ],
@@ -1822,7 +2132,12 @@ class _BatchMeta extends StatelessWidget {
       children: [
         Icon(icon, size: 14, color: AppColors.oceanBlue),
         const SizedBox(width: AppSpacing.xs),
-        Text(label, style: AppTextStyles.bodySmall.copyWith(color: AppColors.textSecondary)),
+        Text(
+          label,
+          style: AppTextStyles.bodySmall.copyWith(
+            color: AppColors.textSecondary,
+          ),
+        ),
       ],
     );
   }
@@ -1879,7 +2194,11 @@ class TestCard extends StatelessWidget {
     return GestureDetector(
       onTap: onTap,
       child: Container(
-        margin: const EdgeInsets.only(bottom: AppSpacing.md, left: 12, right: 12),
+        margin: const EdgeInsets.only(
+          bottom: AppSpacing.md,
+          left: 12,
+          right: 12,
+        ),
         decoration: BoxDecoration(
           color: Theme.of(context).cardTheme.color,
           borderRadius: AppRadius.cardRadius,
@@ -1892,7 +2211,9 @@ class TestCard extends StatelessWidget {
               height: 4,
               decoration: BoxDecoration(
                 color: typeColor,
-                borderRadius: const BorderRadius.vertical(top: Radius.circular(AppRadius.lg)),
+                borderRadius: const BorderRadius.vertical(
+                  top: Radius.circular(AppRadius.lg),
+                ),
               ),
             ),
             Padding(
@@ -1903,21 +2224,33 @@ class TestCard extends StatelessWidget {
                   Row(
                     children: [
                       Container(
-                        padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
+                        padding: const EdgeInsets.symmetric(
+                          horizontal: 10,
+                          vertical: 4,
+                        ),
                         decoration: BoxDecoration(
                           color: typeColor.withAlpha((0.1 * 255).round()),
                           borderRadius: BorderRadius.circular(AppRadius.md),
-                          border: Border.all(color: typeColor.withAlpha((0.2 * 255).round())),
+                          border: Border.all(
+                            color: typeColor.withAlpha((0.2 * 255).round()),
+                          ),
                         ),
                         child: Text(
                           test.type,
-                          style: AppTextStyles.labelSmall.copyWith(color: typeColor, fontWeight: FontWeight.bold),
+                          style: AppTextStyles.labelSmall.copyWith(
+                            color: typeColor,
+                            fontWeight: FontWeight.bold,
+                          ),
                         ),
                       ),
                       const Spacer(),
                       if (onDelete != null)
                         IconButton(
-                          icon: const Icon(Icons.delete_outline_rounded, color: AppColors.error, size: 18),
+                          icon: const Icon(
+                            Icons.delete_outline_rounded,
+                            color: AppColors.error,
+                            size: 18,
+                          ),
                           onPressed: onDelete,
                           padding: EdgeInsets.zero,
                           constraints: const BoxConstraints(),
@@ -1929,21 +2262,37 @@ class TestCard extends StatelessWidget {
                   const SizedBox(height: AppSpacing.sm),
                   Row(
                     children: [
-                      _TestMeta(icon: Icons.subject_rounded, label: test.subject),
+                      _TestMeta(
+                        icon: Icons.subject_rounded,
+                        label: test.subject,
+                      ),
                       if (batchName != null) ...[
                         const SizedBox(width: AppSpacing.lg),
-                        _TestMeta(icon: Icons.class_outlined, label: batchName!),
+                        _TestMeta(
+                          icon: Icons.class_outlined,
+                          label: batchName!,
+                        ),
                       ],
                     ],
                   ),
                   const Divider(height: AppSpacing.xl),
                   Row(
                     children: [
-                      _TestMeta(icon: Icons.calendar_today_outlined, label: "${test.scheduledDate.day}/${test.scheduledDate.month}"),
+                      _TestMeta(
+                        icon: Icons.calendar_today_outlined,
+                        label:
+                            "${test.scheduledDate.day}/${test.scheduledDate.month}",
+                      ),
                       const SizedBox(width: AppSpacing.lg),
-                      _TestMeta(icon: Icons.timer_outlined, label: "${test.durationMinutes}m"),
+                      _TestMeta(
+                        icon: Icons.timer_outlined,
+                        label: "${test.durationMinutes}m",
+                      ),
                       const SizedBox(width: AppSpacing.lg),
-                      _TestMeta(icon: Icons.assignment_outlined, label: "${test.questions.length} Qs"),
+                      _TestMeta(
+                        icon: Icons.assignment_outlined,
+                        label: "${test.questions.length} Qs",
+                      ),
                       const Spacer(),
                       if (onStart != null && isUpcoming)
                         SizedBox(
@@ -1954,10 +2303,22 @@ class TestCard extends StatelessWidget {
                               backgroundColor: typeColor,
                               foregroundColor: Colors.white,
                               elevation: 0,
-                              padding: const EdgeInsets.symmetric(horizontal: AppSpacing.md),
-                              shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(AppRadius.md)),
+                              padding: const EdgeInsets.symmetric(
+                                horizontal: AppSpacing.md,
+                              ),
+                              shape: RoundedRectangleBorder(
+                                borderRadius: BorderRadius.circular(
+                                  AppRadius.md,
+                                ),
+                              ),
                             ),
-                            child: const Text("Start", style: TextStyle(fontSize: 12, fontWeight: FontWeight.bold)),
+                            child: const Text(
+                              "Start",
+                              style: TextStyle(
+                                fontSize: 12,
+                                fontWeight: FontWeight.bold,
+                              ),
+                            ),
                           ),
                         ),
                     ],
@@ -1983,7 +2344,10 @@ class _TestMeta extends StatelessWidget {
       children: [
         Icon(icon, size: 14, color: AppColors.textHint),
         const SizedBox(width: AppSpacing.xs),
-        Text(label, style: AppTextStyles.caption.copyWith(color: AppColors.textSecondary)),
+        Text(
+          label,
+          style: AppTextStyles.caption.copyWith(color: AppColors.textSecondary),
+        ),
       ],
     );
   }
@@ -2003,12 +2367,18 @@ class ResultCard extends StatelessWidget {
   Widget build(BuildContext context) {
     final hasPassed = result.isPassed;
     final color = hasPassed ? AppColors.success : AppColors.error;
-    final bgColor = hasPassed ? AppColors.successSurface : AppColors.errorSurface;
+    final bgColor = hasPassed
+        ? AppColors.successSurface
+        : AppColors.errorSurface;
 
     return GestureDetector(
       onTap: onTap,
       child: Container(
-        margin: const EdgeInsets.only(bottom: AppSpacing.md, left: 12, right: 12),
+        margin: const EdgeInsets.only(
+          bottom: AppSpacing.md,
+          left: 12,
+          right: 12,
+        ),
         padding: const EdgeInsets.all(AppSpacing.lg),
         decoration: BoxDecoration(
           color: Theme.of(context).cardTheme.color,
@@ -2027,7 +2397,10 @@ class ResultCard extends StatelessWidget {
               alignment: Alignment.center,
               child: Text(
                 result.grade,
-                style: AppTextStyles.headingSmall.copyWith(color: color, fontWeight: FontWeight.bold),
+                style: AppTextStyles.headingSmall.copyWith(
+                  color: color,
+                  fontWeight: FontWeight.bold,
+                ),
               ),
             ),
             const SizedBox(width: AppSpacing.lg),
@@ -2039,12 +2412,27 @@ class ResultCard extends StatelessWidget {
                   const SizedBox(height: 2),
                   Text(
                     "Score: ${result.score.toInt()}/${result.totalMarks.toInt()} (${result.percentage.toStringAsFixed(1)}%)",
-                    style: AppTextStyles.caption.copyWith(color: AppColors.textSecondary),
+                    style: AppTextStyles.caption.copyWith(
+                      color: AppColors.textSecondary,
+                    ),
                   ),
+                  if (result.feedback.isNotEmpty) ...[
+                    const SizedBox(height: 2),
+                    Text(
+                      "Feedback added",
+                      style: AppTextStyles.caption.copyWith(
+                        color: AppColors.gold,
+                        fontWeight: FontWeight.bold,
+                      ),
+                    ),
+                  ],
                 ],
               ),
             ),
-            Icon(Icons.chevron_right_rounded, color: AppColors.textHint.withAlpha(100)),
+            Icon(
+              Icons.chevron_right_rounded,
+              color: AppColors.textHint.withAlpha(100),
+            ),
           ],
         ),
       ),
@@ -2083,11 +2471,14 @@ class FeeCard extends StatelessWidget {
               width: 44,
               height: 44,
               decoration: BoxDecoration(
-                color: (isFullyPaid ? AppColors.success : AppColors.warning).withAlpha((0.1 * 255).round()),
+                color: (isFullyPaid ? AppColors.success : AppColors.warning)
+                    .withAlpha((0.1 * 255).round()),
                 shape: BoxShape.circle,
               ),
               child: Icon(
-                isFullyPaid ? Icons.verified_rounded : Icons.hourglass_top_rounded,
+                isFullyPaid
+                    ? Icons.verified_rounded
+                    : Icons.hourglass_top_rounded,
                 color: isFullyPaid ? AppColors.success : AppColors.warning,
                 size: 20,
               ),
@@ -2099,10 +2490,14 @@ class FeeCard extends StatelessWidget {
                 children: [
                   Text(record.studentName, style: AppTextStyles.labelLarge),
                   Text(
-                    isFullyPaid ? "Fully Cleared" : "₹${pending.toInt()} outstanding",
+                    isFullyPaid
+                        ? "Fully Cleared"
+                        : "₹${pending.toInt()} outstanding",
                     style: AppTextStyles.caption.copyWith(
                       color: isFullyPaid ? AppColors.success : AppColors.error,
-                      fontWeight: isFullyPaid ? FontWeight.bold : FontWeight.normal,
+                      fontWeight: isFullyPaid
+                          ? FontWeight.bold
+                          : FontWeight.normal,
                     ),
                   ),
                 ],
@@ -2111,8 +2506,15 @@ class FeeCard extends StatelessWidget {
             Column(
               crossAxisAlignment: CrossAxisAlignment.end,
               children: [
-                Text("₹${record.totalFees.toInt()}", style: AppTextStyles.labelMedium),
-                const Icon(Icons.chevron_right_rounded, color: AppColors.textHint, size: 16),
+                Text(
+                  "₹${record.totalFees.toInt()}",
+                  style: AppTextStyles.labelMedium,
+                ),
+                const Icon(
+                  Icons.chevron_right_rounded,
+                  color: AppColors.textHint,
+                  size: 16,
+                ),
               ],
             ),
           ],

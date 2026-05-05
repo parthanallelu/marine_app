@@ -24,7 +24,8 @@ class StudentDrawer extends StatelessWidget {
             child: ListView(
               padding: EdgeInsets.zero,
               children: [
-                _buildMenuItem(context,
+                _buildMenuItem(
+                  context,
                   icon: Icons.person_rounded,
                   title: "My Profile",
                   onTap: () {
@@ -34,7 +35,8 @@ class StudentDrawer extends StatelessWidget {
                     context.pushNamed(AppRoutes.studentProfileName);
                   },
                 ),
-                _buildMenuItem(context,
+                _buildMenuItem(
+                  context,
                   icon: Icons.dark_mode_rounded,
                   title: "Dark Mode",
                   trailing: Consumer<ThemeProvider>(
@@ -47,7 +49,8 @@ class StudentDrawer extends StatelessWidget {
                     ),
                   ),
                 ),
-                _buildMenuItem(context,
+                _buildMenuItem(
+                  context,
                   icon: Icons.assignment_rounded,
                   title: "Test Series",
                   onTap: () {
@@ -55,27 +58,15 @@ class StudentDrawer extends StatelessWidget {
                     context.pushNamed(AppRoutes.studentTestsName);
                   },
                 ),
-                _buildMenuItem(context,
-                  icon: Icons.download_rounded,
-                  title: "My Downloads",
-                  onTap: () {
-                    // TODO: Implement Downloads screen
-                    context.pop();
-                  },
-                ),
-                _buildMenuItem(context,
-                  icon: Icons.info_rounded,
-                  title: "About Us",
-                  onTap: () {
-                    // TODO: Implement About Us screen
-                    context.pop();
-                  },
-                ),
                 const Padding(
-                  padding: EdgeInsets.symmetric(horizontal: AppSpacing.lg, vertical: AppSpacing.md),
+                  padding: EdgeInsets.symmetric(
+                    horizontal: AppSpacing.lg,
+                    vertical: AppSpacing.md,
+                  ),
                   child: Divider(color: AppColors.divider),
                 ),
-                _buildMenuItem(context,
+                _buildMenuItem(
+                  context,
                   icon: Icons.logout_rounded,
                   title: "Logout",
                   color: AppColors.error,
@@ -102,12 +93,21 @@ class StudentDrawer extends StatelessWidget {
 
   Widget _buildHeader(BuildContext context, dynamic student) {
     return Container(
-      padding: const EdgeInsets.fromLTRB(AppSpacing.xl, 60, AppSpacing.xl, AppSpacing.xl),
+      padding: const EdgeInsets.fromLTRB(
+        AppSpacing.xl,
+        60,
+        AppSpacing.xl,
+        AppSpacing.xl,
+      ),
       decoration: BoxDecoration(
         gradient: LinearGradient(
           colors: [
-            Theme.of(context).brightness == Brightness.dark ? AppColors.navyChrome : AppColors.navyChromeLight,
-            Theme.of(context).brightness == Brightness.dark ? const Color(0xFF0D1F35) : const Color(0xFF0E3578),
+            Theme.of(context).brightness == Brightness.dark
+                ? AppColors.navyChrome
+                : AppColors.navyChromeLight,
+            Theme.of(context).brightness == Brightness.dark
+                ? const Color(0xFF0D1F35)
+                : const Color(0xFF0E3578),
           ],
           begin: Alignment.topCenter,
           end: Alignment.bottomCenter,
@@ -163,7 +163,11 @@ class StudentDrawer extends StatelessWidget {
         title,
         style: AppTextStyles.labelLarge.copyWith(color: color ?? defaultColor),
       ),
-      trailing: trailing ?? (onTap != null ? const Icon(Icons.chevron_right_rounded, size: 20) : null),
+      trailing:
+          trailing ??
+          (onTap != null
+              ? const Icon(Icons.chevron_right_rounded, size: 20)
+              : null),
       onTap: onTap,
     );
   }

@@ -133,7 +133,17 @@ class UserModel extends Equatable implements BaseModel {
   }
 
   @override
-  List<Object?> get props => [id, name, email, phone, role, photoUrl, branch, createdAt, isActive];
+  List<Object?> get props => [
+    id,
+    name,
+    email,
+    phone,
+    role,
+    photoUrl,
+    branch,
+    createdAt,
+    isActive,
+  ];
 }
 
 // ignore: must_be_immutable
@@ -288,15 +298,15 @@ class StudentModel extends UserModel {
 
   @override
   List<Object?> get props => [
-        ...super.props,
-        courseType,
-        batchId,
-        batchName,
-        rollNumber,
-        parentPhone,
-        joiningDate,
-        targetCompany,
-      ];
+    ...super.props,
+    courseType,
+    batchId,
+    batchName,
+    rollNumber,
+    parentPhone,
+    joiningDate,
+    targetCompany,
+  ];
 }
 
 // ignore: must_be_immutable
@@ -394,13 +404,13 @@ class ProfessorModel extends UserModel {
 
   @override
   List<Object?> get props => [
-        ...super.props,
-        subjects,
-        batchIds,
-        qualification,
-        experienceYears,
-        specialization,
-      ];
+    ...super.props,
+    subjects,
+    batchIds,
+    qualification,
+    experienceYears,
+    specialization,
+  ];
 }
 
 // ignore: must_be_immutable
@@ -467,7 +477,9 @@ class BatchModel extends Equatable implements BaseModel {
       startDate: map['startDate'] != null
           ? DateTime.parse(map['startDate']).toUtc()
           : DateTime.now().toUtc(),
-      endDate: map['endDate'] != null ? DateTime.parse(map['endDate']).toUtc() : null,
+      endDate: map['endDate'] != null
+          ? DateTime.parse(map['endDate']).toUtc()
+          : null,
       isActive: map['isActive'] ?? true,
     );
   }
@@ -504,19 +516,19 @@ class BatchModel extends Equatable implements BaseModel {
 
   @override
   List<Object?> get props => [
-        id,
-        name,
-        courseType,
-        professorId,
-        professorName,
-        studentIds,
-        branch,
-        timing,
-        days,
-        startDate,
-        endDate,
-        isActive,
-      ];
+    id,
+    name,
+    courseType,
+    professorId,
+    professorName,
+    studentIds,
+    branch,
+    timing,
+    days,
+    startDate,
+    endDate,
+    isActive,
+  ];
 }
 
 class AttendanceRecord extends Equatable implements BaseModel {
@@ -611,15 +623,15 @@ class AttendanceRecord extends Equatable implements BaseModel {
 
   @override
   List<Object?> get props => [
-        id,
-        studentId,
-        studentName,
-        batchId,
-        date,
-        status,
-        markedByProfessorId,
-        remarks,
-      ];
+    id,
+    studentId,
+    studentName,
+    batchId,
+    date,
+    status,
+    markedByProfessorId,
+    remarks,
+  ];
 }
 
 class AttendanceSummary extends Equatable implements BaseModel {
@@ -683,12 +695,12 @@ class AttendanceSummary extends Equatable implements BaseModel {
 
   @override
   List<Object?> get props => [
-        studentId,
-        totalDays,
-        presentDays,
-        absentDays,
-        halfDays,
-      ];
+    studentId,
+    totalDays,
+    presentDays,
+    absentDays,
+    halfDays,
+  ];
 }
 
 class QuestionModel extends Equatable implements BaseModel {
@@ -757,14 +769,14 @@ class QuestionModel extends Equatable implements BaseModel {
 
   @override
   List<Object?> get props => [
-        id,
-        questionText,
-        options,
-        correctOptionIndex,
-        explanation,
-        subject,
-        imageUrl,
-      ];
+    id,
+    questionText,
+    options,
+    correctOptionIndex,
+    explanation,
+    subject,
+    imageUrl,
+  ];
 }
 
 class TestModel extends Equatable implements BaseModel {
@@ -875,20 +887,20 @@ class TestModel extends Equatable implements BaseModel {
 
   @override
   List<Object?> get props => [
-        id,
-        title,
-        type,
-        subject,
-        batchId,
-        companyTarget,
-        questions,
-        durationMinutes,
-        scheduledDate,
-        createdByProfessorId,
-        isActive,
-        totalMarks,
-        passingMarks,
-      ];
+    id,
+    title,
+    type,
+    subject,
+    batchId,
+    companyTarget,
+    questions,
+    durationMinutes,
+    scheduledDate,
+    createdByProfessorId,
+    isActive,
+    totalMarks,
+    passingMarks,
+  ];
 }
 
 class TestResult extends Equatable implements BaseModel {
@@ -902,6 +914,7 @@ class TestResult extends Equatable implements BaseModel {
   final int timeTakenSeconds;
   final DateTime submittedAt;
   final bool isPassed;
+  final String feedback;
 
   const TestResult({
     required this.id,
@@ -914,6 +927,7 @@ class TestResult extends Equatable implements BaseModel {
     required this.timeTakenSeconds,
     required this.submittedAt,
     required this.isPassed,
+    this.feedback = '',
   });
 
   double get percentage => (score / totalMarks) * 100;
@@ -942,6 +956,7 @@ class TestResult extends Equatable implements BaseModel {
       'timeTakenSeconds': timeTakenSeconds,
       'submittedAt': submittedAt.toIso8601String(),
       'isPassed': isPassed,
+      'feedback': feedback,
     };
   }
 
@@ -959,6 +974,7 @@ class TestResult extends Equatable implements BaseModel {
           ? DateTime.parse(map['submittedAt']).toUtc()
           : DateTime.now().toUtc(),
       isPassed: map['isPassed'] ?? false,
+      feedback: map['feedback'] ?? '',
     );
   }
 
@@ -973,6 +989,7 @@ class TestResult extends Equatable implements BaseModel {
     int? timeTakenSeconds,
     DateTime? submittedAt,
     bool? isPassed,
+    String? feedback,
   }) {
     return TestResult(
       id: id ?? this.id,
@@ -985,22 +1002,24 @@ class TestResult extends Equatable implements BaseModel {
       timeTakenSeconds: timeTakenSeconds ?? this.timeTakenSeconds,
       submittedAt: submittedAt ?? this.submittedAt,
       isPassed: isPassed ?? this.isPassed,
+      feedback: feedback ?? this.feedback,
     );
   }
 
   @override
   List<Object?> get props => [
-        id,
-        testId,
-        testTitle,
-        studentId,
-        answers,
-        score,
-        totalMarks,
-        timeTakenSeconds,
-        submittedAt,
-        isPassed,
-      ];
+    id,
+    testId,
+    testTitle,
+    studentId,
+    answers,
+    score,
+    totalMarks,
+    timeTakenSeconds,
+    submittedAt,
+    isPassed,
+    feedback,
+  ];
 }
 
 class StudyMaterialModel extends Equatable implements BaseModel {
@@ -1102,7 +1121,8 @@ class StudyMaterialModel extends Equatable implements BaseModel {
       subject: subject ?? this.subject,
       fileUrl: fileUrl ?? this.fileUrl,
       fileType: fileType ?? this.fileType,
-      uploadedByProfessorId: uploadedByProfessorId ?? this.uploadedByProfessorId,
+      uploadedByProfessorId:
+          uploadedByProfessorId ?? this.uploadedByProfessorId,
       uploaderName: uploaderName ?? this.uploaderName,
       uploadedAt: uploadedAt ?? this.uploadedAt,
       targetCourses: targetCourses ?? this.targetCourses,
@@ -1113,20 +1133,20 @@ class StudyMaterialModel extends Equatable implements BaseModel {
 
   @override
   List<Object?> get props => [
-        id,
-        title,
-        description,
-        category,
-        subject,
-        fileUrl,
-        fileType,
-        uploadedByProfessorId,
-        uploaderName,
-        uploadedAt,
-        targetCourses,
-        companyTarget,
-        fileSizeKb,
-      ];
+    id,
+    title,
+    description,
+    category,
+    subject,
+    fileUrl,
+    fileType,
+    uploadedByProfessorId,
+    uploaderName,
+    uploadedAt,
+    targetCourses,
+    companyTarget,
+    fileSizeKb,
+  ];
 }
 
 class FeeInstallment extends Equatable implements BaseModel {
@@ -1190,7 +1210,9 @@ class FeeInstallment extends Equatable implements BaseModel {
       dueDate: map['dueDate'] != null
           ? DateTime.parse(map['dueDate']).toUtc()
           : DateTime.now().toUtc(),
-      paidDate: map['paidDate'] != null ? DateTime.parse(map['paidDate']).toUtc() : null,
+      paidDate: map['paidDate'] != null
+          ? DateTime.parse(map['paidDate']).toUtc()
+          : null,
       status: FeeStatus.fromString(map['status'] ?? 'pending'),
       receiptNumber: map['receiptNumber'],
       paymentMode: map['paymentMode'],
@@ -1221,15 +1243,15 @@ class FeeInstallment extends Equatable implements BaseModel {
 
   @override
   List<Object?> get props => [
-        id,
-        title,
-        amount,
-        dueDate,
-        paidDate,
-        status,
-        receiptNumber,
-        paymentMode,
-      ];
+    id,
+    title,
+    amount,
+    dueDate,
+    paidDate,
+    status,
+    receiptNumber,
+    paymentMode,
+  ];
 }
 
 class FeeRecord extends Equatable implements BaseModel {
@@ -1303,14 +1325,14 @@ class FeeRecord extends Equatable implements BaseModel {
 
   @override
   List<Object?> get props => [
-        id,
-        studentId,
-        studentName,
-        batchId,
-        totalFees,
-        paidAmount,
-        installments,
-      ];
+    id,
+    studentId,
+    studentName,
+    batchId,
+    totalFees,
+    paidAmount,
+    installments,
+  ];
 }
 
 class AnnouncementModel extends Equatable implements BaseModel {
@@ -1345,7 +1367,8 @@ class AnnouncementModel extends Equatable implements BaseModel {
     return now.difference(createdAt).inDays;
   }
 
-  String? get branch => targetBranches.length == 1 ? targetBranches.first : null;
+  String? get branch =>
+      targetBranches.length == 1 ? targetBranches.first : null;
 
   Color get priorityColor {
     switch (priority.toLowerCase()) {
@@ -1358,7 +1381,8 @@ class AnnouncementModel extends Equatable implements BaseModel {
     }
   }
 
-  bool get isExpired => expiresAt != null && expiresAt!.isBefore(DateTime.now());
+  bool get isExpired =>
+      expiresAt != null && expiresAt!.isBefore(DateTime.now());
 
   @override
   Map<String, dynamic> toMap() {
@@ -1388,8 +1412,9 @@ class AnnouncementModel extends Equatable implements BaseModel {
       createdAt: map['createdAt'] != null
           ? DateTime.parse(map['createdAt']).toUtc()
           : DateTime.now().toUtc(),
-      expiresAt:
-          map['expiresAt'] != null ? DateTime.parse(map['expiresAt']).toUtc() : null,
+      expiresAt: map['expiresAt'] != null
+          ? DateTime.parse(map['expiresAt']).toUtc()
+          : null,
       targetBranches: List<String>.from(map['targetBranches'] ?? []),
       targetCourses: List<String>.from(map['targetCourses'] ?? []),
       isPinned: map['isPinned'] ?? false,
@@ -1426,16 +1451,16 @@ class AnnouncementModel extends Equatable implements BaseModel {
 
   @override
   List<Object?> get props => [
-        id,
-        title,
-        description,
-        priority,
-        createdByAdminId,
-        authorName,
-        createdAt,
-        expiresAt,
-        targetBranches,
-        targetCourses,
-        isPinned,
-      ];
+    id,
+    title,
+    description,
+    priority,
+    createdByAdminId,
+    authorName,
+    createdAt,
+    expiresAt,
+    targetBranches,
+    targetCourses,
+    isPinned,
+  ];
 }

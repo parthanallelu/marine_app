@@ -109,7 +109,7 @@ class DummyData {
       branch: AppConstants.branches[0],
       createdAt: DateTime.now().subtract(const Duration(days: 365)),
       subjects: const ['IMU-CET', 'Maritime GK'],
-      batchIds: const ['batch_001', 'batch_003'],
+      batchIds: const ['batch_001'],
       qualification: 'Master Mariner',
       experienceYears: 15,
       specialization: 'Navigation & Ship Handling',
@@ -137,7 +137,7 @@ class DummyData {
       branch: AppConstants.branches[2],
       createdAt: DateTime.now().subtract(const Duration(days: 150)),
       subjects: const ['Interview Prep', 'Psychometric'],
-      batchIds: const ['batch_001', 'batch_002', 'batch_003'],
+      batchIds: const ['batch_003'],
       qualification: 'MEO Class 1',
       experienceYears: 12,
       specialization: 'Marine Engineering',
@@ -155,7 +155,14 @@ class DummyData {
       studentIds: const ['stu_001', 'stu_004'],
       branch: AppConstants.branches[0],
       timing: '09:00 AM - 01:00 PM',
-      days: const ['Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday'],
+      days: const [
+        'Monday',
+        'Tuesday',
+        'Wednesday',
+        'Thursday',
+        'Friday',
+        'Saturday',
+      ],
       startDate: DateTime.now().subtract(const Duration(days: 60)),
     ),
     BatchModel(
@@ -167,7 +174,14 @@ class DummyData {
       studentIds: const ['stu_002', 'stu_005'],
       branch: AppConstants.branches[1],
       timing: '02:00 PM - 06:00 PM',
-      days: const ['Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday'],
+      days: const [
+        'Monday',
+        'Tuesday',
+        'Wednesday',
+        'Thursday',
+        'Friday',
+        'Saturday',
+      ],
       startDate: DateTime.now().subtract(const Duration(days: 45)),
     ),
     BatchModel(
@@ -179,7 +193,14 @@ class DummyData {
       studentIds: const ['stu_003', 'stu_006'],
       branch: AppConstants.branches[2],
       timing: '10:00 AM - 04:00 PM',
-      days: const ['Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday'],
+      days: const [
+        'Monday',
+        'Tuesday',
+        'Wednesday',
+        'Thursday',
+        'Friday',
+        'Saturday',
+      ],
       startDate: DateTime.now().subtract(const Duration(days: 30)),
     ),
   ];
@@ -237,6 +258,19 @@ class DummyData {
       totalMarks: 25,
       passingMarks: 12,
     ),
+    TestModel(
+      id: 'test_005',
+      title: 'Maritime GK Quiz',
+      type: 'Unit Test',
+      subject: 'Maritime GK',
+      batchId: 'batch_001',
+      questions: const [],
+      durationMinutes: 40,
+      scheduledDate: DateTime.now().subtract(const Duration(days: 2)),
+      createdByProfessorId: 'prof_001',
+      totalMarks: 40,
+      passingMarks: 20,
+    ),
   ];
 
   // Test Results
@@ -252,6 +286,7 @@ class DummyData {
       timeTakenSeconds: 3200,
       submittedAt: DateTime.now().subtract(const Duration(days: 5)),
       isPassed: true,
+      feedback: 'Strong calculation accuracy. Revise time allocation.',
     ),
     TestResult(
       id: 'res_002',
@@ -264,6 +299,45 @@ class DummyData {
       timeTakenSeconds: 1500,
       submittedAt: DateTime.now().subtract(const Duration(days: 10)),
       isPassed: true,
+      feedback: 'Good revision score. Continue practicing numerical problems.',
+    ),
+    TestResult(
+      id: 'res_003',
+      testId: 'test_005',
+      testTitle: 'Maritime GK Quiz',
+      studentId: 'stu_001',
+      answers: const {},
+      score: 31,
+      totalMarks: 40,
+      timeTakenSeconds: 2100,
+      submittedAt: DateTime.now().subtract(const Duration(days: 2)),
+      isPassed: true,
+      feedback: 'Good command of core maritime terminology.',
+    ),
+    TestResult(
+      id: 'res_004',
+      testId: 'test_005',
+      testTitle: 'Maritime GK Quiz',
+      studentId: 'stu_004',
+      answers: const {},
+      score: 0,
+      totalMarks: 40,
+      timeTakenSeconds: 2300,
+      submittedAt: DateTime.now().subtract(const Duration(days: 1)),
+      isPassed: false,
+    ),
+    TestResult(
+      id: 'res_005',
+      testId: 'test_002',
+      testTitle: 'Mathematics Unit 1',
+      studentId: 'stu_002',
+      answers: const {},
+      score: 36,
+      totalMarks: 50,
+      timeTakenSeconds: 2800,
+      submittedAt: DateTime.now().subtract(const Duration(days: 4)),
+      isPassed: true,
+      feedback: 'Concepts are clear. Show steps more consistently.',
     ),
   ];
 
@@ -308,7 +382,11 @@ class DummyData {
       uploadedByProfessorId: 'prof_001',
       uploaderName: 'Capt. Suresh Iyer',
       uploadedAt: DateTime.now().subtract(const Duration(days: 30)),
-      targetCourses: [AppConstants.courseTypes[0], AppConstants.courseTypes[1], AppConstants.courseTypes[2]],
+      targetCourses: [
+        AppConstants.courseTypes[0],
+        AppConstants.courseTypes[1],
+        AppConstants.courseTypes[2],
+      ],
       fileSizeKb: 51200,
     ),
     StudyMaterialModel(
@@ -388,7 +466,8 @@ class DummyData {
     AnnouncementModel(
       id: 'ann_001',
       title: 'New Batch Starting Soon!',
-      description: 'New Crash Course batch starts on 15th April at Pulgate branch.',
+      description:
+          'New Crash Course batch starts on 15th April at Pulgate branch.',
       priority: 'high',
       createdByAdminId: 'admin_001',
       authorName: 'Academy Admin',
@@ -400,7 +479,8 @@ class DummyData {
     AnnouncementModel(
       id: 'ann_002',
       title: 'Anglo-Eastern Recruitment',
-      description: 'Anglo-Eastern will visit for campus placements on 20th May.',
+      description:
+          'Anglo-Eastern will visit for campus placements on 20th May.',
       priority: 'medium',
       createdByAdminId: 'admin_001',
       authorName: 'Placement Cell',
@@ -411,7 +491,8 @@ class DummyData {
     AnnouncementModel(
       id: 'ann_003',
       title: 'Holiday Notice: Gud Padwa',
-      description: 'The academy will remain closed on the occasion of Gudi Padwa.',
+      description:
+          'The academy will remain closed on the occasion of Gudi Padwa.',
       priority: 'low',
       createdByAdminId: 'admin_001',
       authorName: 'Academy Office',
@@ -423,7 +504,8 @@ class DummyData {
     AnnouncementModel(
       id: 'ann_004',
       title: 'IMU-CET Application Open',
-      description: 'IMU-CET June session application forms are now available online.',
+      description:
+          'IMU-CET June session application forms are now available online.',
       priority: 'high',
       createdByAdminId: 'admin_001',
       authorName: 'Academy Admin',
@@ -434,10 +516,14 @@ class DummyData {
   ];
 
   // Attendance Generation
-  static List<AttendanceRecord> generateAttendanceForStudent(String studentId, String studentName, String batchId) {
+  static List<AttendanceRecord> generateAttendanceForStudent(
+    String studentId,
+    String studentName,
+    String batchId,
+  ) {
     final List<AttendanceRecord> records = [];
     final now = DateTime.now();
-    
+
     for (int i = 0; i < 30; i++) {
       final date = now.subtract(Duration(days: i));
       if (date.weekday == DateTime.sunday) continue;
@@ -452,19 +538,24 @@ class DummyData {
         status = AttendanceStatus.halfDay;
       }
 
-      records.add(AttendanceRecord(
-        id: 'att_${studentId}_$i',
-        studentId: studentId,
-        studentName: studentName,
-        batchId: batchId,
-        date: date,
-        status: status,
-      ));
+      records.add(
+        AttendanceRecord(
+          id: 'att_${studentId}_$i',
+          studentId: studentId,
+          studentName: studentName,
+          batchId: batchId,
+          date: date,
+          status: status,
+        ),
+      );
     }
     return records;
   }
 
-  static AttendanceSummary attendanceSummaryFor(String studentId, List<AttendanceRecord> records) {
+  static AttendanceSummary attendanceSummaryFor(
+    String studentId,
+    List<AttendanceRecord> records,
+  ) {
     int total = 0;
     int present = 0;
     int absent = 0;

@@ -33,7 +33,7 @@ class _ProfessorHomeScreenState extends State<ProfessorHomeScreen> {
 
   Future<void> _loadDashboardData() async {
     setState(() => _isLoading = true);
-    
+
     try {
       await Future.delayed(const Duration(milliseconds: 600));
 
@@ -58,9 +58,11 @@ class _ProfessorHomeScreenState extends State<ProfessorHomeScreen> {
 
       _totalStudents = 0;
       _batchStudentCounts = {};
-      
+
       for (var batch in _assignedBatches) {
-        final count = DummyData.students.where((s) => s.batchId == batch.id).length;
+        final count = DummyData.students
+            .where((s) => s.batchId == batch.id)
+            .length;
         _batchStudentCounts[batch.id] = count;
         _totalStudents += count;
       }
@@ -128,7 +130,6 @@ class _ProfessorHomeScreenState extends State<ProfessorHomeScreen> {
               ),
             ),
           ),
-
         ],
       ),
     );
@@ -193,10 +194,23 @@ class _ProfessorHomeScreenState extends State<ProfessorHomeScreen> {
               onTap: () => context.pushNamed(AppRoutes.professorMaterialsName),
             ),
             QuickActionTile(
+              label: 'Tests',
+              icon: Icons.assignment_rounded,
+              color: AppColors.purple,
+              onTap: () => context.pushNamed(AppRoutes.professorTestsName),
+            ),
+            QuickActionTile(
+              label: 'Submissions',
+              icon: Icons.fact_check_rounded,
+              color: AppColors.success,
+              onTap: () =>
+                  context.pushNamed(AppRoutes.professorSubmissionsName),
+            ),
+            QuickActionTile(
               label: 'Students',
               icon: Icons.person_search_rounded,
               color: AppColors.gold,
-              onTap: () => _showStudentsBottomSheet(),
+              onTap: () => context.pushNamed(AppRoutes.professorStudentsName),
             ),
           ],
         ),
@@ -221,14 +235,17 @@ class _ProfessorHomeScreenState extends State<ProfessorHomeScreen> {
             subtitle: "You don't have any classes scheduled for today.",
           )
         else
-          ..._todaysClasses.map((batch) => Padding(
-                padding: const EdgeInsets.only(bottom: AppSpacing.md),
-                child: BatchCard(
-                  batch: batch,
-                  studentCount: _batchStudentCounts[batch.id] ?? 0,
-                  onManage: () => context.pushNamed(AppRoutes.professorAttendanceName),
-                ),
-              )),
+          ..._todaysClasses.map(
+            (batch) => Padding(
+              padding: const EdgeInsets.only(bottom: AppSpacing.md),
+              child: BatchCard(
+                batch: batch,
+                studentCount: _batchStudentCounts[batch.id] ?? 0,
+                onManage: () =>
+                    context.pushNamed(AppRoutes.professorAttendanceName),
+              ),
+            ),
+          ),
       ],
     );
   }
@@ -258,69 +275,13 @@ class _ProfessorHomeScreenState extends State<ProfessorHomeScreen> {
                 child: BatchCard(
                   batch: batch,
                   studentCount: _batchStudentCounts[batch.id] ?? 0,
-                  onManage: () => context.pushNamed(AppRoutes.professorAttendanceName),
+                  onManage: () =>
+                      context.pushNamed(AppRoutes.professorAttendanceName),
                 ),
               );
             },
-
           ),
       ],
-    );
-  }
-
-  void _showStudentsBottomSheet() {
-    final prof = Provider.of<AuthProvider>(context, listen: false).currentUser as ProfessorModel;
-    final students = DummyData.students.where((s) => prof.batchIds.contains(s.batchId)).toList();
-
-    showModalBottomSheet(
-      context: context,
-      isScrollControlled: true,
-      shape: const RoundedRectangleBorder(borderRadius: BorderRadius.vertical(top: Radius.circular(AppRadius.xxl))),
-      builder: (context) => DraggableScrollableSheet(
-        initialChildSize: 0.7,
-        maxChildSize: 0.9,
-        minChildSize: 0.5,
-        expand: false,
-        builder: (context, scrollController) => Column(
-          children: [
-            const SizedBox(height: AppSpacing.md),
-            Container(width: 40, height: 4, decoration: BoxDecoration(color: AppColors.navyBlueSurface, borderRadius: BorderRadius.circular(AppRadius.xs))),
-            const SizedBox(height: AppSpacing.lg),
-            Padding(
-              padding: const EdgeInsets.symmetric(horizontal: AppSpacing.xl),
-              child: Text('Assigned Students', style: AppTextStyles.headingSmall),
-            ),
-            const SizedBox(height: AppSpacing.xl),
-            if (students.isEmpty)
-              const Expanded(
-                child: EmptyState(
-
-                  icon: Icons.person_off_rounded,
-                  title: 'No Students Found',
-                  subtitle: 'You are not connected to any students yet.',
-                ),
-              )
-            else
-              Expanded(
-                child: ListView.builder(
-                  controller: scrollController,
-                  padding: const EdgeInsets.symmetric(horizontal: AppSpacing.xl),
-                  itemCount: students.length,
-                  itemBuilder: (context, index) {
-
-                    final student = students[index];
-                    return StudentCard(
-                      student: student,
-                      onEdit: () {},
-                      onDelete: () {},
-                      trailing: const Icon(Icons.phone_outlined, size: 20, color: AppColors.oceanBlue),
-                    );
-                  },
-                ),
-              ),
-          ],
-        ),
-      ),
     );
   }
 }

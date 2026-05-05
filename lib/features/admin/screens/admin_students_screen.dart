@@ -21,7 +21,6 @@ class _AdminStudentsScreenState extends State<AdminStudentsScreen> {
   String _searchQuery = "";
   bool _isSubmitting = false;
 
-
   // Controllers promoted to class members for proper disposal
   final _nameController = TextEditingController();
   final _emailController = TextEditingController();
@@ -55,17 +54,19 @@ class _AdminStudentsScreenState extends State<AdminStudentsScreen> {
   void _applyFilters() {
     _filteredStudents = _allStudents.where((s) {
       final q = _searchQuery.toLowerCase();
-      final matchesSearch = s.name.toLowerCase().contains(q) ||
+      final matchesSearch =
+          s.name.toLowerCase().contains(q) ||
           s.rollNumber.toLowerCase().contains(q) ||
           s.email.toLowerCase().contains(q) ||
           s.phone.toLowerCase().contains(q) ||
           s.batchName.toLowerCase().contains(q);
-      final matchesBranch = _selectedBranch == "All" || s.branch == _selectedBranch;
-      final matchesCourse = _selectedCourse == "All" || s.courseType == _selectedCourse;
+      final matchesBranch =
+          _selectedBranch == "All" || s.branch == _selectedBranch;
+      final matchesCourse =
+          _selectedCourse == "All" || s.courseType == _selectedCourse;
       return matchesSearch && matchesBranch && matchesCourse;
     }).toList();
   }
-
 
   void _setSubmitting(bool value) {
     if (mounted) setState(() => _isSubmitting = value);
@@ -75,7 +76,8 @@ class _AdminStudentsScreenState extends State<AdminStudentsScreen> {
     GenericConfirmationDialog.show(
       context,
       title: "Delete Student",
-      content: "Are you sure you want to delete ${student.name}? This action cannot be undone.",
+      content:
+          "Are you sure you want to delete ${student.name}? This action cannot be undone.",
       confirmLabel: "Delete",
       isDestructive: true,
       onConfirm: () {
@@ -88,7 +90,6 @@ class _AdminStudentsScreenState extends State<AdminStudentsScreen> {
     );
   }
 
-
   @override
   Widget build(BuildContext context) {
     return AppPageShell(
@@ -99,7 +100,10 @@ class _AdminStudentsScreenState extends State<AdminStudentsScreen> {
         onPressed: () => _showAddStudentSheet(),
         backgroundColor: AppColors.navyBlueBase,
         icon: const Icon(Icons.person_add_alt_1_rounded, color: Colors.white),
-        label: Text("Add Student", style: AppTextStyles.labelLarge.copyWith(color: Colors.white)),
+        label: Text(
+          "Add Student",
+          style: AppTextStyles.labelLarge.copyWith(color: Colors.white),
+        ),
       ),
       headerWidgets: [
         CustomTextField(
@@ -137,15 +141,22 @@ class _AdminStudentsScreenState extends State<AdminStudentsScreen> {
         children: [
           // STUDENT COUNT
           Padding(
-            padding: const EdgeInsets.symmetric(horizontal: AppSpacing.lg, vertical: AppSpacing.md),
+            padding: const EdgeInsets.symmetric(
+              horizontal: AppSpacing.lg,
+              vertical: AppSpacing.md,
+            ),
             child: Row(
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
               children: [
                 Text(
                   "Found ${_filteredStudents.length} Students",
-                  style: AppTextStyles.labelLarge.copyWith(color: AppColors.textSecondary),
+                  style: AppTextStyles.labelLarge.copyWith(
+                    color: AppColors.textSecondary,
+                  ),
                 ),
-                if (_selectedBranch != "All" || _selectedCourse != "All" || _searchQuery.isNotEmpty)
+                if (_selectedBranch != "All" ||
+                    _selectedCourse != "All" ||
+                    _searchQuery.isNotEmpty)
                   TextButton(
                     onPressed: () => setState(() {
                       _selectedBranch = "All";
@@ -167,14 +178,20 @@ class _AdminStudentsScreenState extends State<AdminStudentsScreen> {
                     const EmptyState(
                       icon: Icons.school_outlined,
                       title: "No Students Found",
-                      subtitle: "Add students to get started or adjust your filters.",
+                      subtitle:
+                          "Add students to get started or adjust your filters.",
                     ),
                   ],
                 )
               : ListView.builder(
                   shrinkWrap: true,
                   physics: const NeverScrollableScrollPhysics(),
-                  padding: const EdgeInsets.fromLTRB(AppSpacing.lg, 0, AppSpacing.lg, 80),
+                  padding: const EdgeInsets.fromLTRB(
+                    AppSpacing.lg,
+                    0,
+                    AppSpacing.lg,
+                    80,
+                  ),
                   itemCount: _filteredStudents.length,
                   itemBuilder: (context, index) {
                     final student = _filteredStudents[index];
@@ -182,7 +199,8 @@ class _AdminStudentsScreenState extends State<AdminStudentsScreen> {
                       student: student,
                       onEdit: () => _showEditStudentSheet(student),
                       onDelete: () => _confirmDeleteStudent(student),
-                      onAssignBatch: () => _showBatchSelectorForStudent(student),
+                      onAssignBatch: () =>
+                          _showBatchSelectorForStudent(student),
                     );
                   },
                 ),
@@ -197,7 +215,7 @@ class _AdminStudentsScreenState extends State<AdminStudentsScreen> {
 
   void _showAddStudentSheet() {
     final formKey = GlobalKey<FormState>();
-    
+
     // Reset controllers for new entry
     _nameController.clear();
     _emailController.clear();
@@ -217,7 +235,9 @@ class _AdminStudentsScreenState extends State<AdminStudentsScreen> {
         height: MediaQuery.of(context).size.height * 0.85,
         decoration: const BoxDecoration(
           color: Colors.white,
-          borderRadius: BorderRadius.vertical(top: Radius.circular(AppRadius.xxl)),
+          borderRadius: BorderRadius.vertical(
+            top: Radius.circular(AppRadius.xxl),
+          ),
         ),
         padding: EdgeInsets.only(
           bottom: MediaQuery.of(context).viewInsets.bottom,
@@ -242,12 +262,17 @@ class _AdminStudentsScreenState extends State<AdminStudentsScreen> {
                   child: Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
-                      Text("Enroll New Student", style: AppTextStyles.headingMedium),
+                      Text(
+                        "Enroll New Student",
+                        style: AppTextStyles.headingMedium,
+                      ),
                       const SizedBox(height: AppSpacing.sm),
                       Text(
                         "Fill in the details below to add a student to the academy database.",
 
-                        style: AppTextStyles.bodyMedium.copyWith(color: AppColors.textSecondary),
+                        style: AppTextStyles.bodyMedium.copyWith(
+                          color: AppColors.textSecondary,
+                        ),
                       ),
                       const SizedBox(height: AppSpacing.xl),
                       CustomTextField(
@@ -256,7 +281,8 @@ class _AdminStudentsScreenState extends State<AdminStudentsScreen> {
                         controller: _nameController,
                         textInputAction: TextInputAction.next,
                         prefixIcon: Icons.person_outline_rounded,
-                        validator: (v) => v == null || v.isEmpty ? "Name is required" : null,
+                        validator: (v) =>
+                            v == null || v.isEmpty ? "Name is required" : null,
                       ),
                       const SizedBox(height: AppSpacing.lg),
                       CustomTextField(
@@ -266,7 +292,9 @@ class _AdminStudentsScreenState extends State<AdminStudentsScreen> {
                         keyboardType: TextInputType.emailAddress,
                         textInputAction: TextInputAction.next,
                         prefixIcon: Icons.email_outlined,
-                        validator: (v) => v == null || !v.contains('@') ? "Enter a valid email" : null,
+                        validator: (v) => v == null || !v.contains('@')
+                            ? "Enter a valid email"
+                            : null,
                       ),
                       const SizedBox(height: AppSpacing.lg),
                       Row(
@@ -279,7 +307,9 @@ class _AdminStudentsScreenState extends State<AdminStudentsScreen> {
                               keyboardType: TextInputType.phone,
                               textInputAction: TextInputAction.next,
                               prefixIcon: Icons.phone_outlined,
-                              validator: (v) => v == null || v.length < 10 ? "Min 10 digits" : null,
+                              validator: (v) => v == null || v.length < 10
+                                  ? "Min 10 digits"
+                                  : null,
                             ),
                           ),
                           const SizedBox(width: AppSpacing.lg),
@@ -290,7 +320,8 @@ class _AdminStudentsScreenState extends State<AdminStudentsScreen> {
                               controller: _rollController,
                               textInputAction: TextInputAction.next,
                               prefixIcon: Icons.badge_outlined,
-                              validator: (v) => v == null || v.isEmpty ? "Required" : null,
+                              validator: (v) =>
+                                  v == null || v.isEmpty ? "Required" : null,
                             ),
                           ),
                         ],
@@ -303,7 +334,8 @@ class _AdminStudentsScreenState extends State<AdminStudentsScreen> {
                         keyboardType: TextInputType.phone,
                         textInputAction: TextInputAction.next,
                         prefixIcon: Icons.family_restroom_outlined,
-                        validator: (v) => v == null || v.length < 10 ? "Min 10 digits" : null,
+                        validator: (v) =>
+                            v == null || v.length < 10 ? "Min 10 digits" : null,
                       ),
                       const SizedBox(height: AppSpacing.lg),
                       CustomTextField(
@@ -315,15 +347,32 @@ class _AdminStudentsScreenState extends State<AdminStudentsScreen> {
                       ),
                       const SizedBox(height: AppSpacing.lg),
                       DropdownButtonFormField<String>(
-                        decoration: const InputDecoration(labelText: "Branch", prefixIcon: Icon(Icons.location_on_outlined, size: 20)),
-                        items: AppConstants.branches.map((b) => DropdownMenuItem(value: b, child: Text(b))).toList(),
+                        decoration: const InputDecoration(
+                          labelText: "Branch",
+                          prefixIcon: Icon(
+                            Icons.location_on_outlined,
+                            size: 20,
+                          ),
+                        ),
+                        items: AppConstants.branches
+                            .map(
+                              (b) => DropdownMenuItem(value: b, child: Text(b)),
+                            )
+                            .toList(),
                         onChanged: (val) => selectedBranch = val,
                         validator: (v) => v == null ? "Required" : null,
                       ),
                       const SizedBox(height: AppSpacing.lg),
                       DropdownButtonFormField<String>(
-                        decoration: const InputDecoration(labelText: "Course Type", prefixIcon: Icon(Icons.school_outlined, size: 20)),
-                        items: AppConstants.courseTypes.map((c) => DropdownMenuItem(value: c, child: Text(c))).toList(),
+                        decoration: const InputDecoration(
+                          labelText: "Course Type",
+                          prefixIcon: Icon(Icons.school_outlined, size: 20),
+                        ),
+                        items: AppConstants.courseTypes
+                            .map(
+                              (c) => DropdownMenuItem(value: c, child: Text(c)),
+                            )
+                            .toList(),
                         onChanged: (val) => selectedCourse = val,
                         validator: (v) => v == null ? "Required" : null,
                       ),
@@ -332,45 +381,56 @@ class _AdminStudentsScreenState extends State<AdminStudentsScreen> {
                         label: "Add Student to Records",
                         width: double.infinity,
                         isLoading: _isSubmitting,
-                        onPressed: _isSubmitting ? null : () async {
-                          if (formKey.currentState!.validate()) {
-                            _setSubmitting(true);
-                            
-                            // Simulate network delay for demo feel
-                            await Future.delayed(const Duration(milliseconds: 800));
-                            
-                            if (!mounted) return;
+                        onPressed: _isSubmitting
+                            ? null
+                            : () async {
+                                if (formKey.currentState!.validate()) {
+                                  _setSubmitting(true);
 
-                            final newStudent = StudentModel(
-                              id: const Uuid().v4(),
-                              name: _nameController.text,
-                              email: _emailController.text,
-                              phone: _phoneController.text,
-                              parentPhone: _parentPhoneController.text,
-                              role: AppConstants.roleStudent,
-                              branch: selectedBranch!,
-                              courseType: selectedCourse!,
-                              rollNumber: _rollController.text,
-                              batchId: "",
-                              batchName: "",
-                              createdAt: DateTime.now(),
-                              joiningDate: DateTime.now(),
-                              targetCompany: _targetCompanyController.text,
-                            );
-                            
-                            setState(() {
-                              _allStudents.insert(0, newStudent);
-                              _applyFilters();
-                            });
-                            
-                            _setSubmitting(false);
-                            if (!context.mounted) return;
-                            Navigator.pop(context);
-                            AppSnackBar.showSuccess(context, "Student enrolled successfully");
-                          } else {
-                            AppSnackBar.showError(context, "Please fix the errors in the form");
-                          }
-                        },
+                                  // Simulate network delay for demo feel
+                                  await Future.delayed(
+                                    const Duration(milliseconds: 800),
+                                  );
+
+                                  if (!mounted) return;
+
+                                  final newStudent = StudentModel(
+                                    id: const Uuid().v4(),
+                                    name: _nameController.text,
+                                    email: _emailController.text,
+                                    phone: _phoneController.text,
+                                    parentPhone: _parentPhoneController.text,
+                                    role: AppConstants.roleStudent,
+                                    branch: selectedBranch!,
+                                    courseType: selectedCourse!,
+                                    rollNumber: _rollController.text,
+                                    batchId: "",
+                                    batchName: "",
+                                    createdAt: DateTime.now(),
+                                    joiningDate: DateTime.now(),
+                                    targetCompany:
+                                        _targetCompanyController.text,
+                                  );
+
+                                  setState(() {
+                                    _allStudents.insert(0, newStudent);
+                                    _applyFilters();
+                                  });
+
+                                  _setSubmitting(false);
+                                  if (!context.mounted) return;
+                                  Navigator.pop(context);
+                                  AppSnackBar.showSuccess(
+                                    context,
+                                    "Student enrolled successfully",
+                                  );
+                                } else {
+                                  AppSnackBar.showError(
+                                    context,
+                                    "Please fix the errors in the form",
+                                  );
+                                }
+                              },
                       ),
 
                       const SizedBox(height: AppSpacing.lg),
@@ -391,7 +451,7 @@ class _AdminStudentsScreenState extends State<AdminStudentsScreen> {
 
   void _showEditStudentSheet(StudentModel student) {
     final formKey = GlobalKey<FormState>();
-    
+
     // Initialize class controllers with current student values
     _nameController.text = student.name;
     _emailController.text = student.email;
@@ -411,7 +471,9 @@ class _AdminStudentsScreenState extends State<AdminStudentsScreen> {
         height: MediaQuery.of(context).size.height * 0.85,
         decoration: const BoxDecoration(
           color: Colors.white,
-          borderRadius: BorderRadius.vertical(top: Radius.circular(AppRadius.xxl)),
+          borderRadius: BorderRadius.vertical(
+            top: Radius.circular(AppRadius.xxl),
+          ),
         ),
         padding: EdgeInsets.only(
           bottom: MediaQuery.of(context).viewInsets.bottom,
@@ -440,7 +502,9 @@ class _AdminStudentsScreenState extends State<AdminStudentsScreen> {
                       Text(
                         "Update ${student.name}'s information below.",
 
-                        style: AppTextStyles.bodyMedium.copyWith(color: AppColors.textSecondary),
+                        style: AppTextStyles.bodyMedium.copyWith(
+                          color: AppColors.textSecondary,
+                        ),
                       ),
                       const SizedBox(height: AppSpacing.xl),
                       CustomTextField(
@@ -448,7 +512,8 @@ class _AdminStudentsScreenState extends State<AdminStudentsScreen> {
                         hintText: "Enter student's full name",
                         controller: _nameController,
                         prefixIcon: Icons.person_outline_rounded,
-                        validator: (v) => v == null || v.isEmpty ? "Name is required" : null,
+                        validator: (v) =>
+                            v == null || v.isEmpty ? "Name is required" : null,
                       ),
                       const SizedBox(height: AppSpacing.lg),
                       CustomTextField(
@@ -457,7 +522,9 @@ class _AdminStudentsScreenState extends State<AdminStudentsScreen> {
                         controller: _emailController,
                         keyboardType: TextInputType.emailAddress,
                         prefixIcon: Icons.email_outlined,
-                        validator: (v) => v == null || !v.contains('@') ? "Enter a valid email" : null,
+                        validator: (v) => v == null || !v.contains('@')
+                            ? "Enter a valid email"
+                            : null,
                       ),
                       const SizedBox(height: AppSpacing.lg),
                       Row(
@@ -469,7 +536,9 @@ class _AdminStudentsScreenState extends State<AdminStudentsScreen> {
                               controller: _phoneController,
                               keyboardType: TextInputType.phone,
                               prefixIcon: Icons.phone_outlined,
-                              validator: (v) => v == null || v.length < 10 ? "Min 10 digits" : null,
+                              validator: (v) => v == null || v.length < 10
+                                  ? "Min 10 digits"
+                                  : null,
                             ),
                           ),
                           const SizedBox(width: AppSpacing.lg),
@@ -479,7 +548,8 @@ class _AdminStudentsScreenState extends State<AdminStudentsScreen> {
                               hintText: "MA-2024-XXX",
                               controller: _rollController,
                               prefixIcon: Icons.badge_outlined,
-                              validator: (v) => v == null || v.isEmpty ? "Required" : null,
+                              validator: (v) =>
+                                  v == null || v.isEmpty ? "Required" : null,
                             ),
                           ),
                         ],
@@ -491,7 +561,8 @@ class _AdminStudentsScreenState extends State<AdminStudentsScreen> {
                         controller: _parentPhoneController,
                         keyboardType: TextInputType.phone,
                         prefixIcon: Icons.family_restroom_outlined,
-                        validator: (v) => v == null || v.length < 10 ? "Min 10 digits" : null,
+                        validator: (v) =>
+                            v == null || v.length < 10 ? "Min 10 digits" : null,
                       ),
                       const SizedBox(height: AppSpacing.lg),
                       CustomTextField(
@@ -502,17 +573,34 @@ class _AdminStudentsScreenState extends State<AdminStudentsScreen> {
                       ),
                       const SizedBox(height: AppSpacing.lg),
                       DropdownButtonFormField<String>(
-                        decoration: const InputDecoration(labelText: "Branch", prefixIcon: Icon(Icons.location_on_outlined, size: 20)),
+                        decoration: const InputDecoration(
+                          labelText: "Branch",
+                          prefixIcon: Icon(
+                            Icons.location_on_outlined,
+                            size: 20,
+                          ),
+                        ),
                         initialValue: selectedBranch,
-                        items: AppConstants.branches.map((b) => DropdownMenuItem(value: b, child: Text(b))).toList(),
+                        items: AppConstants.branches
+                            .map(
+                              (b) => DropdownMenuItem(value: b, child: Text(b)),
+                            )
+                            .toList(),
                         onChanged: (val) => selectedBranch = val!,
                         validator: (v) => v == null ? "Required" : null,
                       ),
                       const SizedBox(height: AppSpacing.lg),
                       DropdownButtonFormField<String>(
-                        decoration: const InputDecoration(labelText: "Course Type", prefixIcon: Icon(Icons.school_outlined, size: 20)),
+                        decoration: const InputDecoration(
+                          labelText: "Course Type",
+                          prefixIcon: Icon(Icons.school_outlined, size: 20),
+                        ),
                         initialValue: selectedCourse,
-                        items: AppConstants.courseTypes.map((c) => DropdownMenuItem(value: c, child: Text(c))).toList(),
+                        items: AppConstants.courseTypes
+                            .map(
+                              (c) => DropdownMenuItem(value: c, child: Text(c)),
+                            )
+                            .toList(),
                         onChanged: (val) => selectedCourse = val!,
                         validator: (v) => v == null ? "Required" : null,
                       ),
@@ -521,35 +609,47 @@ class _AdminStudentsScreenState extends State<AdminStudentsScreen> {
                         label: "Update Student Information",
                         width: double.infinity,
                         isLoading: _isSubmitting,
-                        onPressed: _isSubmitting ? null : () async {
-                          if (formKey.currentState!.validate()) {
-                            _setSubmitting(true);
-                            
-                            // Simulate network delay
-                            await Future.delayed(const Duration(milliseconds: 800));
-                            
-                            if (!mounted) return;
+                        onPressed: _isSubmitting
+                            ? null
+                            : () async {
+                                if (formKey.currentState!.validate()) {
+                                  _setSubmitting(true);
 
-                            setState(() {
-                              student.name = _nameController.text;
-                              student.email = _emailController.text;
-                              student.phone = _phoneController.text;
-                              student.rollNumber = _rollController.text;
-                              student.parentPhone = _parentPhoneController.text;
-                              student.targetCompany = _targetCompanyController.text;
-                              student.branch = selectedBranch;
-                              student.courseType = selectedCourse;
-                              _applyFilters();
-                            });
-                            
-                            _setSubmitting(false);
-                            if (!context.mounted) return;
-                            Navigator.pop(context);
-                            AppSnackBar.showSuccess(context, "Student records updated");
-                          } else {
-                            AppSnackBar.showError(context, "Please fix the errors before saving");
-                          }
-                        },
+                                  // Simulate network delay
+                                  await Future.delayed(
+                                    const Duration(milliseconds: 800),
+                                  );
+
+                                  if (!mounted) return;
+
+                                  setState(() {
+                                    student.name = _nameController.text;
+                                    student.email = _emailController.text;
+                                    student.phone = _phoneController.text;
+                                    student.rollNumber = _rollController.text;
+                                    student.parentPhone =
+                                        _parentPhoneController.text;
+                                    student.targetCompany =
+                                        _targetCompanyController.text;
+                                    student.branch = selectedBranch;
+                                    student.courseType = selectedCourse;
+                                    _applyFilters();
+                                  });
+
+                                  _setSubmitting(false);
+                                  if (!context.mounted) return;
+                                  Navigator.pop(context);
+                                  AppSnackBar.showSuccess(
+                                    context,
+                                    "Student records updated",
+                                  );
+                                } else {
+                                  AppSnackBar.showError(
+                                    context,
+                                    "Please fix the errors before saving",
+                                  );
+                                }
+                              },
                       ),
 
                       const SizedBox(height: AppSpacing.lg),
@@ -564,7 +664,6 @@ class _AdminStudentsScreenState extends State<AdminStudentsScreen> {
     );
   }
 
-
   // ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
   // FILTER SELECTORS
   // ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
@@ -572,29 +671,46 @@ class _AdminStudentsScreenState extends State<AdminStudentsScreen> {
   void _showBranchSelector() {
     showModalBottomSheet(
       context: context,
-      shape: const RoundedRectangleBorder(borderRadius: BorderRadius.vertical(top: Radius.circular(AppRadius.xl))),
+      shape: const RoundedRectangleBorder(
+        borderRadius: BorderRadius.vertical(top: Radius.circular(AppRadius.xl)),
+      ),
       builder: (context) => ListView(
         shrinkWrap: true,
         padding: const EdgeInsets.symmetric(vertical: AppSpacing.xl),
         children: [
           Padding(
-            padding: const EdgeInsets.symmetric(horizontal: AppSpacing.xl, vertical: AppSpacing.sm),
+            padding: const EdgeInsets.symmetric(
+              horizontal: AppSpacing.xl,
+              vertical: AppSpacing.sm,
+            ),
             child: Text("Filter by Branch", style: AppTextStyles.headingSmall),
           ),
 
-          ...["All", ...AppConstants.branches].map((branch) => RadioListTile<String>.adaptive(
-                title: Text(branch),
-                value: branch,
-                groupValue: _selectedBranch,
-                onChanged: (val) {
-                  setState(() {
-                    _selectedBranch = val!;
-                    _applyFilters();
-                  });
-                  Navigator.pop(context);
-                },
-                contentPadding: const EdgeInsets.symmetric(horizontal: AppSpacing.xl),
-              )),
+          RadioGroup<String>(
+            groupValue: _selectedBranch,
+            onChanged: (val) {
+              if (val == null) return;
+              setState(() {
+                _selectedBranch = val;
+                _applyFilters();
+              });
+              Navigator.pop(context);
+            },
+            child: Column(
+              mainAxisSize: MainAxisSize.min,
+              children: ["All", ...AppConstants.branches]
+                  .map(
+                    (branch) => RadioListTile<String>.adaptive(
+                      title: Text(branch),
+                      value: branch,
+                      contentPadding: const EdgeInsets.symmetric(
+                        horizontal: AppSpacing.xl,
+                      ),
+                    ),
+                  )
+                  .toList(),
+            ),
+          ),
         ],
       ),
     );
@@ -603,29 +719,46 @@ class _AdminStudentsScreenState extends State<AdminStudentsScreen> {
   void _showCourseSelector() {
     showModalBottomSheet(
       context: context,
-      shape: const RoundedRectangleBorder(borderRadius: BorderRadius.vertical(top: Radius.circular(AppRadius.xl))),
+      shape: const RoundedRectangleBorder(
+        borderRadius: BorderRadius.vertical(top: Radius.circular(AppRadius.xl)),
+      ),
       builder: (context) => ListView(
         shrinkWrap: true,
         padding: const EdgeInsets.symmetric(vertical: AppSpacing.xl),
         children: [
           Padding(
-            padding: const EdgeInsets.symmetric(horizontal: AppSpacing.xl, vertical: AppSpacing.sm),
+            padding: const EdgeInsets.symmetric(
+              horizontal: AppSpacing.xl,
+              vertical: AppSpacing.sm,
+            ),
             child: Text("Filter by Course", style: AppTextStyles.headingSmall),
           ),
 
-          ...["All", ...AppConstants.courseTypes].map((course) => RadioListTile<String>.adaptive(
-                title: Text(course),
-                value: course,
-                groupValue: _selectedCourse,
-                onChanged: (val) {
-                  setState(() {
-                    _selectedCourse = val!;
-                    _applyFilters();
-                  });
-                  Navigator.pop(context);
-                },
-                contentPadding: const EdgeInsets.symmetric(horizontal: AppSpacing.xl),
-              )),
+          RadioGroup<String>(
+            groupValue: _selectedCourse,
+            onChanged: (val) {
+              if (val == null) return;
+              setState(() {
+                _selectedCourse = val;
+                _applyFilters();
+              });
+              Navigator.pop(context);
+            },
+            child: Column(
+              mainAxisSize: MainAxisSize.min,
+              children: ["All", ...AppConstants.courseTypes]
+                  .map(
+                    (course) => RadioListTile<String>.adaptive(
+                      title: Text(course),
+                      value: course,
+                      contentPadding: const EdgeInsets.symmetric(
+                        horizontal: AppSpacing.xl,
+                      ),
+                    ),
+                  )
+                  .toList(),
+            ),
+          ),
         ],
       ),
     );
@@ -637,11 +770,18 @@ class _AdminStudentsScreenState extends State<AdminStudentsScreen> {
       builder: (context) {
         String? selectedBatchId;
         return AlertDialog(
-          shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(AppRadius.lg)),
+          shape: RoundedRectangleBorder(
+            borderRadius: BorderRadius.circular(AppRadius.lg),
+          ),
           title: const Text("Assign Batch"),
           content: DropdownButtonFormField<String>(
-            decoration: const InputDecoration(labelText: "Select Batch", prefixIcon: Icon(Icons.class_outlined, size: 20)),
-            items: DummyData.batches.map((b) => DropdownMenuItem(value: b.id, child: Text(b.name))).toList(),
+            decoration: const InputDecoration(
+              labelText: "Select Batch",
+              prefixIcon: Icon(Icons.class_outlined, size: 20),
+            ),
+            items: DummyData.batches
+                .map((b) => DropdownMenuItem(value: b.id, child: Text(b.name)))
+                .toList(),
             onChanged: (val) => selectedBatchId = val,
           ),
           actions: [
@@ -668,7 +808,9 @@ class _AdminStudentsScreenState extends State<AdminStudentsScreen> {
               style: ElevatedButton.styleFrom(
                 backgroundColor: AppColors.navyBlueBase,
                 foregroundColor: Colors.white,
-                shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(AppRadius.md)),
+                shape: RoundedRectangleBorder(
+                  borderRadius: BorderRadius.circular(AppRadius.md),
+                ),
               ),
               child: const Text("Assign"),
             ),
@@ -690,8 +832,8 @@ class _FilterButton extends StatelessWidget {
   final bool isLight;
 
   const _FilterButton({
-    required this.label, 
-    required this.icon, 
+    required this.label,
+    required this.icon,
     required this.onTap,
     this.isLight = false,
   });
@@ -701,21 +843,28 @@ class _FilterButton extends StatelessWidget {
     return GestureDetector(
       onTap: onTap,
       child: Container(
-        padding: const EdgeInsets.symmetric(horizontal: AppSpacing.lg, vertical: 10),
+        padding: const EdgeInsets.symmetric(
+          horizontal: AppSpacing.lg,
+          vertical: 10,
+        ),
         decoration: BoxDecoration(
-          color: isLight 
-              ? Colors.white.withAlpha((0.1 * 255).round()) 
+          color: isLight
+              ? Colors.white.withAlpha((0.1 * 255).round())
               : Theme.of(context).scaffoldBackgroundColor,
           borderRadius: BorderRadius.circular(AppRadius.md),
           border: Border.all(
-            color: isLight 
-                ? Colors.white.withAlpha((0.2 * 255).round()) 
+            color: isLight
+                ? Colors.white.withAlpha((0.2 * 255).round())
                 : AppColors.divider,
           ),
         ),
         child: Row(
           children: [
-            Icon(icon, size: 16, color: isLight ? Colors.white : AppColors.navyBlueBase),
+            Icon(
+              icon,
+              size: 16,
+              color: isLight ? Colors.white : AppColors.navyBlueBase,
+            ),
             const SizedBox(width: AppSpacing.sm),
             Expanded(
               child: Text(
@@ -726,7 +875,11 @@ class _FilterButton extends StatelessWidget {
                 overflow: TextOverflow.ellipsis,
               ),
             ),
-            Icon(Icons.arrow_drop_down, size: 18, color: isLight ? Colors.white70 : AppColors.textHint),
+            Icon(
+              Icons.arrow_drop_down,
+              size: 18,
+              color: isLight ? Colors.white70 : AppColors.textHint,
+            ),
           ],
         ),
       ),

@@ -35,14 +35,20 @@ class _AdminHomeScreenState extends State<AdminHomeScreen> {
   void _computeData() {
     try {
       final now = DateTime.now();
-      
+
       totalStudents = DummyData.students.length;
       totalProfessors = DummyData.professors.length;
       activeBatches = DummyData.batches.where((b) => b.isActive).length;
 
       // Fees computation
-      totalFeesPending = DummyData.feeRecords.fold<double>(0.0, (sum, r) => sum + r.pendingAmount);
-      totalCollected = DummyData.feeRecords.fold<double>(0.0, (sum, r) => sum + r.paidAmount);
+      totalFeesPending = DummyData.feeRecords.fold<double>(
+        0.0,
+        (sum, r) => sum + r.pendingAmount,
+      );
+      totalCollected = DummyData.feeRecords.fold<double>(
+        0.0,
+        (sum, r) => sum + r.paidAmount,
+      );
       totalFees = totalCollected + totalFeesPending;
       collectedPct = totalFees > 0 ? (totalCollected / totalFees) : 0.0;
 
@@ -50,8 +56,9 @@ class _AdminHomeScreenState extends State<AdminHomeScreen> {
       feeAlerts = [];
       for (var record in DummyData.feeRecords) {
         for (var inst in record.installments) {
-          if (inst.status == FeeStatus.overdue || 
-             (inst.status == FeeStatus.pending && inst.dueDate.isBefore(now))) {
+          if (inst.status == FeeStatus.overdue ||
+              (inst.status == FeeStatus.pending &&
+                  inst.dueDate.isBefore(now))) {
             feeAlerts.add({
               'studentName': record.studentName,
               'amount': inst.amount,
@@ -64,7 +71,10 @@ class _AdminHomeScreenState extends State<AdminHomeScreen> {
 
       attendanceAlerts = [];
       for (var s in DummyData.students) {
-        final summary = DummyData.attendanceSummaryFor(s.id, DummyData.generateAttendanceForStudent(s.id, s.name, s.batchId));
+        final summary = DummyData.attendanceSummaryFor(
+          s.id,
+          DummyData.generateAttendanceForStudent(s.id, s.name, s.batchId),
+        );
         if (summary.percentage < 75) {
           attendanceAlerts.add({
             'student': s,
@@ -76,13 +86,17 @@ class _AdminHomeScreenState extends State<AdminHomeScreen> {
       // Branch counts
       branchCounts = {};
       for (var branch in AppConstants.branches) {
-        branchCounts[branch] = DummyData.students.where((s) => s.branch == branch).length;
+        branchCounts[branch] = DummyData.students
+            .where((s) => s.branch == branch)
+            .length;
       }
 
       // Course counts
       courseCounts = {};
       for (var course in AppConstants.courseTypes) {
-        courseCounts[course] = DummyData.students.where((s) => s.courseType == course).length;
+        courseCounts[course] = DummyData.students
+            .where((s) => s.courseType == course)
+            .length;
       }
     } catch (e) {
       if (mounted) {
@@ -201,6 +215,12 @@ class _AdminHomeScreenState extends State<AdminHomeScreen> {
                   onTap: () => context.goNamed(AppRoutes.adminStudentsName),
                 ),
                 QuickActionTile(
+                  label: "Professors",
+                  icon: Icons.co_present_rounded,
+                  color: AppColors.gold,
+                  onTap: () => context.goNamed(AppRoutes.adminProfessorsName),
+                ),
+                QuickActionTile(
                   label: "New Batch",
                   icon: Icons.add_box_rounded,
                   color: AppColors.oceanBlue,
@@ -210,13 +230,8 @@ class _AdminHomeScreenState extends State<AdminHomeScreen> {
                   label: "Post Notice",
                   icon: Icons.campaign_rounded,
                   color: AppColors.warning,
-                  onTap: () => context.goNamed(AppRoutes.adminAnnouncementsName),
-                ),
-                QuickActionTile(
-                  label: "Upload Material",
-                  icon: Icons.upload_file_rounded,
-                  color: AppColors.success,
-                  onTap: () => AppSnackBar.showSuccess(context, "Upload functionality coming soon!"),
+                  onTap: () =>
+                      context.goNamed(AppRoutes.adminAnnouncementsName),
                 ),
                 QuickActionTile(
                   label: "Record Fee",
@@ -225,10 +240,10 @@ class _AdminHomeScreenState extends State<AdminHomeScreen> {
                   onTap: () => context.goNamed(AppRoutes.adminFeesName),
                 ),
                 QuickActionTile(
-                  label: "View Reports",
+                  label: "Reports",
                   icon: Icons.bar_chart_rounded,
-                  color: AppColors.gold,
-                  onTap: () => AppSnackBar.showInfo(context, "Reports coming soon"),
+                  color: AppColors.success,
+                  onTap: () => context.goNamed(AppRoutes.adminReportsName),
                 ),
               ],
             ),
@@ -255,38 +270,57 @@ class _AdminHomeScreenState extends State<AdminHomeScreen> {
                 decoration: BoxDecoration(
                   color: AppColors.success.withAlpha((0.08 * 255).round()),
                   borderRadius: BorderRadius.circular(12),
-                  border: Border.all(color: AppColors.success.withAlpha((0.2 * 255).round())),
+                  border: Border.all(
+                    color: AppColors.success.withAlpha((0.2 * 255).round()),
+                  ),
                 ),
                 child: Row(
                   children: [
-                    const Icon(Icons.check_circle_rounded, color: AppColors.success),
+                    const Icon(
+                      Icons.check_circle_rounded,
+                      color: AppColors.success,
+                    ),
                     const SizedBox(width: 12),
-                    Text("All clear — no issues today", style: AppTextStyles.bodyMedium.copyWith(color: AppColors.success)),
+                    Text(
+                      "All clear — no issues today",
+                      style: AppTextStyles.bodyMedium.copyWith(
+                        color: AppColors.success,
+                      ),
+                    ),
                   ],
                 ),
               )
             else ...[
-              ...feeAlerts.take(2).map((alert) => _AlertTile(
-                title: "Fee overdue — ${alert['studentName']}",
-                subtitle: "₹${alert['amount']} · ${alert['title']} · ${alert['daysLate']} days late",
-                actionLabel: "Follow up →",
-                icon: Icons.error_rounded,
-                color: AppColors.error,
-                bgColor: AppColors.errorSurface,
-                borderColor: AppColors.divider,
-                onTap: () => context.goNamed(AppRoutes.adminFeesName),
-              )),
+              ...feeAlerts
+                  .take(2)
+                  .map(
+                    (alert) => _AlertTile(
+                      title: "Fee overdue — ${alert['studentName']}",
+                      subtitle:
+                          "₹${alert['amount']} · ${alert['title']} · ${alert['daysLate']} days late",
+                      actionLabel: "Follow up →",
+                      icon: Icons.error_rounded,
+                      color: AppColors.error,
+                      bgColor: AppColors.errorSurface,
+                      borderColor: AppColors.divider,
+                      onTap: () => context.goNamed(AppRoutes.adminFeesName),
+                    ),
+                  ),
               ...attendanceAlerts.take(2).map((alert) {
                 final StudentModel student = alert['student'];
                 return _AlertTile(
                   title: "Low attendance — ${student.name}",
-                  subtitle: "${alert['percentageLabel']} · Below 75% threshold · ${student.branch}",
+                  subtitle:
+                      "${alert['percentageLabel']} · Below 75% threshold · ${student.branch}",
                   actionLabel: "Notify →",
                   icon: Icons.calendar_today_rounded,
                   color: AppColors.warning,
                   bgColor: AppColors.warningSurface,
                   borderColor: AppColors.warningSurface,
-                  onTap: () => AppSnackBar.showInfo(context, "Notification sent to ${student.name}"),
+                  onTap: () => AppSnackBar.showInfo(
+                    context,
+                    "Notification sent to ${student.name}",
+                  ),
                 );
               }),
             ],
@@ -323,7 +357,14 @@ class _AdminHomeScreenState extends State<AdminHomeScreen> {
                       Expanded(
                         child: Column(
                           children: [
-                            FittedBox(child: Text("₹${(totalCollected / 1000).toStringAsFixed(0)}k", style: AppTextStyles.headingSmall.copyWith(color: AppColors.success))),
+                            FittedBox(
+                              child: Text(
+                                "₹${(totalCollected / 1000).toStringAsFixed(0)}k",
+                                style: AppTextStyles.headingSmall.copyWith(
+                                  color: AppColors.success,
+                                ),
+                              ),
+                            ),
                             Text("Collected", style: AppTextStyles.caption),
                           ],
                         ),
@@ -332,7 +373,14 @@ class _AdminHomeScreenState extends State<AdminHomeScreen> {
                       Expanded(
                         child: Column(
                           children: [
-                            FittedBox(child: Text("₹${(totalFeesPending / 1000).toStringAsFixed(0)}k", style: AppTextStyles.headingSmall.copyWith(color: AppColors.error))),
+                            FittedBox(
+                              child: Text(
+                                "₹${(totalFeesPending / 1000).toStringAsFixed(0)}k",
+                                style: AppTextStyles.headingSmall.copyWith(
+                                  color: AppColors.error,
+                                ),
+                              ),
+                            ),
                             Text("Pending", style: AppTextStyles.caption),
                           ],
                         ),
@@ -341,7 +389,12 @@ class _AdminHomeScreenState extends State<AdminHomeScreen> {
                       Expanded(
                         child: Column(
                           children: [
-                            FittedBox(child: Text("₹${(totalFees / 1000).toStringAsFixed(0)}k", style: AppTextStyles.headingSmall)),
+                            FittedBox(
+                              child: Text(
+                                "₹${(totalFees / 1000).toStringAsFixed(0)}k",
+                                style: AppTextStyles.headingSmall,
+                              ),
+                            ),
                             Text("Total", style: AppTextStyles.caption),
                           ],
                         ),
@@ -354,7 +407,9 @@ class _AdminHomeScreenState extends State<AdminHomeScreen> {
                     child: LinearProgressIndicator(
                       value: collectedPct,
                       minHeight: 8,
-                      backgroundColor: Theme.of(context).scaffoldBackgroundColor,
+                      backgroundColor: Theme.of(
+                        context,
+                      ).scaffoldBackgroundColor,
                       color: AppColors.oceanBlue,
                     ),
                   ),
@@ -362,8 +417,18 @@ class _AdminHomeScreenState extends State<AdminHomeScreen> {
                   Row(
                     mainAxisAlignment: MainAxisAlignment.spaceBetween,
                     children: [
-                      Text("${(collectedPct * 100).toStringAsFixed(0)}% collected", style: AppTextStyles.labelSmall.copyWith(color: AppColors.success)),
-                      Text("₹${(totalFeesPending / 1000).toStringAsFixed(0)}k remaining", style: AppTextStyles.labelSmall.copyWith(color: AppColors.error)),
+                      Text(
+                        "${(collectedPct * 100).toStringAsFixed(0)}% collected",
+                        style: AppTextStyles.labelSmall.copyWith(
+                          color: AppColors.success,
+                        ),
+                      ),
+                      Text(
+                        "₹${(totalFeesPending / 1000).toStringAsFixed(0)}k remaining",
+                        style: AppTextStyles.labelSmall.copyWith(
+                          color: AppColors.error,
+                        ),
+                      ),
                     ],
                   ),
                 ],
@@ -377,8 +442,15 @@ class _AdminHomeScreenState extends State<AdminHomeScreen> {
   }
 
   Widget _buildBranchChart() {
-    final maxCount = branchCounts.values.isEmpty ? 1 : branchCounts.values.reduce((a, b) => a > b ? a : b);
-    final colors = [AppColors.navyBlueBase, AppColors.oceanBlue, AppColors.navyBlueLight, AppColors.textHint];
+    final maxCount = branchCounts.values.isEmpty
+        ? 1
+        : branchCounts.values.reduce((a, b) => a > b ? a : b);
+    final colors = [
+      AppColors.navyBlueBase,
+      AppColors.oceanBlue,
+      AppColors.navyBlueLight,
+      AppColors.textHint,
+    ];
 
     return SliverPadding(
       padding: const EdgeInsets.symmetric(horizontal: 20),
@@ -404,22 +476,53 @@ class _AdminHomeScreenState extends State<AdminHomeScreen> {
                       children: [
                         SizedBox(
                           width: 80,
-                          child: Text(branch, style: AppTextStyles.labelMedium.copyWith(fontSize: 13), overflow: TextOverflow.ellipsis),
+                          child: Text(
+                            branch,
+                            style: AppTextStyles.labelMedium.copyWith(
+                              fontSize: 13,
+                            ),
+                            overflow: TextOverflow.ellipsis,
+                          ),
                         ),
                         const SizedBox(width: 10),
                         Expanded(
                           child: Stack(
                             children: [
-                              Container(height: 8, decoration: BoxDecoration(color: Theme.of(context).scaffoldBackgroundColor, borderRadius: BorderRadius.circular(8))),
+                              Container(
+                                height: 8,
+                                decoration: BoxDecoration(
+                                  color: Theme.of(
+                                    context,
+                                  ).scaffoldBackgroundColor,
+                                  borderRadius: BorderRadius.circular(8),
+                                ),
+                              ),
                               FractionallySizedBox(
                                 widthFactor: count / maxCount,
-                                child: Container(height: 8, decoration: BoxDecoration(color: colors[i % colors.length], borderRadius: BorderRadius.circular(8))),
+                                child: Container(
+                                  height: 8,
+                                  decoration: BoxDecoration(
+                                    color: colors[i % colors.length],
+                                    borderRadius: BorderRadius.circular(8),
+                                  ),
+                                ),
                               ),
                             ],
                           ),
                         ),
                         const SizedBox(width: 8),
-                        SizedBox(width: 20, child: FittedBox(child: Text(count.toString(), style: AppTextStyles.labelMedium.copyWith(fontSize: 12), textAlign: TextAlign.right))),
+                        SizedBox(
+                          width: 20,
+                          child: FittedBox(
+                            child: Text(
+                              count.toString(),
+                              style: AppTextStyles.labelMedium.copyWith(
+                                fontSize: 12,
+                              ),
+                              textAlign: TextAlign.right,
+                            ),
+                          ),
+                        ),
                       ],
                     ),
                   );
@@ -447,11 +550,26 @@ class _AdminHomeScreenState extends State<AdminHomeScreen> {
             const SizedBox(height: 12),
             Row(
               children: [
-                _CourseChip(label: "11th Science", count: c11, color: AppColors.course11th, bgColor: AppColors.navyBlueSurface),
+                _CourseChip(
+                  label: "11th Science",
+                  count: c11,
+                  color: AppColors.course11th,
+                  bgColor: AppColors.navyBlueSurface,
+                ),
                 const SizedBox(width: 8),
-                _CourseChip(label: "12th Science", count: c12, color: AppColors.course12th, bgColor: AppColors.navyBlueSurface),
+                _CourseChip(
+                  label: "12th Science",
+                  count: c12,
+                  color: AppColors.course12th,
+                  bgColor: AppColors.navyBlueSurface,
+                ),
                 const SizedBox(width: 8),
-                _CourseChip(label: "Crash Course", count: crash, color: AppColors.courseCrash, bgColor: AppColors.errorSurface),
+                _CourseChip(
+                  label: "Crash Course",
+                  count: crash,
+                  color: AppColors.courseCrash,
+                  bgColor: AppColors.errorSurface,
+                ),
               ],
             ),
             const SizedBox(height: 24),
@@ -467,7 +585,11 @@ class _AdminHomeScreenState extends State<AdminHomeScreen> {
       sliver: SliverToBoxAdapter(
         child: Column(
           children: [
-            SectionHeader(title: "Recent Activity", actionLabel: "View All →", onAction: () {}),
+            SectionHeader(
+              title: "Recent Activity",
+              actionLabel: "View All →",
+              onAction: () {},
+            ),
             const SizedBox(height: 12),
             Container(
               decoration: BoxDecoration(
@@ -528,9 +650,7 @@ class _AdminHeader extends StatelessWidget {
   Widget build(BuildContext context) {
     return Container(
       padding: const EdgeInsets.fromLTRB(20, 48, 20, 32),
-      decoration: const BoxDecoration(
-        color: AppColors.navyBlueBase,
-      ),
+      decoration: const BoxDecoration(color: AppColors.navyBlueBase),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
@@ -540,8 +660,21 @@ class _AdminHeader extends StatelessWidget {
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
-                    Text("Admin Panel", style: AppTextStyles.headingLarge.copyWith(color: Colors.white, fontSize: 24, fontWeight: FontWeight.w500)),
-                    Text(AppConstants.appName, style: AppTextStyles.bodySmall.copyWith(color: Colors.white.withAlpha((0.6 * 255).round()), fontSize: 13)),
+                    Text(
+                      "Admin Panel",
+                      style: AppTextStyles.headingLarge.copyWith(
+                        color: Colors.white,
+                        fontSize: 24,
+                        fontWeight: FontWeight.w500,
+                      ),
+                    ),
+                    Text(
+                      AppConstants.appName,
+                      style: AppTextStyles.bodySmall.copyWith(
+                        color: Colors.white.withAlpha((0.6 * 255).round()),
+                        fontSize: 13,
+                      ),
+                    ),
                   ],
                 ),
               ),
@@ -549,15 +682,36 @@ class _AdminHeader extends StatelessWidget {
                 children: [
                   CircleAvatar(
                     radius: 21,
-                    backgroundColor: AppColors.gold.withAlpha((0.25 * 255).round()),
-                    child: Text("CM", style: AppTextStyles.labelLarge.copyWith(color: AppColors.gold, fontWeight: FontWeight.w500)),
+                    backgroundColor: AppColors.gold.withAlpha(
+                      (0.25 * 255).round(),
+                    ),
+                    child: Text(
+                      "CM",
+                      style: AppTextStyles.labelLarge.copyWith(
+                        color: AppColors.gold,
+                        fontWeight: FontWeight.w500,
+                      ),
+                    ),
                   ),
                   const SizedBox(height: 6),
                   Row(
                     children: [
-                      Container(width: 6, height: 6, decoration: const BoxDecoration(color: Colors.green, shape: BoxShape.circle)),
+                      Container(
+                        width: 6,
+                        height: 6,
+                        decoration: const BoxDecoration(
+                          color: Colors.green,
+                          shape: BoxShape.circle,
+                        ),
+                      ),
                       const SizedBox(width: 4),
-                      Text("Live", style: AppTextStyles.caption.copyWith(color: Colors.white.withAlpha((0.55 * 255).round()), fontSize: 10)),
+                      Text(
+                        "Live",
+                        style: AppTextStyles.caption.copyWith(
+                          color: Colors.white.withAlpha((0.55 * 255).round()),
+                          fontSize: 10,
+                        ),
+                      ),
                     ],
                   ),
                 ],
@@ -567,7 +721,10 @@ class _AdminHeader extends StatelessWidget {
           const SizedBox(height: 20),
           Text(
             "Wednesday, 9 April 2025 · All Branches",
-            style: AppTextStyles.caption.copyWith(color: Colors.white.withAlpha((0.45 * 255).round()), fontSize: 11),
+            style: AppTextStyles.caption.copyWith(
+              color: Colors.white.withAlpha((0.45 * 255).round()),
+              fontSize: 11,
+            ),
           ),
         ],
       ),
@@ -607,7 +764,9 @@ class _StatCard extends StatelessWidget {
       decoration: BoxDecoration(
         color: Colors.white,
         borderRadius: BorderRadius.circular(16),
-        border: Border.all(color: AppColors.textHint.withAlpha((0.1 * 255).round())),
+        border: Border.all(
+          color: AppColors.textHint.withAlpha((0.1 * 255).round()),
+        ),
       ),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
@@ -617,14 +776,27 @@ class _StatCard extends StatelessWidget {
               Container(
                 width: 36,
                 height: 36,
-                decoration: BoxDecoration(color: iconBg, borderRadius: BorderRadius.circular(10)),
+                decoration: BoxDecoration(
+                  color: iconBg,
+                  borderRadius: BorderRadius.circular(10),
+                ),
                 child: Icon(icon, color: iconColor, size: 20),
               ),
               const Spacer(),
               Container(
                 padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
-                decoration: BoxDecoration(color: trendBg, borderRadius: BorderRadius.circular(20)),
-                child: Text(trendLabel, style: AppTextStyles.labelSmall.copyWith(color: trendColor, fontSize: 9, fontWeight: FontWeight.bold)),
+                decoration: BoxDecoration(
+                  color: trendBg,
+                  borderRadius: BorderRadius.circular(20),
+                ),
+                child: Text(
+                  trendLabel,
+                  style: AppTextStyles.labelSmall.copyWith(
+                    color: trendColor,
+                    fontSize: 9,
+                    fontWeight: FontWeight.bold,
+                  ),
+                ),
               ),
             ],
           ),
@@ -632,18 +804,32 @@ class _StatCard extends StatelessWidget {
           FittedBox(
             fit: BoxFit.scaleDown,
             alignment: Alignment.centerLeft,
-            child: Text(value, style: AppTextStyles.headingLarge.copyWith(fontSize: 22, fontWeight: FontWeight.w600, color: valueColor)), // Reduced from 26
+            child: Text(
+              value,
+              style: AppTextStyles.headingLarge.copyWith(
+                fontSize: 22,
+                fontWeight: FontWeight.w600,
+                color: valueColor,
+              ),
+            ), // Reduced from 26
           ),
           const SizedBox(height: 2),
           Text(
-            label, 
-            style: AppTextStyles.bodySmall.copyWith(color: AppColors.textSecondary, fontSize: 11, fontWeight: FontWeight.w500), 
+            label,
+            style: AppTextStyles.bodySmall.copyWith(
+              color: AppColors.textSecondary,
+              fontSize: 11,
+              fontWeight: FontWeight.w500,
+            ),
             overflow: TextOverflow.ellipsis,
             maxLines: 1,
           ),
           Text(
-            subLabel, 
-            style: AppTextStyles.caption.copyWith(color: valueColor ?? AppColors.textSecondary, fontSize: 9), 
+            subLabel,
+            style: AppTextStyles.caption.copyWith(
+              color: valueColor ?? AppColors.textSecondary,
+              fontSize: 9,
+            ),
             overflow: TextOverflow.ellipsis,
             maxLines: 1,
           ),
@@ -699,7 +885,10 @@ class _AlertTile extends StatelessWidget {
                       Container(
                         width: 32,
                         height: 32,
-                        decoration: BoxDecoration(color: borderColor, borderRadius: BorderRadius.circular(8)),
+                        decoration: BoxDecoration(
+                          color: borderColor,
+                          borderRadius: BorderRadius.circular(8),
+                        ),
                         child: Icon(icon, color: color, size: 18),
                       ),
                       const SizedBox(width: 12),
@@ -707,12 +896,32 @@ class _AlertTile extends StatelessWidget {
                         child: Column(
                           crossAxisAlignment: CrossAxisAlignment.start,
                           children: [
-                            Text(title, style: AppTextStyles.labelLarge.copyWith(fontSize: 12, fontWeight: FontWeight.w500, color: color)),
-                            Text(subtitle, style: AppTextStyles.caption.copyWith(fontSize: 11, color: color.withAlpha((0.7 * 255).round()))),
+                            Text(
+                              title,
+                              style: AppTextStyles.labelLarge.copyWith(
+                                fontSize: 12,
+                                fontWeight: FontWeight.w500,
+                                color: color,
+                              ),
+                            ),
+                            Text(
+                              subtitle,
+                              style: AppTextStyles.caption.copyWith(
+                                fontSize: 11,
+                                color: color.withAlpha((0.7 * 255).round()),
+                              ),
+                            ),
                           ],
                         ),
                       ),
-                      Text(actionLabel, style: AppTextStyles.labelSmall.copyWith(color: color, fontWeight: FontWeight.bold, fontSize: 11)),
+                      Text(
+                        actionLabel,
+                        style: AppTextStyles.labelSmall.copyWith(
+                          color: color,
+                          fontWeight: FontWeight.bold,
+                          fontSize: 11,
+                        ),
+                      ),
                     ],
                   ),
                 ),
@@ -731,7 +940,12 @@ class _CourseChip extends StatelessWidget {
   final Color color;
   final Color bgColor;
 
-  const _CourseChip({required this.label, required this.count, required this.color, required this.bgColor});
+  const _CourseChip({
+    required this.label,
+    required this.count,
+    required this.color,
+    required this.bgColor,
+  });
 
   @override
   Widget build(BuildContext context) {
@@ -741,12 +955,27 @@ class _CourseChip extends StatelessWidget {
         decoration: BoxDecoration(
           color: bgColor,
           borderRadius: BorderRadius.circular(12),
-          border: Border.all(color: AppColors.textHint.withAlpha((0.1 * 255).round())),
+          border: Border.all(
+            color: AppColors.textHint.withAlpha((0.1 * 255).round()),
+          ),
         ),
         child: Column(
           children: [
-            FittedBox(child: Text(count.toString(), style: AppTextStyles.headingMedium.copyWith(color: color, fontSize: 20, fontWeight: FontWeight.w500))),
-            Text(label, style: AppTextStyles.caption.copyWith(color: color, fontSize: 10), textAlign: TextAlign.center),
+            FittedBox(
+              child: Text(
+                count.toString(),
+                style: AppTextStyles.headingMedium.copyWith(
+                  color: color,
+                  fontSize: 20,
+                  fontWeight: FontWeight.w500,
+                ),
+              ),
+            ),
+            Text(
+              label,
+              style: AppTextStyles.caption.copyWith(color: color, fontSize: 10),
+              textAlign: TextAlign.center,
+            ),
           ],
         ),
       ),
@@ -778,7 +1007,14 @@ class _ActivityRow extends StatelessWidget {
     return Container(
       padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 12),
       decoration: BoxDecoration(
-        border: isLast ? null : Border(bottom: BorderSide(color: AppColors.textHint.withAlpha((0.1 * 255).round()), width: 0.5)),
+        border: isLast
+            ? null
+            : Border(
+                bottom: BorderSide(
+                  color: AppColors.textHint.withAlpha((0.1 * 255).round()),
+                  width: 0.5,
+                ),
+              ),
       ),
       child: Row(
         children: [
@@ -793,14 +1029,36 @@ class _ActivityRow extends StatelessWidget {
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                Text(title, style: AppTextStyles.labelLarge.copyWith(fontSize: 13, fontWeight: FontWeight.w500), maxLines: 1, overflow: TextOverflow.ellipsis),
+                Text(
+                  title,
+                  style: AppTextStyles.labelLarge.copyWith(
+                    fontSize: 13,
+                    fontWeight: FontWeight.w500,
+                  ),
+                  maxLines: 1,
+                  overflow: TextOverflow.ellipsis,
+                ),
                 const SizedBox(height: 2),
-                Text(subtitle, style: AppTextStyles.bodySmall.copyWith(color: AppColors.textSecondary, fontSize: 11), maxLines: 1, overflow: TextOverflow.ellipsis),
+                Text(
+                  subtitle,
+                  style: AppTextStyles.bodySmall.copyWith(
+                    color: AppColors.textSecondary,
+                    fontSize: 11,
+                  ),
+                  maxLines: 1,
+                  overflow: TextOverflow.ellipsis,
+                ),
               ],
             ),
           ),
           const SizedBox(width: 8),
-          Text(time, style: AppTextStyles.caption.copyWith(color: AppColors.textHint, fontSize: 10)),
+          Text(
+            time,
+            style: AppTextStyles.caption.copyWith(
+              color: AppColors.textHint,
+              fontSize: 10,
+            ),
+          ),
         ],
       ),
     );
