@@ -33,12 +33,6 @@ class _LoginScreenState extends State<LoginScreen> {
     return AppColors.navyBlueBase;
   }
 
-  IconData _getRoleIcon(String? role) {
-    if (role == AppConstants.roleStudent) return Icons.school_rounded;
-    if (role == AppConstants.roleProfessor) return Icons.person_search_rounded;
-    if (role == AppConstants.roleAdmin) return Icons.admin_panel_settings_rounded;
-    return Icons.school_rounded;
-  }
 
   String _getRoleLabel(String? role) {
     if (role == AppConstants.roleStudent) return 'Student';
@@ -51,7 +45,6 @@ class _LoginScreenState extends State<LoginScreen> {
   Widget build(BuildContext context) {
     final auth = context.watch<AuthProvider>();
     final roleColor = _getRoleColor(auth.selectedRole);
-    final roleIcon = _getRoleIcon(auth.selectedRole);
     final roleLabel = _getRoleLabel(auth.selectedRole);
 
     return AppPageShell(
@@ -66,7 +59,6 @@ class _LoginScreenState extends State<LoginScreen> {
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
               const SizedBox(height: AppSpacing.lg),
-              // Info Banner
               Container(
                 padding: const EdgeInsets.all(AppSpacing.md),
                 decoration: BoxDecoration(

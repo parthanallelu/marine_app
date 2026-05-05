@@ -26,7 +26,6 @@ class _ProfessorHomeScreenState extends State<ProfessorHomeScreen> {
   @override
   void initState() {
     super.initState();
-    // Use post-frame callback to ensure context is available for Provider
     WidgetsBinding.instance.addPostFrameCallback((_) {
       _loadDashboardData();
     });
@@ -36,7 +35,6 @@ class _ProfessorHomeScreenState extends State<ProfessorHomeScreen> {
     setState(() => _isLoading = true);
     
     try {
-      // Simulate async network delay for future-readiness
       await Future.delayed(const Duration(milliseconds: 600));
 
       if (!mounted) return;
@@ -54,23 +52,19 @@ class _ProfessorHomeScreenState extends State<ProfessorHomeScreen> {
         return;
       }
 
-      // Filter batches assigned to this professor
       _assignedBatches = DummyData.batches
           .where((b) => b.professorId == professor.id && b.isActive)
           .toList();
 
-      // Calculate total students across all assigned batches
       _totalStudents = 0;
       _batchStudentCounts = {};
       
-      // Efficiently count students for assigned batches
       for (var batch in _assignedBatches) {
         final count = DummyData.students.where((s) => s.batchId == batch.id).length;
         _batchStudentCounts[batch.id] = count;
         _totalStudents += count;
       }
 
-      // Filter today's classes
       final today = DateFormat('EEEE').format(DateTime.now()); // e.g., "Monday"
       _todaysClasses = _assignedBatches
           .where((b) => b.days.contains(today))
@@ -91,7 +85,6 @@ class _ProfessorHomeScreenState extends State<ProfessorHomeScreen> {
     final authProvider = context.watch<AuthProvider>();
     final professor = authProvider.currentUser as ProfessorModel?;
 
-    // Role security check
     if (!authProvider.isProfessor) {
       WidgetsBinding.instance.addPostFrameCallback((_) {
         context.goNamed(AppRoutes.roleSelectionName);
@@ -114,7 +107,7 @@ class _ProfessorHomeScreenState extends State<ProfessorHomeScreen> {
             child: NavyHeader(
               title: 'Welcome Back,',
               subtitle: professor.name,
-              logoPath: 'assets/images/logo.jpg',
+              logoPath: AppConstants.logo,
             ),
           ),
           SliverToBoxAdapter(
@@ -148,7 +141,7 @@ class _ProfessorHomeScreenState extends State<ProfessorHomeScreen> {
       physics: const NeverScrollableScrollPhysics(),
       crossAxisSpacing: AppSpacing.md,
       mainAxisSpacing: AppSpacing.md,
-      childAspectRatio: 0.85, // Increased height to prevent overflow
+      childAspectRatio: 0.85,
       children: [
         StatCard(
           label: 'Batches',
@@ -185,7 +178,7 @@ class _ProfessorHomeScreenState extends State<ProfessorHomeScreen> {
           physics: const NeverScrollableScrollPhysics(),
           crossAxisSpacing: AppSpacing.md,
           mainAxisSpacing: AppSpacing.md,
-          childAspectRatio: 0.9, // Improved height to prevent overflow
+          childAspectRatio: 0.9,
           children: [
             QuickActionTile(
               label: 'Attendance',

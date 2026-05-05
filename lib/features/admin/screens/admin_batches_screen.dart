@@ -293,7 +293,7 @@ class _AdminBatchesScreenState extends State<AdminBatchesScreen> {
                               // Simulate network delay
                               await Future.delayed(const Duration(milliseconds: 800));
                               
-                              if (!mounted) return;
+                              if (!context.mounted) return;
 
                               final prof = DummyData.professors.firstWhere((p) => p.id == selectedProfessor, orElse: () => DummyData.professors.first);
                               final newBatch = BatchModel(
@@ -440,7 +440,7 @@ class _AdminBatchesScreenState extends State<AdminBatchesScreen> {
                             // Simulate network delay
                             await Future.delayed(const Duration(milliseconds: 800));
                             
-                            if (!mounted) return;
+                            if (!context.mounted) return;
 
                             final prof = DummyData.professors.firstWhere((p) => p.id == selectedProfessor, orElse: () => DummyData.professors.first);
                             setState(() {

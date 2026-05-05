@@ -29,10 +29,10 @@ class _ProfessorProfileScreenState extends State<ProfessorProfileScreen> {
 
   void _loadProfileData() {
     if (!mounted) return;
-    
+
     final authProvider = context.read<AuthProvider>();
     final prof = authProvider.currentUser as ProfessorModel?;
-    
+
     if (prof == null) {
       setState(() {
         _myBatches = [];
@@ -42,10 +42,9 @@ class _ProfessorProfileScreenState extends State<ProfessorProfileScreen> {
     }
 
     setState(() => _isLoading = true);
-    
-    // Simulate slight delay for future-readiness
+
     _myBatches = DummyData.batches.where((b) => b.professorId == prof.id).toList();
-    
+
     setState(() => _isLoading = false);
   }
 
@@ -53,7 +52,6 @@ class _ProfessorProfileScreenState extends State<ProfessorProfileScreen> {
   Widget build(BuildContext context) {
     final authProvider = context.watch<AuthProvider>();
 
-    // Role security check
     if (!authProvider.isProfessor) {
       WidgetsBinding.instance.addPostFrameCallback((_) {
         context.goNamed(AppRoutes.roleSelectionName);
@@ -121,7 +119,6 @@ class _ProfessorProfileScreenState extends State<ProfessorProfileScreen> {
         child: Column(
           children: [
             const SizedBox(height: AppSpacing.lg),
-            // Academic Summary Card
             Container(
               padding: const EdgeInsets.all(AppSpacing.lg),
               decoration: BoxDecoration(
@@ -143,7 +140,6 @@ class _ProfessorProfileScreenState extends State<ProfessorProfileScreen> {
               ),
             ),
             const SizedBox(height: AppSpacing.xl),
-            // Contact & Professional Info
             DashboardCard(
               title: "Professional Information",
               child: Column(
@@ -159,10 +155,8 @@ class _ProfessorProfileScreenState extends State<ProfessorProfileScreen> {
               ),
             ),
             const SizedBox(height: AppSpacing.xl),
-            // Subjects Section
             _buildSubjects(prof),
             const SizedBox(height: AppSpacing.xl),
-            // My Batches Section
             Row(
               children: [
                 Text("My Assigned Batches", style: AppTextStyles.headingSmall),
@@ -193,7 +187,6 @@ class _ProfessorProfileScreenState extends State<ProfessorProfileScreen> {
                 },
               ),
             const SizedBox(height: AppSpacing.xxl),
-            // Logout Button
             CustomButton(
               label: "Logout",
               isOutlined: true,
@@ -268,6 +261,3 @@ class _ProfessorProfileScreenState extends State<ProfessorProfileScreen> {
   }
 }
 
-extension on Widget {
-  SliverToBoxAdapter get toSliver => SliverToBoxAdapter(child: this);
-}
